@@ -4,7 +4,7 @@ MAKEFLAGS += -rRs
 # LIBRARIES
 # -------------------
 
-libraries = 
+libraries = example_library
 
 # Required:
 # LIBRARY_NAME_source_dirs = libs/LIBRARY_NAME
@@ -14,17 +14,22 @@ libraries =
 # LIBRARY_NAME_depedencies = OTHER_LIBRARY_NAME_1 OTHER_LIBRARY_NAME_2 ...
 # LIBRARY_NAME_cflags = -nicktamaman
 
+example_library_source_dirs = libs/example_library
+example_library_name = example_library
+
 # -------------------
 # EXECUTABLES
 # -------------------
 
-executables = 
+executables = example_executable
 
 # EXECUTABLE_NAME_source_dirs := executables/EXECUTABLE_NAME
 # EXECUTABLE_NAME_executable_name := name_of_an_executable
 # EXECUTABLE_NAME_depedencies := LIBRARY_NAME_1 LIBRARY_NAME_2
 
-
+example_executable_source_dirs := executables/example_executable
+example_executable_executable_name := example_executable
+example_executable_depedencies := example_library
 
 # -------------------
 # (Build) PROFILES
