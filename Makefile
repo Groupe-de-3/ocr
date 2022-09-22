@@ -70,10 +70,11 @@ clean: $(foreach profile,$(profiles),$(patsubst %,clean-$(profile)-%,$(libraries
 	rm build/generated.mk
 	find build -type d 2> /dev/null | tac | xargs --no-run-if-empty rmdir --ignore-fail-on-non-empty
 
+format: $(addprefix format-,$(libraries) $(executables))
 dev: run-debug-xor_nn
 test: run-debug-tests
 
-.PHONY: all clean dev test $(addprefix all-,$(profiles))
+.PHONY: all clean dev test $(addprefix all-,$(profiles)) format-all
 build/generated.mk: library-template.mk executable-template.mk Makefile
 	mkdir -p build
 	touch $@

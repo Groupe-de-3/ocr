@@ -9,6 +9,8 @@ $(error "INVALID MAKEFILE: Missing the ¤_executable_name variable")
 endif
 
 §_¤_executable_file_path = build/§/¤/$(¤_executable_name)
+
+# Only executed once per executable (ignored for next profiles)
 ifndef ¤_source_files
 ¤_source_files != find $(¤_source_dirs) -name "*.c" -type f
 P=(
@@ -17,6 +19,10 @@ $(eval ¤_rec_depedencies_with_duplicates := $(¤_depedencies) $(addprefix $$$P,
 ¤_rec_depedencies := $(¤_rec_depedencies_with_duplicates)
 
 $(eval ¤_depedencies_include_dirs := $(addprefix $$$P,$(addsuffix _source_dirs$M,$(¤_depedencies))))
+
+format-¤:
+	clang-format -i --style=file $(¤_source_files)
+.PHONY: format-¤
 endif
 
 §_¤_obj_dir = build/§/¤/obj
