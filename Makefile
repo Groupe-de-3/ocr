@@ -4,7 +4,7 @@ MAKEFLAGS += -rRs
 # LIBRARIES
 # -------------------
 
-libraries = example_library
+libraries = example_library matrices
 
 # Required:
 # LIBRARY_NAME_source_dirs = libs/LIBRARY_NAME
@@ -16,6 +16,9 @@ libraries = example_library
 
 example_library_source_dirs = libs/example_library
 example_library_name = example_library
+
+matrices_source_dirs = libs/matrices
+matrices_name = matrices
 
 # -------------------
 # EXECUTABLES
