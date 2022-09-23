@@ -41,10 +41,11 @@ example_executable_depedencies := example_library
 CC = clang
 
 c_warnings = -Wall -Wextra -Wpedantic -Wshadow -Wpointer-arith -Wcast-align \
-             -Wwrite-strings -Wmissing-declarations -Wconversion -Wstrict-prototypes \
+             -Wmissing-declarations -Wconversion -Wstrict-prototypes \
 			 -Wtautological-compare -Wtype-limits -Wconstant-evaluated \
 			 -Wno-unused-command-line-argument
-default_cflags = $(c_warnings) -std=gnu17 -lm -g -Og
+c_errors = -Werror=implicit-function-declaration
+default_cflags = $(c_warnings) $(c_errors) -std=gnu17 -lm -g -Og
 disable_asserts_cflags = -DNDEBUG -Wno-unused-variable -Wno-unused-parameter
 
 profiles = valgrind-debug debug release
