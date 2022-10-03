@@ -2,6 +2,9 @@ MAKEFLAGS += -rRs
 
 # -------------------
 # LIBRARIES
+#
+# Libraries are a collection of files all built together for them to be
+# used by another library and/or executable.
 # -------------------
 
 libraries = example_library matrices
@@ -22,6 +25,9 @@ matrices_name = matrices
 
 # -------------------
 # EXECUTABLES
+#
+# Executables are a collection of files all built together with depedencies
+# to create an executable file.
 # -------------------
 
 executables = example_executable
@@ -36,16 +42,21 @@ example_executable_depedencies := example_library
 
 # -------------------
 # (Build) PROFILES
+#
+# Profiles are a set of build flags that can be easily switched.
 # -------------------
 
 CC = clang
 
+# All profiles share the same warnings (kinda)
 c_warnings = -Wall -Wextra -Wpedantic -Wshadow -Wpointer-arith -Wcast-align \
              -Wmissing-declarations -Wconversion -Wstrict-prototypes \
 			 -Wtautological-compare -Wtype-limits -Wconstant-evaluated \
 			 -Wno-unused-command-line-argument
 c_errors = -Werror=implicit-function-declaration
+# Flags all profiles share
 default_cflags = $(c_warnings) $(c_errors) -std=gnu17 -lm -g -Og
+# Some flags required to remove all asserts()
 disable_asserts_cflags = -DNDEBUG -Wno-unused-variable -Wno-unused-parameter
 
 profiles = valgrind-debug debug release
@@ -55,10 +66,13 @@ valgrind-debug_cflags = $(default_cflags) -gdwarf-4 -g -Og $(disable_asserts_cfl
 release_cflags = $(default_cflags) -O3 $(disable_asserts_cflags)
 
 # -------------------
-# Normal rules
+# SPECIAL RULES
 # -------------------
 
 .DEFAULT_GOAL = all
+
+# `all` will use the release profile by default, but can use debug if the
+# env variable `MODE` is set to debug.
 ifeq ($(MODE), debug)
 all: all-debug
 else
@@ -76,6 +90,13 @@ dev: run-debug-xor_nn
 test: run-debug-tests
 
 .PHONY: all clean dev test $(addprefix all-,$(profiles)) format-all
+
+# Generates a new Makefile (build/generated.mk) that have rules for building 
+# all libraries and executables.
+# To do this it takes the files executable-template.mk and library-template.mk
+# and replaces all occurences of the characters '§' and '¤' with the profile
+# name and executable or library name respectively.
+# And does that for evey library or executable respectively times all profiles.
 build/generated.mk: library-template.mk executable-template.mk Makefile
 	mkdir -p build
 	touch $@
@@ -94,4 +115,5 @@ build/generated.mk: library-template.mk executable-template.mk Makefile
 		done \
 	done
 
+# Including the generated makefile will trigged it's generation if not present
 -include build/generated.mk
