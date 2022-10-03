@@ -1,9 +1,19 @@
 #pragma once
 
-/**
- * Adds the two given numbers
- * @param int a The first number
- * @param int b The second number
- * @return The result of the addition
+/*! \file example_library.h
+ *
+ *  \brief This header file contains every function and type definition of the example library.
+ *
+ *  This library is only an example for showing how the build system and other works. It only contains the
+ *  useless #add function.
+ */
+
+/*! \brief Adds the two given numbers
+ *
+ *  Uses the standard c '+' operator to add the given two numbers together.
+ *
+ *  \param a The first number
+ *  \param b The second number
+ *  \return The result of the addition
  */
 int add(int a, int b);

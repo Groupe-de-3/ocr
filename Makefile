@@ -83,13 +83,21 @@ endif
 $(addprefix all-,$(profiles)): all-%: $(patsubst %,build-\%-%,$(libraries) $(executables))
 clean: $(foreach profile,$(profiles),$(patsubst %,clean-$(profile)-%,$(libraries) $(executables)))
 	rm build/generated.mk
+	rm -rf build/doc
 	find build -type d 2> /dev/null | tac | xargs --no-run-if-empty rmdir --ignore-fail-on-non-empty
 
 format: $(addprefix format-,$(libraries) $(executables))
 dev: run-debug-xor_nn
 test: run-debug-tests
 
-.PHONY: all clean dev test $(addprefix all-,$(profiles)) format-all
+doc:
+	mkdir -p build/doc
+	doxygen Doxyfile
+
+open-html-doc: doc
+	xdg-open build/doc/html/index.html
+
+.PHONY: all doc open-doc clean dev test $(addprefix all-,$(profiles)) format-all
 
 # Generates a new Makefile (build/generated.mk) that have rules for building 
 # all libraries and executables.
