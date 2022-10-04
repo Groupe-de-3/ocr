@@ -1,6 +1,7 @@
 #include "matrices.h"
 
 #include <assert.h>
+#include <stdbool.h>
 #include <stdalign.h>
 #include <stdlib.h>
 #include <string.h>
@@ -69,6 +70,29 @@ size_t m_height(Matrix(void) m) {
 
 void m_copy(Matrix(void) destination, void *data) {
     memcpy(destination, data, m_elem_size(destination) * m_length(destination));
+}
+bool m_dim_eq(Matrix(void) a, Matrix(void) b) {
+    if (m_dimc(a) != m_dimc(b))
+        return false;
+
+    for (size_t i = 0; i < m_dimc(a); i++) {
+        if (m_dimv(a)[i] != m_dimv(b)[i])
+            return false;
+    }
+
+    return true;
+}
+bool m_eq(Matrix(void) a, Matrix(void) b) {
+    assert(m_dim_eq(a, b));
+    assert(m_elem_size(a) == m_elem_size(b));
+    char *av = a; char *bv = b;
+
+    for (size_t i = 0; i < m_elem_size(a) * m_length(a); i++) {
+        if (av[i] != bv[i])
+            return false;
+    }
+
+    return true;
 }
 
 #define matrix_mul(name, type)                                                \

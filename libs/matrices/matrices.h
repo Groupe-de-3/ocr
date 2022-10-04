@@ -124,6 +124,8 @@ size_t m_width(Matrix(void) m);
 size_t m_height(Matrix(void) m);
 
 void m_copy(Matrix(void) destination, void *data);
+bool m_dim_eq(Matrix(void) a, Matrix(void) b);
+bool m_eq(Matrix(void) a, Matrix(void) b);
 
 /*! \brief Convinient macro for accessing elements of a 2d matrix.
  *
@@ -162,6 +164,41 @@ void m_copy(Matrix(void) destination, void *data);
  *  - For matrices of ints: #m_imul
  *  - For matrices of doubles: #m_fmul
  *  - For matrices of floats: #m_fmulf
+ *
+ *  \par Example
+ *  \parblock \code
+ *  // Creates a new 3 by 3 matrix of ints
+ *  Matrix(int) m1 = m_new(int, 3, (size_t[]){ 3, 3 });
+ *  m_copy(m1, (int[]) {
+ *      1, 2, 3,
+ *      4, 5, 6,
+ *      7, 8, 9
+ *  });
+ *
+ *  Matrix(int) m2 = m_new(int, 3, (size_t[]){ 3, 3 });
+ *  m_copy(m2, (int[]) {
+ *      5, 3, 1,
+ *      7, 3, 9,
+ *      9, 1, 4
+ *  });
+ *
+ *  Matrix(int) out = m_new(int, 3, (size_t[]){ 3, 3 });
+ *  m_mul(m1, m2, out);
+ *
+ *  Matrix(int) excpected = m_new(int, 3, (size_t[]){ 3, 3 });
+ *  m_copy(excpected, (int[]) {
+ *      f, f, f,
+ *      f, f, f,
+ *      f, f, f
+ *  });
+ *
+ *  assert(m_eq(out, excpected));
+ *
+ *  m_destroy(m1);
+ *  m_destroy(m2);
+ *  m_destroy(out);
+ *  m_destroy(excpected);
+ *  \endcode \endparblock
  *
  *  \param[in] A The first matrix.
  *  \param[in] B The second matrix.
