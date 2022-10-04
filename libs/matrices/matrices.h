@@ -27,7 +27,7 @@
  *  \par Example
  *  \parblock \code
  *  // Creates a new 2 by 3 matrix of ints
- *  Matrix(int) m = m_new(int, 2, (int[]){ 2, 3 });
+ *  Matrix(int) m = m_new(int, 2, (size_t[]){ 2, 3 });
  *  assert(m_length(m) == 6);
  *  assert(m_width(m) == 2);
  *  assert(m_height(m) == 3);
@@ -65,6 +65,19 @@ void m_destroy(Matrix(void) m);
  *
  *  Instead of returning the size of a single dimension, this computes the
  *  number of elements across all dimensions.
+ *  
+ *  \par Example
+ *  \parblock \code
+ *  // Creates a new 2 by 3 matrix of ints
+ *  Matrix(int) m1 = m_new(int, 2, (size_t[]){ 2, 3 });
+ *  assert(m_length(m1) == 6);
+ *  m_destroy(m1);
+ *  
+ *  // Creates a new 4 by 2 b 10 matrix of ints
+ *  Matrix(int) m2 = m_new(int, 3, (size_t[]){ 4, 2, 10 });
+ *  assert(m_length(m2) == 80);
+ *  m_destroy(m2);
+ *  \endcode \endparblock
  *
  *  \param m The matrix of which to get the length.
  *  \return The total amount of element in the matrix.
@@ -86,12 +99,42 @@ size_t m_width(Matrix(void) m);
  *  \par Safety
  *  The passed matrix must have at least two dimension.
  *
+ *  \par Example
+ *  \parblock \code
+ *  // Creates a new 2 by 3 matrix of ints
+ *  Matrix(int) m1 = m_new(int, 2, (size_t[]){ 2, 3 });
+ *  assert(m_width(m2) == 2);
+ *  assert(m_height(m2) == 3);
+ *  m_destroy(m1);
+ *  
+ *  // Creates a new 4 by 2 b 10 matrix of ints
+ *  Matrix(int) m2 = m_new(int, 3, (size_t[]){ 4, 2, 10 });
+ *  assert(m_width(m2) == 4);
+ *  assert(m_height(m2) == 3);
+ *  m_destroy(m2);
+ *  \endcode \endparblock
+ *
  *  \param m The matrix of which to get the height.
  *  \return The size of the matrix's second dimension.
  */
 size_t m_height(Matrix(void) m);
 
 /*! \brief Convinient macro for accessing elements of a 2d matrix.
+ *
+ *  \par Example
+ *  \parblock \code
+ *  Matrix(int) m = m_new(int, 2, (size_t[]){ 3, 3 });
+ *  for (int y = 0; y < 3; y++)
+ *      for (int x = 0; x < 3; x++)
+ *          m_get2(m, x, y) = x + y;
+ *
+ *  assert(m[0] == 3);
+ *  assert(m_get2(m, 0, 0) == 0);
+ *
+ *  assert(m[2 * 3 + 1] == 3);
+ *  assert(m_get2(m, 1, 2) == 3);
+ *  m_destroy(m);
+ *  \endcode \endparblock
  *
  *  \param m The matrix to access.
  *  \param x The position in the first dimension.
