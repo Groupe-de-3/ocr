@@ -7,7 +7,7 @@ MAKEFLAGS += -rRs
 # used by another library and/or executable.
 # -------------------
 
-libraries = example_library matrices
+libraries = example_library matrices sudoku
 
 # Required:
 # LIBRARY_NAME_source_dirs = libs/LIBRARY_NAME
@@ -22,6 +22,9 @@ example_library_name = example_library
 
 matrices_source_dirs = libs/matrices
 matrices_name = matrices
+
+sudoku_source_dirs = libs/sudoku
+sudoku_name = sudoku
 
 # -------------------
 # EXECUTABLES
