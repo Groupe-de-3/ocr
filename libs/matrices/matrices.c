@@ -8,6 +8,7 @@
 typedef struct {
     size_t dimc;
     size_t dimv[MATRIX_MAX_DIMS];
+    size_t elem_size;
 } __attribute__((aligned(alignof(max_align_t)))) MatrixMetadata;
 
 static MatrixMetadata *m_metadata(Matrix(void) m) {
@@ -27,12 +28,23 @@ Matrix(void) m_create(size_t elem_size, size_t dimc, size_t dimv[]) {
 
     matrix->dimc = dimc;
     memcpy(&matrix->dimv, dimv, dimc * sizeof(size_t));
+    matrix->elem_size = elem_size;
 
     return (Matrix(void))(matrix + 1);
 }
 void m_destroy(void *m) {
     MatrixMetadata *allocated_ptr = (MatrixMetadata *)m - 1;
     free(allocated_ptr);
+}
+
+size_t m_elem_size(Matrix(void) m) {
+    return m_metadata(m)->elem_size;
+}
+size_t m_dimc(Matrix(void) m) {
+    return m_metadata(m)->dimc;
+}
+size_t *m_dimv(Matrix(void) m) {
+    return m_metadata(m)->dimv;
 }
 
 size_t m_length(Matrix(void) m) {
@@ -53,6 +65,10 @@ size_t m_height(Matrix(void) m) {
     MatrixMetadata *metadata = m_metadata(m);
     assert(metadata->dimc >= 2);
     return metadata->dimv[1];
+}
+
+void m_copy(Matrix(void) destination, void *data) {
+    memcpy(destination, data, m_elem_size(destination) * m_length(destination));
 }
 
 #define matrix_mul(name, type)                                                \

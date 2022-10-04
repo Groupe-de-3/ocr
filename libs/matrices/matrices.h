@@ -61,6 +61,10 @@ Matrix(void) m_create(size_t elem_size, size_t dimc, size_t dimv[]);
  */
 void m_destroy(Matrix(void) m);
 
+size_t m_elem_size(Matrix(void) m);
+size_t m_dimc(Matrix(void) m);
+size_t *m_dimv(Matrix(void) m);
+
 /*! \brief Get the length of a matrix.
  *
  *  Instead of returning the size of a single dimension, this computes the
@@ -118,6 +122,8 @@ size_t m_width(Matrix(void) m);
  *  \return The size of the matrix's second dimension.
  */
 size_t m_height(Matrix(void) m);
+
+void m_copy(Matrix(void) destination, void *data);
 
 /*! \brief Convinient macro for accessing elements of a 2d matrix.
  *
