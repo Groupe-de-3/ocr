@@ -1,8 +1,8 @@
 #include "matrices.h"
 
 #include <assert.h>
-#include <stdbool.h>
 #include <stdalign.h>
+#include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -85,7 +85,8 @@ bool m_dim_eq(Matrix(void) a, Matrix(void) b) {
 bool m_eq(Matrix(void) a, Matrix(void) b) {
     assert(m_dim_eq(a, b));
     assert(m_elem_size(a) == m_elem_size(b));
-    char *av = a; char *bv = b;
+    char *av = a;
+    char *bv = b;
 
     for (size_t i = 0; i < m_elem_size(a) * m_length(a); i++) {
         if (av[i] != bv[i])

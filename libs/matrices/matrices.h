@@ -4,7 +4,8 @@
 
 /*! \file matrices.h
  *
- *  \brief This header file contains every function and type definition of the matrices library.
+ *  \brief This header file contains every function and type definition of the
+ * matrices library.
  *
  *  The matrices library handle eveything matrix-related.
  */
@@ -45,7 +46,7 @@
 /*! \brief Creates a new matrix, prefer using #m_new instead.
  *
  *  Don't forget to call #m_destroy after usage!!!!
- *  
+ *
  *  \param elem_size The size of a single matrix element in bytes.
  *  \param dimc The size of the \a dimv array.
  *  \param dimv Array of the sizes of the Matrix's dimensions.
@@ -53,7 +54,7 @@
  */
 Matrix(void) m_create(size_t elem_size, size_t dimc, size_t dimv[]);
 /*! \brief Frees the memory used by a matrix.
- *  
+ *
  *  Must be called when the matrix isn't needed anymore. The matrix cannot
  *  be used after this.
  *
@@ -61,22 +62,22 @@ Matrix(void) m_create(size_t elem_size, size_t dimc, size_t dimv[]);
  */
 void m_destroy(Matrix(void) m);
 
-size_t m_elem_size(Matrix(void) m);
-size_t m_dimc(Matrix(void) m);
+size_t  m_elem_size(Matrix(void) m);
+size_t  m_dimc(Matrix(void) m);
 size_t *m_dimv(Matrix(void) m);
 
 /*! \brief Get the length of a matrix.
  *
  *  Instead of returning the size of a single dimension, this computes the
  *  number of elements across all dimensions.
- *  
+ *
  *  \par Example
  *  \parblock \code
  *  // Creates a new 2 by 3 matrix of ints
  *  Matrix(int) m1 = m_new(int, 2, (size_t[]){ 2, 3 });
  *  assert(m_length(m1) == 6);
  *  m_destroy(m1);
- *  
+ *
  *  // Creates a new 4 by 2 b 10 matrix of ints
  *  Matrix(int) m2 = m_new(int, 3, (size_t[]){ 4, 2, 10 });
  *  assert(m_length(m2) == 80);
@@ -110,7 +111,7 @@ size_t m_width(Matrix(void) m);
  *  assert(m_width(m2) == 2);
  *  assert(m_height(m2) == 3);
  *  m_destroy(m1);
- *  
+ *
  *  // Creates a new 4 by 2 b 10 matrix of ints
  *  Matrix(int) m2 = m_new(int, 3, (size_t[]){ 4, 2, 10 });
  *  assert(m_width(m2) == 4);
@@ -152,12 +153,12 @@ bool m_eq(Matrix(void) a, Matrix(void) b);
 #define m_get2(m, x, y) m[m_width(m) * y + x]
 
 /*! \brief Convinient macro for using functions in the form m_xmul.
- *  
+ *
  *  All matrices must be of the same type and respect the following:
  *  \code
- *  assert(m_width(a) == m_height(b));   
- *  assert(m_height(a) == m_height(out));  
- *  assert(m_width(b) == m_width(out));  
+ *  assert(m_width(a) == m_height(b));
+ *  assert(m_height(a) == m_height(out));
+ *  assert(m_width(b) == m_width(out));
  *  \endcode
  *
  *  Calling this macro will redirect to the correct function:
@@ -211,29 +212,29 @@ bool m_eq(Matrix(void) a, Matrix(void) b);
              : m_fmulf)(A, B, out)
 
 /*! \brief Multiplies the given int matrices of together, see #m_mul.
- *                                                               
+ *
  *  \param[in] a The first matrix.
  *  \param[in] b The second matrix.
  *  \param[out] out The matrix where to save the result.
- */ 
+ */
 void m_imul(Matrix(int) a, Matrix(int) b, Matrix(int) out);
 /*! \brief Multiplies the given double matrices of together, see #m_mul.
- *                                                               
+ *
  *  \param[in] a The first matrix.
  *  \param[in] b The second matrix.
  *  \param[out] out The matrix where to save the result.
- */ 
+ */
 void m_fmul(Matrix(double) a, Matrix(double) b, Matrix(double) out);
 /*! \brief Multiplies the given float matrices of together, see #m_mul.
- *                                                               
+ *
  *  \param[in] a The first matrix.
  *  \param[in] b The second matrix.
  *  \param[out] out The matrix where to save the result.
- */ 
+ */
 void m_fmulf(Matrix(float) a, Matrix(float) b, Matrix(float) out);
 
 /*! \brief Convinient macro for using functions in the form m_xadd.
- *  
+ *
  *  All matrices must be of the same type and of the same size.
  *
  *  Calling this macro will redirect to the correct function:
@@ -251,26 +252,26 @@ void m_fmulf(Matrix(float) a, Matrix(float) b, Matrix(float) out);
              : m_fmulf)(A, B)
 
 /*! \brief Adds the given int matrices of together, see #m_add.
- *                                                               
+ *
  *  \param[in] a The first matrix.
  *  \param[out] out The matrix where to save the result.
- */ 
+ */
 void m_iadd(Matrix(int) a, Matrix(int) out);
 /*! \brief Adds the given doubles matrices of together, see #m_add.
- *                                                               
+ *
  *  \param[in] a The first matrix.
  *  \param[out] out The matrix where to save the result.
- */ 
+ */
 void m_fadd(Matrix(double) a, Matrix(double) out);
 /*! \brief Adds the given floats matrices of together, see #m_add.
- *                                                               
+ *
  *  \param[in] a The first matrix.
  *  \param[out] out The matrix where to save the result.
- */ 
+ */
 void m_faddf(Matrix(float) a, Matrix(float) out);
 
 /*! \brief Convinient macro for using functions in the form m_xsub.
- *  
+ *
  *  All matrices must be of the same type and of the same size.
  *
  *  Calling this macro will redirect to the correct function:
@@ -288,20 +289,20 @@ void m_faddf(Matrix(float) a, Matrix(float) out);
              : m_fmulf)(A, B)
 
 /*! \brief Substract the first matrix from the second matrix, see #m_sub.
- *                                                               
+ *
  *  \param[in] a The first matrix.
  *  \param[out] out The second matrix, also the output destination.
- */ 
+ */
 void m_isub(Matrix(int) a, Matrix(int) out);
 /*! \brief Substract the first matrix from the second matrix, see #m_sub.
- *                                                               
+ *
  *  \param[in] a The first matrix.
  *  \param[out] out The matrix where to save the result.
- */ 
+ */
 void m_fsub(Matrix(double) a, Matrix(double) out);
 /*! \brief Substract the first matrix from the second matrix, see #m_sub.
- *                                                               
+ *
  *  \param[in] a The first matrix.
  *  \param[out] out The matrix where to save the result.
- */ 
+ */
 void m_fsubf(Matrix(float) a, Matrix(float) out);

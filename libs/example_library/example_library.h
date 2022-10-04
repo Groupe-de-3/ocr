@@ -2,10 +2,11 @@
 
 /*! \file example_library.h
  *
- *  \brief This header file contains every function and type definition of the example library.
+ *  \brief This header file contains every function and type definition of the
+ * example library.
  *
- *  This library is only an example for showing how the build system and other works. It only contains the
- *  useless #add function.
+ *  This library is only an example for showing how the build system and other
+ * works. It only contains the useless #add function.
  */
 
 /*! \brief Adds the two given numbers
