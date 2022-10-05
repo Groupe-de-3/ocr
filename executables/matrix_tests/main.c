@@ -1,21 +1,24 @@
 #include <stddef.h>
 #include <stdio.h>
+
 #include "matrices.h"
 
 #define VALUE 5
 
 int main() {
     Matrix(int) id = m_new(int, 2, 2);
-    m_copy(id, (int[]) {
-        1, 0,
-        0, 1
-    });
+    m_copy(id, (int[]){1, 0, 0, 1});
 
     Matrix(int) m = m_new(int, 2, 2);
-    m_copy(m, (int[]) {
-        22, 10,
-        7,  10,
-    });
+    m_copy(
+        m,
+        (int[]){
+            22,
+            10,
+            7,
+            10,
+        }
+    );
 
     Matrix(int) out = m_new(int, 1, 2);
     m_mul(id, m, out);

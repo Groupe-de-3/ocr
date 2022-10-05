@@ -41,8 +41,10 @@
  *  \param ... List of the length of each dimensions of the matrix.
  *  \return A new Matrix with the specified sizes and type.
  */
-#define m_new(type, ...) \
-    (Matrix(type)) m_create(sizeof(type), utils_countargs(__VA_ARGS__), (size_t[]){ __VA_ARGS__ })
+#define m_new(type, ...)                                                    \
+    (Matrix(type)) m_create(                                                \
+        sizeof(type), utils_countargs(__VA_ARGS__), (size_t[]){__VA_ARGS__} \
+    )
 
 /*! \brief Creates a new matrix, prefer using #m_new instead.
  *
