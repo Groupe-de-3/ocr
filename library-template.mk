@@ -11,7 +11,9 @@ endif
 §_¤_library_file_path = build/§/¤/lib$(¤_name).a
 
 # Only executed once per library (ignored for next profiles)
-ifndef ¤_source_files
+ifndef ¤_first_exec
+¤_first_exec = passed
+
 ¤_source_files != find $(¤_source_dirs) -name "*.c" -type f
 ¤_header_files != find $(¤_source_dirs) -name "*.h" -type f
 P=(

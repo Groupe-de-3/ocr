@@ -11,7 +11,9 @@ endif
 §_¤_executable_file_path = build/§/¤/$(¤_executable_name)
 
 # Only executed once per executable (ignored for next profiles)
-ifndef ¤_source_files
+ifndef ¤_first_exec
+¤_first_exec = passed
+
 ¤_source_files != find $(¤_source_dirs) -name "*.c" -type f
 P=(
 M=)
