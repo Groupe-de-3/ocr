@@ -2,6 +2,8 @@
 #include <stdbool.h>
 #include <stddef.h>
 
+#include "utils_countargs.h"
+
 /*! \file matrices.h
  *
  *  \brief This header file contains every function and type definition of the
@@ -28,7 +30,7 @@
  *  \par Example
  *  \parblock \code
  *  // Creates a new 2 by 3 matrix of ints
- *  Matrix(int) m = m_new(int, 2, (size_t[]){ 2, 3 });
+ *  Matrix(int) m = m_new(int, 2, 3);
  *  assert(m_length(m) == 6);
  *  assert(m_width(m) == 2);
  *  assert(m_height(m) == 3);
@@ -36,12 +38,11 @@
  *  \endcode \endparblock
  *
  *  \param type The type of the Matrix's content.
- *  \param dimc The number of element in the \a dimv array.
- *  \param dimv Array of the sizes of the Matrix's dimensions.
+ *  \param ... List of the length of each dimensions of the matrix.
  *  \return A new Matrix with the specified sizes and type.
  */
-#define m_new(type, dimc, dimv) \
-    (Matrix(type)) m_create(sizeof(type), dimc, dimv)
+#define m_new(type, ...) \
+    (Matrix(type)) m_create(sizeof(type), utils_countargs(__VA_ARGS__), (size_t[]){ __VA_ARGS__ })
 
 /*! \brief Creates a new matrix, prefer using #m_new instead.
  *
@@ -74,12 +75,12 @@ size_t *m_dimv(Matrix(void) m);
  *  \par Example
  *  \parblock \code
  *  // Creates a new 2 by 3 matrix of ints
- *  Matrix(int) m1 = m_new(int, 2, (size_t[]){ 2, 3 });
+ *  Matrix(int) m1 = m_new(int, 2, 3);
  *  assert(m_length(m1) == 6);
  *  m_destroy(m1);
  *
  *  // Creates a new 4 by 2 b 10 matrix of ints
- *  Matrix(int) m2 = m_new(int, 3, (size_t[]){ 4, 2, 10 });
+ *  Matrix(int) m2 = m_new(int, 4, 2, 10);
  *  assert(m_length(m2) == 80);
  *  m_destroy(m2);
  *  \endcode \endparblock
@@ -107,13 +108,13 @@ size_t m_width(Matrix(void) m);
  *  \par Example
  *  \parblock \code
  *  // Creates a new 2 by 3 matrix of ints
- *  Matrix(int) m1 = m_new(int, 2, (size_t[]){ 2, 3 });
+ *  Matrix(int) m1 = m_new(int, 2, 3);
  *  assert(m_width(m2) == 2);
  *  assert(m_height(m2) == 3);
  *  m_destroy(m1);
  *
  *  // Creates a new 4 by 2 b 10 matrix of ints
- *  Matrix(int) m2 = m_new(int, 3, (size_t[]){ 4, 2, 10 });
+ *  Matrix(int) m2 = m_new(int, 4, 2, 10);
  *  assert(m_width(m2) == 4);
  *  assert(m_height(m2) == 3);
  *  m_destroy(m2);
@@ -132,7 +133,7 @@ bool m_eq(Matrix(void) a, Matrix(void) b);
  *
  *  \par Example
  *  \parblock \code
- *  Matrix(int) m = m_new(int, 2, (size_t[]){ 3, 3 });
+ *  Matrix(int) m = m_new(int, 3, 3);
  *  for (int y = 0; y < 3; y++)
  *      for (int x = 0; x < 3; x++)
  *          m_get2(m, x, y) = x + y;
@@ -169,24 +170,24 @@ bool m_eq(Matrix(void) a, Matrix(void) b);
  *  \par Example
  *  \parblock \code
  *  // Creates a new 3 by 3 matrix of ints
- *  Matrix(int) m1 = m_new(int, 3, (size_t[]){ 3, 3 });
+ *  Matrix(int) m1 = m_new(int, 3, 3);
  *  m_copy(m1, (int[]) {
  *      1, 2, 3,
  *      4, 5, 6,
  *      7, 8, 9
  *  });
  *
- *  Matrix(int) m2 = m_new(int, 3, (size_t[]){ 3, 3 });
+ *  Matrix(int) m2 = m_new(int, 3, 3);
  *  m_copy(m2, (int[]) {
  *      5, 3, 1,
  *      7, 3, 9,
  *      9, 1, 4
  *  });
  *
- *  Matrix(int) out = m_new(int, 3, (size_t[]){ 3, 3 });
+ *  Matrix(int) out = m_new(int, 3, 3);
  *  m_mul(m1, m2, out);
  *
- *  Matrix(int) excpected = m_new(int, 3, (size_t[]){ 3, 3 });
+ *  Matrix(int) excpected = m_new(int, 3, 3);
  *  m_copy(excpected, (int[]) {
  *      f, f, f,
  *      f, f, f,

@@ -7,7 +7,7 @@ MAKEFLAGS += -rRs
 # used by another library and/or executable.
 # -------------------
 
-libraries = example_library matrices sudoku ia
+libraries = example_library utils matrices sudoku ia
 
 # Required:
 # LIBRARY_NAME_source_dirs = libs/LIBRARY_NAME
@@ -22,12 +22,16 @@ example_library_name = example_library
 
 matrices_source_dirs = libs/matrices
 matrices_name = matrices
+matrices_depedencies = utils
 
 sudoku_source_dirs = libs/sudoku
 sudoku_name = sudoku
 
 ia_source_dirs = libs/ia
 ia_name = ia
+
+utils_source_dirs = libs/utils
+utils_name = utils
 
 # -------------------
 # EXECUTABLES
@@ -36,7 +40,7 @@ ia_name = ia
 # to create an executable file.
 # -------------------
 
-executables = example_executable
+executables = example_executable matrix_tests
 
 # EXECUTABLE_NAME_source_dirs := executables/EXECUTABLE_NAME
 # EXECUTABLE_NAME_executable_name := name_of_an_executable
@@ -45,6 +49,10 @@ executables = example_executable
 example_executable_source_dirs := executables/example_executable
 example_executable_executable_name := example_executable
 example_executable_depedencies := example_library
+
+matrix_tests_source_dirs := executables/matrix_tests
+matrix_tests_executable_name := matrix_tests
+matrix_tests_depedencies := matrices
 
 # -------------------
 # (Build) PROFILES
