@@ -40,7 +40,7 @@ utils_name = utils
 # to create an executable file.
 # -------------------
 
-executables = example_executable matrix_tests
+executables = example_executable matrix_tests sudoku_tests
 
 # EXECUTABLE_NAME_source_dirs := executables/EXECUTABLE_NAME
 # EXECUTABLE_NAME_executable_name := name_of_an_executable
@@ -53,6 +53,10 @@ example_executable_depedencies := example_library
 matrix_tests_source_dirs := executables/matrix_tests
 matrix_tests_executable_name := matrix_tests
 matrix_tests_depedencies := matrices
+
+sudoku_tests_source_dirs := executables/sudoku_tests
+sudoku_tests_executable_name := sudoku_tests
+sudoku_tests_depedencies := sudoku
 
 # -------------------
 # (Build) PROFILES
