@@ -19,7 +19,7 @@ M=)
 $(eval ¤_rec_depedencies_with_duplicates := $(¤_depedencies) $(addprefix $$$P,$(addsuffix _rec_depedencies$M,$(¤_depedencies))))
 ¤_rec_depedencies := $(¤_rec_depedencies_with_duplicates)
 
-$(eval ¤_depedencies_include_dirs := $(addprefix $$$P,$(addsuffix _source_dirs$M,$(¤_depedencies))))
+$(eval ¤_depedencies_include_dirs := $(addprefix $$$P,$(addsuffix _source_dirs$M,$(sort $(¤_rec_depedencies)))))
 
 format-¤:
 	clang-format -i --style=file $(¤_source_files) $(¤_header_files)
