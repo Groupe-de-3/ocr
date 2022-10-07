@@ -123,19 +123,32 @@ open-html-doc: doc
 # and replaces all occurences of the characters '§' and '¤' with the profile
 # name and executable or library name respectively.
 # And does that for evey library or executable respectively times all profiles.
-build/generated.mk: library-template.mk executable-template.mk Makefile
+build/generated.mk: make_internal/library-target-template.mk make_internal/executable-target-template.mk Makefile
 	mkdir -p build
 	touch $@
 	echo "# THIS IS AN AUTO-GENERATED FILE" > $@
 	echo "# DO NOT EDIT DIRECTLY" >> $@
+	
+	# Normal templates of libraries
+	for LIBRARY_NAME in $(libraries); do \
+		cat make_internal/library-target-template.mk | sed "s/^#.*$$//" | sed "s/¤/$$LIBRARY_NAME/g"  | sed "s/§/$$PROFILE_NAME/g" >> $@; \
+		echo "# THIS IS AN AUTO-GENERATED FILE" >> $@; \
+		echo "# DO NOT EDIT DIRECTLY" >> $@; \
+	done
+	# Normal templates of executables
+	for EXECUTABLE_NAME in $(executables); do \
+		cat make_internal/executable-target-template.mk | sed "s/^#.*$$//" | sed "s/¤/$$EXECUTABLE_NAME/g"  | sed "s/§/$$PROFILE_NAME/g" >> $@; \
+		echo "# THIS IS AN AUTO-GENERATED FILE" >> $@; \
+		echo "# DO NOT EDIT DIRECTLY" >> $@; \
+	done
 	for PROFILE_NAME in $(profiles); do \
 		for LIBRARY_NAME in $(libraries); do \
-			cat library-template.mk | sed "s/^#.*$$//" | sed "s/¤/$$LIBRARY_NAME/g"  | sed "s/§/$$PROFILE_NAME/g" >> $@; \
+			cat make_internal/library-target-template.mk | sed "s/^#.*$$//" | sed "s/¤/$$LIBRARY_NAME/g"  | sed "s/§/$$PROFILE_NAME/g" >> $@; \
 			echo "# THIS IS AN AUTO-GENERATED FILE" >> $@; \
 			echo "# DO NOT EDIT DIRECTLY" >> $@; \
 		done; \
 		for EXECUTABLE_NAME in $(executables); do \
-			cat executable-template.mk | sed "s/^#.*$$//" | sed "s/¤/$$EXECUTABLE_NAME/g"  | sed "s/§/$$PROFILE_NAME/g" >> $@; \
+			cat make_internal/executable-target-template.mk | sed "s/^#.*$$//" | sed "s/¤/$$EXECUTABLE_NAME/g"  | sed "s/§/$$PROFILE_NAME/g" >> $@; \
 			echo "# THIS IS AN AUTO-GENERATED FILE" >> $@; \
 			echo "# DO NOT EDIT DIRECTLY" >> $@; \
 		done \
