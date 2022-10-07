@@ -1,4 +1,5 @@
 #pragma once
+#include "struct.h"
 
 /*! \file save.h
  *
@@ -7,18 +8,7 @@
  *  This library contains the , #init, #load, #save function.
  */
 
-typedef struct Neurone {
-    double bias;
-    double weights[10];
-} N;
 
-typedef struct Layer {
-    N layer_[10];
-} Layer;
-
-typedef struct neural_network {
-    Layer layers_[10];
-} neural_network;
 
 /*! \brief Initialization of the neural network
  *
@@ -51,12 +41,10 @@ neural_network load(char* file_name);
  *  The file can be removed with #clear
  *  
  *  \param NN The neural network.
- *  \param layers_number Number of layer of the neural network
- *  \param layers_sizes a array of the lenght of each layer
  *
  *  \return void
  */
-void save(neural_network *NN, int layers_number, int layers_sizes[]);
+void save(neural_network *NN);
 
 /*! \brief Deletes files created by #save
  */
