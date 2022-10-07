@@ -6,10 +6,6 @@
 #include <stdlib.h>
 #include <time.h>
 
-int    layers_number  = 3; // number of hidden layer
-int    layers_sizes[] = {2, 5, 1};
-double inputs[]       = {1, 0};
-
 // TRAITEMENT FICHIER / neural network
 
 void clear() {
@@ -17,7 +13,9 @@ void clear() {
         errx(1, "Could not delete file neural_network.txt");
 }
 
-void save(neural_network NN) {
+void save(neural_network *NN, int layers_number, int layers_sizes[]) // save the neural network in the file "neural_network"
+{
+
     clear();
     FILE *fichier = NULL;
     fichier       = fopen("neural_network.txt", "w");
@@ -32,13 +30,13 @@ void save(neural_network NN) {
         for (int weight_ind = 0; weight_ind < layers_sizes[layer_ind];
              weight_ind++) {
             fprintf(
-                fichier, "%f\n", NN.layers_[layer_ind].layer_[weight_ind].bias
+                fichier, "%f\n", NN->layers_[layer_ind].layer_[weight_ind].bias
             );
             if (layer_ind < layers_number - 1) {
                 for (int j = 0; j < layers_sizes[layer_ind + 1]; j++)
                     fprintf(
                         fichier, "%f\n",
-                        NN.layers_[layer_ind].layer_[weight_ind].weights[j]
+                        NN->layers_[layer_ind].layer_[weight_ind].weights[j]
                     );
             }
         }
@@ -47,18 +45,21 @@ void save(neural_network NN) {
     fclose(fichier);
 }
 
-neural_network load() {
+neural_network load(char* file_name) // initialisation of the neural network from a file
+{
     neural_network NN;
 
     FILE *fichier = NULL;
-    fichier       = fopen("neural_network.txt", "r");
+    fichier       = fopen(file_name, "r");
 
     // ini base
     char chaine[10] = "";
     fgets(chaine, 10, fichier);
-    layers_number = atoi(chaine);
+    int layers_number = atoi(chaine);
 
-    for (int i = 0; i < layers_number; i++) {
+    int layers_sizes[layers_number];
+    for (int i = 0; i < layers_number; i++)
+    {
         fgets(chaine, 10, fichier);
         layers_sizes[i] = atoi(chaine);
     }
@@ -94,7 +95,8 @@ neural_network load() {
     return NN;
 }
 
-neural_network init() {
+neural_network init(int layers_number, int layers_sizes[], double inputs[])// initialisation of a new neural network
+{
     neural_network NN;
 
     for (int layer_ind = 0; layer_ind < layers_number; layer_ind++) {

@@ -1,5 +1,12 @@
 #pragma once
 
+/*! \file save.h
+ *
+ *  \brief This library help manipulate the neurla network 
+ *
+ *  This library contains the , #init, #load, #save function.
+ */
+
 typedef struct Neurone {
     double bias;
     double weights[10];
@@ -13,20 +20,44 @@ typedef struct neural_network {
     Layer layers_[10];
 } neural_network;
 
-/*! \brief Initialize a new neural network with random weights and biases.
+/*! \brief Initialization of the neural network
+ *
+ *  
+ *  Create the neural network with the given layers and size 
+ *  with random value in the bias and weigth
+ *
+ *  \param layers_number Number of layer of the neural network
+ *  \param layers_sizes a array of the lenght of each layer
+ *  \param inputs a array of the inputs value
+ * 
+ *  \return neural_wetwork
  */
-neural_network init(void);
+neural_network init(int layers_number, int layers_sizes[], double inputs[]);
 
-/*! \brief Loads the neural network saved in "neural_network.txt"
- */
-neural_network load(void);
-/*! \brief Serialize a neural network into a file named "neural_network.txt".
+/*! \brief Load of the neural network
  *
+ *  Return the neural network from the given file
+ *
+ *  \param file_name name of the file that contain the neural network value
+ * 
+ *  \return neural_wetwork
+ */
+neural_network load(char* file_name);
+
+
+/*! \brief Save the neural network
+ *
+ *  Save the current neural network
  *  The file can be removed with #clear
- *
+ *  
  *  \param NN The neural network.
+ *  \param layers_number Number of layer of the neural network
+ *  \param layers_sizes a array of the lenght of each layer
+ *
+ *  \return void
  */
-void save(neural_network NN);
+void save(neural_network *NN, int layers_number, int layers_sizes[]);
+
 /*! \brief Deletes files created by #save
  */
 void clear(void);
