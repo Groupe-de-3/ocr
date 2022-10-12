@@ -22,8 +22,8 @@ $(guile (define-library "example_library" \
 	`(target-type "dynlib")))
 $(guile (enable-library-tests "example_library"))
 
-$(guile (define-library "matrices"))
-matrices_depedencies += utils
+$(guile (define-library "matrices" \
+	`(deps "utils")))
 
 $(guile (define-library "sudoku"))
 
@@ -50,7 +50,6 @@ example_executable_depedencies := example_library
 
 tests_source_dirs := tests
 tests_executable_name := tests
-#tests_depedencies := $(libraries)
 
 matrix_tests_source_dirs := executables/matrix_tests
 matrix_tests_executable_name := matrix_tests
