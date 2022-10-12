@@ -1,3 +1,4 @@
+$(guile (load "make_internal/utils.scm"))
 MAKEFLAGS += -rR
 
 # -------------------
@@ -6,9 +7,6 @@ MAKEFLAGS += -rR
 # Libraries are a collection of files all built together for them to be
 # used by another library and/or executable.
 # -------------------
-
-libraries := example_library utils matrices sudoku ia
-libraries += example_library_tests
 
 # Required:
 # LIBRARY_NAME_source_dirs = libs/LIBRARY_NAME
@@ -20,27 +18,17 @@ libraries += example_library_tests
 # LIBRARY_NAME_ignore = path/to*/ignore/*
 # LIBRARY_NAME_target_type = dynlib # Defaults to static
 
-example_library_source_dirs = libs/example_library
-example_library_name = example_library
-example_library_ignore = libs/example_library/tests*
-# example_library_target_type = dynlib
-example_library_tests_source_dirs = libs/example_library/tests
-example_library_tests_name = example_library_tests
-example_library_tests_depedencies = example_library
-example_library_tests_target_type = dynlib
+$(guile (define-library "example_library"))
+$(guile (enable-library-tests "example_library"))
 
-matrices_source_dirs = libs/matrices
-matrices_name = matrices
-matrices_depedencies = utils
+$(guile (define-library "matrices"))
+matrices_depedencies += utils
 
-sudoku_source_dirs = libs/sudoku
-sudoku_name = sudoku
+$(guile (define-library "sudoku"))
 
-ia_source_dirs = libs/ia
-ia_name = ia
+$(guile (define-library "ia"))
 
-utils_source_dirs = libs/utils
-utils_name = utils
+$(guile (define-library "utils"))
 
 # -------------------
 # EXECUTABLES
