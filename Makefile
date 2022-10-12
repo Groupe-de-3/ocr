@@ -2,15 +2,63 @@ $(guile (load "make_internal/utils.scm"))
 MAKEFLAGS += -rR
 
 # -------------------
-# LIBRARIES
+# TARGETS
 #
-# Libraries are a collection of files all built together for them to be
-# used by another library and/or executable.
+# Targets are a bunch of C files compiled into either an executable, a dynamic
+# library or a static library. They can be depending on other targets, meaning
+# they can include their files, and reference functions defined in them.
 # -------------------
+#
+# Target example:
+# 
+# $(guile (define-target "example_library" \
+#      # If given, another target named __example_library_tests will also be
+#      # created. It will use as source folder, the one of the current target
+#      # to which is appended '/tests'. It will have as target-type 'dynlib'.
+#      # This also adds the 'ignore' option to the current target for the
+#      # tests folder(s).
+#     `(enable-tests)\         # Optional
+#
+#      # Specified what kind of artefact should be created by the target.
+#      # Optional, defaults to staticlib
+#      # Possible values are 'dynlib', 'staticlib' or 'executable'
+#     `(target-type "dynlib")\
+#
+#      # If set to true, the final artefact will have all its depedencies
+#      # linked into it. Making depedents of the target not needing to link
+#      # them. Automatically enabled if target-type is executable, but can be
+#      # overwritten.
+#      # Optional, default to #f (false)
+#      # If no value is given, it default to #t.
+#     `(link-in-deps #t)
+#
+#      # List of one of more folder in which source files should be looked for,
+#      # this also will be the include folder for this target and its depedents.
+#      # Optional, defaults to:
+#      #   If target-type is executable         -> executables/NAME
+#      #   Otherwise (for dynlib and staticlib) -> libs/NAME
+#      # Where NAME is the target's name given at the begigning.
+#     `(source-dirs "source/folder" "other/source/folder")
+#      
+#      # List of targets which this target will depend on. This has for effect
+#      # for any other target depending directly, or not, on this target, to
+#      # link these depedencies if link-in-deps is true.
+#      # Optional, defaults to an empty list.
+#     `(deps "dep-one" "dep-two")
+#      
+#     `(cflags --flag-one -flags)
+#     
+#      # Blob of files to ignore while looking for source files in the given
+#      # source-dirs.
+#      # Optional, default to nothing.
+#     `(ignore ignore/*/fil?)
+# ))
+#
+
+# LIBRARIES
 
 $(guile (define-target "example_library" \
 	`(enable-tests)\
-	`(target-type "dynlib")\
 ))
 
 $(guile (define-target "matrices" \
@@ -23,12 +71,7 @@ $(guile (define-target "ia"))
 
 $(guile (define-target "utils"))
 
-# -------------------
 # EXECUTABLES
-#
-# Executables are a collection of files all built together with depedencies
-# to create an executable file.
-# -------------------
 
 $(guile (define-target "example_executable"\
 	`(target-type "executable")\
