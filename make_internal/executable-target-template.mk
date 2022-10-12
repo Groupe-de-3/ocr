@@ -8,7 +8,7 @@ ifndef ¤_executable_name
 $(error "INVALID MAKEFILE: Missing the ¤_executable_name variable")
 endif
 
-§_¤_executable_file_path = build/§/¤/$(¤_executable_name)
+§_¤_executable_file_path = build/§/$(¤_executable_name).out
 
 §_¤_obj_dir = build/§/¤/obj
 §_¤_obj_files = $(patsubst %.c,$(§_¤_obj_dir)/%.o,$(¤_source_files))
@@ -20,6 +20,8 @@ $(eval §_¤_depedencies_files := $(addprefix $$$P§_,$(addsuffix _library_file_
 
 # Adding libraries search paths
 $(eval §_¤_depedencies_flags += $(addprefix -L$$$P§_,$(addsuffix _library_folder$M,$(¤_rec_depedencies))))
+# Remove duplicates (which will happen if all libraries are in the same folder)
+§_¤_depedencies_flags := $(sort $(§_¤_depedencies_flags))
 # Adding libraries
 §_¤_depedencies_flags += $(addprefix -l,$(¤_rec_depedencies))
 
@@ -29,7 +31,7 @@ $(§_¤_obj_dir)/%.o: %.c
 
 $(§_¤_executable_file_path): $(§_¤_obj_files) $(§_¤_depedencies_files)
 	mkdir -p $(dir $@)
-	$(CC) $(§_¤_cflags) $(§_¤_obj_files) $(§_¤_depedencies_flags) -o $@
+	$(CC) $(§_¤_cflags) $(§_¤_obj_files) $(§_¤_depedencies_flags) -Wl,-rpath,'$$ORIGIN' -o $@
 
 build-§-¤: $(§_¤_executable_file_path)
 run-§-¤: $(§_¤_executable_file_path)

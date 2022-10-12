@@ -14,11 +14,12 @@ endif
 
 §_¤_cflags = $(addprefix -I ,$(¤_depedencies_include_dirs) $(¤_source_dirs)) $(§_cflags) $(¤_cflags)
 
-§_¤_library_folder = build/§/¤
 ifeq ($(¤_target_type),dynlib)
+§_¤_library_folder = build/§
 §_¤_library_file_path = $(§_¤_library_folder)/lib$(¤_name).so
-§_¤_cflags += -fPIC
+§_¤_cflags += -fPIC -fvisibility=default
 else
+§_¤_library_folder = build/§/¤
 §_¤_library_file_path = $(§_¤_library_folder)/lib$(¤_name).a
 endif
 

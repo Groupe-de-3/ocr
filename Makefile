@@ -23,6 +23,7 @@ libraries += example_library_tests
 example_library_source_dirs = libs/example_library
 example_library_name = example_library
 example_library_ignore = libs/example_library/tests*
+# example_library_target_type = dynlib
 example_library_tests_source_dirs = libs/example_library/tests
 example_library_tests_name = example_library_tests
 example_library_tests_depedencies = example_library
