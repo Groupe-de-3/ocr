@@ -7,8 +7,10 @@ ifndef ¤_name
 $(error "INVALID MAKEFILE: Missing the ¤_executable_name variable")
 endif
 
-¤_source_files != find $(¤_source_dirs) -name "*.c" -type f
+¤_source_files != find $(¤_source_dirs) -name "*.c" -type f -not -path "$(¤_ignore)"
 ¤_header_files != find $(¤_source_dirs) -name "*.h" -type f
+
+# Could not find how to escape parenthesis x)
 P=(
 M=)
 $(eval ¤_rec_depedencies_with_duplicates := $(¤_depedencies) $(addprefix $$$P,$(addsuffix _rec_depedencies$M,$(¤_depedencies))))

@@ -1,4 +1,4 @@
-MAKEFLAGS += -rRs
+MAKEFLAGS += -rR
 
 # -------------------
 # LIBRARIES
@@ -7,7 +7,8 @@ MAKEFLAGS += -rRs
 # used by another library and/or executable.
 # -------------------
 
-libraries = example_library utils matrices sudoku ia
+libraries := example_library utils matrices sudoku ia
+libraries += example_library_tests
 
 # Required:
 # LIBRARY_NAME_source_dirs = libs/LIBRARY_NAME
@@ -15,10 +16,17 @@ libraries = example_library utils matrices sudoku ia
 # 
 # Optional:
 # LIBRARY_NAME_depedencies = OTHER_LIBRARY_NAME_1 OTHER_LIBRARY_NAME_2 ...
-# LIBRARY_NAME_cflags = -nicktamaman
+# LIBRARY_NAME_cflags = -FLAG1 -FLAG2 value2
+# LIBRARY_NAME_ignore = path/to*/ignore/*
+# LIBRARY_NAME_target_type = dynlib # Defaults to static
 
 example_library_source_dirs = libs/example_library
 example_library_name = example_library
+example_library_ignore = libs/example_library/tests*
+example_library_tests_source_dirs = libs/example_library/tests
+example_library_tests_name = example_library_tests
+example_library_tests_depedencies = example_library
+example_library_tests_target_type = dynlib
 
 matrices_source_dirs = libs/matrices
 matrices_name = matrices
@@ -40,7 +48,7 @@ utils_name = utils
 # to create an executable file.
 # -------------------
 
-executables = example_executable matrix_tests sudoku_tests
+executables = example_executable tests matrix_tests sudoku_tests
 
 # EXECUTABLE_NAME_source_dirs := executables/EXECUTABLE_NAME
 # EXECUTABLE_NAME_executable_name := name_of_an_executable
@@ -49,6 +57,10 @@ executables = example_executable matrix_tests sudoku_tests
 example_executable_source_dirs := executables/example_executable
 example_executable_executable_name := example_executable
 example_executable_depedencies := example_library
+
+tests_source_dirs := tests
+tests_executable_name := tests
+#tests_depedencies := $(libraries)
 
 matrix_tests_source_dirs := executables/matrix_tests
 matrix_tests_executable_name := matrix_tests
@@ -73,13 +85,18 @@ c_warnings = -Wall -Wextra -Wpedantic -Wshadow -Wpointer-arith -Wcast-align \
 			 -Wno-unused-command-line-argument
 c_errors = -Werror=implicit-function-declaration
 # Flags all profiles share
-default_cflags = $(c_warnings) $(c_errors) -std=gnu17 -lm -g -Og
+default_cflags = $(c_warnings) $(c_errors) -std=gnu17 -lm
 # Some flags required to remove all asserts()
 disable_asserts_cflags = -DNDEBUG -Wno-unused-variable -Wno-unused-parameter
 
 profiles = valgrind-debug debug release
+# Targets gave to libraries or executables that don't precise them
+default_profiles = valgrind-debug debug release
 
-debug_cflags = $(default_cflags) -fsanitize=address -g -Og
+# Avaible but not required variables for a profile
+# PROFILE_NAME_cflags - List of flags to give to $CC
+
+debug_cflags = $(default_cflags) -fsanitize=address  -static-libsan -g -Og
 valgrind-debug_cflags = $(default_cflags) -gdwarf-4 -g -Og $(disable_asserts_cflags)
 release_cflags = $(default_cflags) -O3 $(disable_asserts_cflags)
 
@@ -116,6 +133,7 @@ open-html-doc: doc
 	xdg-open build/doc/html/index.html
 
 .PHONY: all doc open-doc clean dev test $(addprefix all-,$(profiles)) format-all
+.SILENT: build/generated.mk
 
 # Generates a new Makefile (build/generated.mk) that have rules for building 
 # all libraries and executables.
@@ -131,28 +149,20 @@ build/generated.mk: make_internal/library-target-template.mk make_internal/execu
 	
 	# Normal templates of libraries
 	for LIBRARY_NAME in $(libraries); do \
-		cat make_internal/library-target-template.mk | sed "s/^#.*$$//" | sed "s/¤/$$LIBRARY_NAME/g"  | sed "s/§/$$PROFILE_NAME/g" >> $@; \
-		echo "# THIS IS AN AUTO-GENERATED FILE" >> $@; \
-		echo "# DO NOT EDIT DIRECTLY" >> $@; \
+		cat make_internal/library-template.mk | sed "s/^#.*$$//" | sed "s/¤/$$LIBRARY_NAME/g" >> $@; \
 	done
 	# Normal templates of executables
 	for EXECUTABLE_NAME in $(executables); do \
-		cat make_internal/executable-target-template.mk | sed "s/^#.*$$//" | sed "s/¤/$$EXECUTABLE_NAME/g"  | sed "s/§/$$PROFILE_NAME/g" >> $@; \
-		echo "# THIS IS AN AUTO-GENERATED FILE" >> $@; \
-		echo "# DO NOT EDIT DIRECTLY" >> $@; \
+		cat make_internal/executable-template.mk | sed "s/^#.*$$//" | sed "s/¤/$$EXECUTABLE_NAME/g"  | sed "s/§/$$PROFILE_NAME/g" >> $@; \
 	done
 	for PROFILE_NAME in $(profiles); do \
 		for LIBRARY_NAME in $(libraries); do \
 			cat make_internal/library-target-template.mk | sed "s/^#.*$$//" | sed "s/¤/$$LIBRARY_NAME/g"  | sed "s/§/$$PROFILE_NAME/g" >> $@; \
-			echo "# THIS IS AN AUTO-GENERATED FILE" >> $@; \
-			echo "# DO NOT EDIT DIRECTLY" >> $@; \
 		done; \
 		for EXECUTABLE_NAME in $(executables); do \
 			cat make_internal/executable-target-template.mk | sed "s/^#.*$$//" | sed "s/¤/$$EXECUTABLE_NAME/g"  | sed "s/§/$$PROFILE_NAME/g" >> $@; \
-			echo "# THIS IS AN AUTO-GENERATED FILE" >> $@; \
-			echo "# DO NOT EDIT DIRECTLY" >> $@; \
 		done \
 	done
 
-# Including the generated makefile will trigged it's generation if not present
+# Including the generated makefile will trigged its generation if not present
 -include build/generated.mk

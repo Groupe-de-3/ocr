@@ -8,31 +8,19 @@ ifndef ¤_name
 $(error "INVALID MAKEFILE: Missing the ¤_executable_name variable")
 endif
 
-§_¤_library_file_path = build/§/¤/lib$(¤_name).a
-
-# Only executed once per library (ignored for next profiles)
-ifndef ¤_first_exec
-¤_first_exec = passed
-
-¤_source_files != find $(¤_source_dirs) -name "*.c" -type f
-¤_header_files != find $(¤_source_dirs) -name "*.h" -type f
-P=(
-M=)
-$(eval ¤_rec_depedencies_with_duplicates := $(¤_depedencies) $(addprefix $$$P,$(addsuffix _rec_depedencies$M,$(¤_depedencies))))
-¤_rec_depedencies := $(¤_rec_depedencies_with_duplicates)
-
-$(eval ¤_depedencies_include_dirs := $(addprefix $$$P,$(addsuffix _source_dirs$M,$(sort $(¤_rec_depedencies)))))
-
-format-¤:
-	clang-format -i --style=file $(¤_source_files) $(¤_header_files)
-.PHONY: format-¤
-endif
-
 §_¤_obj_dir = build/§/¤/obj
 §_¤_obj_files = $(patsubst %.c,$(§_¤_obj_dir)/%.o,$(¤_source_files))
 §_¤_dep_files = $(patsubst %.c,$(§_¤_obj_dir)/%.d,$(¤_source_files))
 
 §_¤_cflags = $(addprefix -I ,$(¤_depedencies_include_dirs) $(¤_source_dirs)) $(§_cflags) $(¤_cflags)
+
+§_¤_library_folder = build/§/¤
+ifeq ($(¤_target_type),dynlib)
+§_¤_library_file_path = $(§_¤_library_folder)/lib$(¤_name).so
+§_¤_cflags += -fPIC
+else
+§_¤_library_file_path = $(§_¤_library_folder)/lib$(¤_name).a
+endif
 
 $(§_¤_obj_dir)/%.o: %.c
 	mkdir -p $(dir $@)
@@ -40,8 +28,12 @@ $(§_¤_obj_dir)/%.o: %.c
 
 $(§_¤_library_file_path): $(§_¤_obj_files)
 	mkdir -p $(dir $@)
+ifeq ($(¤_target_type),dynlib)
+	$(CC) $(§_¤_cflags) -shared $^ -o $@
+else
 	ar rcs $@ $^
 	ranlib $@
+endif
 
 build-§-¤: $(§_¤_library_file_path)
 clean-§-¤:

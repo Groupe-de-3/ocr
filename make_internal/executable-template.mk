@@ -8,6 +8,8 @@ $(error "INVALID MAKEFILE: Missing the ¤_executable_name variable")
 endif
 
 ¤_source_files != find $(¤_source_dirs) -name "*.c" -type f
+
+# Could not find how to escape parenthesis x)
 P=(
 M=)
 $(eval ¤_rec_depedencies_with_duplicates := $(¤_depedencies) $(addprefix $$$P,$(addsuffix _rec_depedencies$M,$(¤_depedencies))))

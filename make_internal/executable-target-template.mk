@@ -10,23 +10,6 @@ endif
 
 §_¤_executable_file_path = build/§/¤/$(¤_executable_name)
 
-# Only executed once per executable (ignored for next profiles)
-ifndef ¤_first_exec
-¤_first_exec = passed
-
-¤_source_files != find $(¤_source_dirs) -name "*.c" -type f
-P=(
-M=)
-$(eval ¤_rec_depedencies_with_duplicates := $(¤_depedencies) $(addprefix $$$P,$(addsuffix _rec_depedencies$M,$(¤_depedencies))))
-¤_rec_depedencies := $(¤_rec_depedencies_with_duplicates)
-
-$(eval ¤_depedencies_include_dirs := $(addprefix $$$P,$(addsuffix _source_dirs$M,$(sort $(¤_rec_depedencies)))))
-
-format-¤:
-	clang-format -i --style=file $(¤_source_files)
-.PHONY: format-¤
-endif
-
 §_¤_obj_dir = build/§/¤/obj
 §_¤_obj_files = $(patsubst %.c,$(§_¤_obj_dir)/%.o,$(¤_source_files))
 §_¤_dep_files = $(patsubst %.c,$(§_¤_obj_dir)/%.d,$(¤_source_files))
@@ -35,13 +18,18 @@ endif
 
 $(eval §_¤_depedencies_files := $(addprefix $$$P§_,$(addsuffix _library_file_path$M,$(¤_rec_depedencies))))
 
+# Adding libraries search paths
+$(eval §_¤_depedencies_flags += $(addprefix -L$$$P§_,$(addsuffix _library_folder$M,$(¤_rec_depedencies))))
+# Adding libraries
+§_¤_depedencies_flags += $(addprefix -l,$(¤_rec_depedencies))
+
 $(§_¤_obj_dir)/%.o: %.c
 	mkdir -p $(dir $@)
 	$(CC) $(§_¤_cflags) -MMD -c $< -o $@
 
 $(§_¤_executable_file_path): $(§_¤_obj_files) $(§_¤_depedencies_files)
 	mkdir -p $(dir $@)
-	$(CC) $(§_¤_cflags) $(§_¤_obj_files) $(§_¤_depedencies_files) -o $@
+	$(CC) $(§_¤_cflags) $(§_¤_obj_files) $(§_¤_depedencies_flags) -o $@
 
 build-§-¤: $(§_¤_executable_file_path)
 run-§-¤: $(§_¤_executable_file_path)
