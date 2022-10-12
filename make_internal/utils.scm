@@ -1,7 +1,17 @@
 (define define-library (lambda (name . options)
+    ; Set to true of the option source-dirs is present at least once
     (define has_source_dirs #f)
+    (define has_enable_tests #f)
 
     (for-each (lambda (option) (cond
+        ((eq? (car option) 'enable-tests)
+            (if has_enable_tests
+                (error "Cannot enable tests multiple time")
+                (begin
+                    (set! has_enable_tests #t)
+                    (enable-library-tests name)
+                ))
+        )
         ((eq? (car option) 'source-dirs) (begin
             (gmk-eval (string-append name"_source_dirs += " (string-join (cdr option) " ")))
             (set! has_source_dirs #t)

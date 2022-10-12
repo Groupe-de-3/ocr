@@ -19,8 +19,8 @@ MAKEFLAGS += -rR
 # LIBRARY_NAME_target_type = dynlib # Defaults to static
 
 $(guile (define-library "example_library" \
+	`(enable-tests)\
 	`(target-type "dynlib")))
-$(guile (enable-library-tests "example_library"))
 
 $(guile (define-library "matrices" \
 	`(deps "utils")))
