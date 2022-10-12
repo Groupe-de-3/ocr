@@ -147,7 +147,8 @@ clean: $(foreach profile,$(profiles),$(patsubst %,clean-$(profile)-%,$(targets))
 
 format: $(addprefix format-,$(libraries) $(executables))
 dev: run-debug-xor_nn
-test: run-debug-tests
+
+build-all-tests: $(addprefix build-debug-,$(test_targets))
 
 doc:
 	mkdir -p build/doc
@@ -156,7 +157,7 @@ doc:
 open-html-doc: doc
 	xdg-open build/doc/html/index.html
 
-.PHONY: all doc open-doc clean dev test $(addprefix all-,$(profiles)) format-all
+.PHONY: all doc open-doc clean dev build-all-tests $(addprefix all-,$(profiles)) format-all
 .SILENT: build/generated.mk
 
 # Generates a new Makefile (build/generated.mk) that have rules for building 

@@ -70,5 +70,6 @@
         `(target-type "dynlib")
         `(deps ,name)
     )
+    (gmk-eval (string-append "test_targets += __"name"_tests"))
 ))
 
