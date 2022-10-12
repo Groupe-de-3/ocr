@@ -1,6 +1,6 @@
-#include <stdio.h>
 #include <dlfcn.h>
 #include <err.h>
+#include <stdio.h>
 
 int main() {
     char *error;
@@ -10,7 +10,7 @@ int main() {
         errx(1, "%s\n", dlerror());
     dlerror();
 
-    double (*cosine)(double) = (double (*)(double)) dlsym(dl_handle, "test");
+    double (*cosine)(double) = (double (*)(double))dlsym(dl_handle, "test");
 
     if ((error = dlerror()) != NULL)
         errx(1, "%s\n", error);

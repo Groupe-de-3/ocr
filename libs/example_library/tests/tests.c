@@ -1,4 +1,5 @@
 #include <assert.h>
+
 #include "example_library.h"
 
 void test_add(void) {
