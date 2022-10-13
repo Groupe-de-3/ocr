@@ -17,6 +17,7 @@ else ifeq ($(¤_target_type),dynlib)
 else
 §_¤_output_folder = build/§/¤
 §_¤_output_file_path = $(§_¤_output_folder)/lib$(¤_name).a
+§_¤_cflags += -fPIC
 endif
 
 # if ¤_link_in_deps is set to true, depedencies must be linked into the output
