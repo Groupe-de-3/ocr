@@ -1,8 +1,8 @@
 #include <dlfcn.h>
-#include <unistd.h>
 #include <err.h>
-#include <sys/wait.h>
 #include <stdio.h>
+#include <sys/wait.h>
+#include <unistd.h>
 
 #define xstr(s) str(s)
 #define str(s) #s
@@ -35,17 +35,17 @@ void execute_tests(const char *path) {
 }
 
 int main() {
-    char lib[50];
-    int i = 0;
+    char        lib[50];
+    int         i    = 0;
     const char *text = values;
     while (*text != '\0') {
         i = 0;
-        for (;*text != ' ' && *text != '\0';text++)
+        for (; *text != ' ' && *text != '\0'; text++)
             lib[i++] = *text;
         if (*text == ' ')
             text++;
         lib[i] = 0;
-        
+
         printf("Running tests for %s\n", lib);
         execute_tests(lib);
         printf("Ran !\n");

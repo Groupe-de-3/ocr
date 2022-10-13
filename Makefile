@@ -153,7 +153,7 @@ clean: $(foreach profile,$(profiles),$(patsubst %,clean-$(profile)-%,$(targets))
 # 	Delete every non empty directory in the build folder
 	find build -type d 2> /dev/null | tac | xargs --no-run-if-empty rmdir --ignore-fail-on-non-empty
 
-format: $(addprefix format-,$(libraries) $(executables))
+format: $(addprefix format-,$(targets))
 dev: run-debug-xor_nn
 
 build-all-tests: $(addprefix build-debug-,$(test_targets))
@@ -165,7 +165,8 @@ doc:
 open-html-doc: doc
 	xdg-open build/doc/html/index.html
 
-.PHONY: all doc open-doc clean dev build-all-tests $(addprefix all-,$(profiles)) format-all
+.PHONY: all doc open-doc clean dev build-all-tests \
+        $(addprefix all-,$(profiles)) format format-all
 .SILENT: build/generated.mk
 
 # Generates a new Makefile (build/generated.mk) that have rules for building 
