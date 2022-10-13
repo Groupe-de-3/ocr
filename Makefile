@@ -1,5 +1,7 @@
-$(guile (load "make_internal/utils.scm"))
+.SECONDEXPANSION:
 MAKEFLAGS += -rR
+
+$(guile (load "make_internal/utils.scm"))
 
 # -------------------
 # TARGETS
@@ -71,6 +73,10 @@ $(guile (define-target "ia"))
 
 $(guile (define-target "utils"))
 
+$(guile (define-target "test-lib" \
+	`(source-dirs "tests/lib")\
+))
+
 # EXECUTABLES
 
 $(guile (define-target "example_executable"\
@@ -79,8 +85,10 @@ $(guile (define-target "example_executable"\
 ))
 
 $(guile (define-target "tests"\
+	`(cflags "-DTEST_LIBS=$$(patsubst %,lib%.so,$$(test_targets))")\
+	`(deps "test-lib")\
 	`(target-type "executable")\
-	`(source-dirs "tests")\
+	`(source-dirs "tests/runner")\
 ))
 
 $(guile (define-target "matrix_tests"\

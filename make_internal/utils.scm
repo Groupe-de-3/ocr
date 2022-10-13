@@ -42,12 +42,13 @@
     )) options)
         
     ; The default value for link_in_deps
-    ; is true for executable and false otherwise
+    ; is only false for static libs, true in other cases.
     (if (eq? link_in_deps 'default)
-        (set! link_in_deps (equal? target_type "executable")))
+        (set! link_in_deps (not (equal? target_type "staticlib"))))
 
     (gmk-eval (string-append name"_target_type := "target_type))
     (gmk-eval (string-append "targets += "name))
+
     (if link_in_deps
         (gmk-eval (string-append name"_link_in_deps = true")))
 
@@ -68,7 +69,8 @@
     (define-target (string-append "__"name"_tests")
         `(source-dirs ,(string-append "$(addsuffix /tests,$("name"_source_dirs))"))
         `(target-type "dynlib")
-        `(deps ,name)
+        `(deps ,name "test-lib")
+        `(link-in-deps #t)
     )
     (gmk-eval (string-append "test_targets += __"name"_tests"))
 ))
