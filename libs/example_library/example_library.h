@@ -18,3 +18,13 @@
  *  \return The result of the addition
  */
 int add(int a, int b);
+
+/*! \brief Substract the two given numbers.
+ *
+ *  Uses the standard c '-' operator to substract b from a.
+ *
+ *  \param a The first number
+ *  \param b The second number
+ *  \return The result of the substraction of b from a.
+ */
+int sub(int a, int b);

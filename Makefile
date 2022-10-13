@@ -85,7 +85,7 @@ $(guile (define-target "example_executable"\
 ))
 
 $(guile (define-target "tests"\
-	`(cflags "-DTEST_LIBS=$$(patsubst %,lib%.so,$$(test_targets))")\
+	`(cflags "-DTEST_LIBS=$$(patsubst %,lib%.so,$$(test_targets))" "-ldl")\
 	`(deps "test-lib")\
 	`(target-type "executable")\
 	`(source-dirs "tests/runner")\
