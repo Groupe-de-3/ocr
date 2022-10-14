@@ -1,24 +1,33 @@
-#include <stdio.h>
 #include "tests.h"
+
+#include <stdio.h>
+
 #include "matrices.h"
 
-const char *test_functions[] = {
-    "test_add",
-    NULL
-};
+const char *test_functions[] = {"test_add", NULL};
 
 void test_add(void) {
     Matrix(int) id = m_new(int, 1, 2);
-    m_copy(id, (int[]){
-        1, 1,
-        3, 1,
-    });
+    m_copy(
+        id,
+        (int[]){
+            1,
+            1,
+            3,
+            1,
+        }
+    );
 
     Matrix(int) m = m_new(int, 2, 1);
-    m_copy(m, (int[]){
-        22, 43,
-        7, 3,
-    });
+    m_copy(
+        m,
+        (int[]){
+            22,
+            43,
+            7,
+            3,
+        }
+    );
 
     Matrix(int) out = m_new(int, 2, 2);
     m_mul(id, m, out);
