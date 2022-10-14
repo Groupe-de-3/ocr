@@ -63,7 +63,7 @@ run-§-¤: $(§_¤_output_file_path)
 endif
 
 
-.PHONY: clean-¤ build-¤
+.PHONY: clean-¤ build-¤ run-§-¤
 
 include $(wildcard $(§_¤_dep_files))
 

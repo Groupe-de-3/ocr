@@ -201,3 +201,5 @@ build/generated.mk: make_internal/target-template.mk make_internal/target-profil
 
 # Including the generated makefile will trigged its generation if not present
 -include build/generated.mk
+
+-include make_internal/bonus-test-rules.mk
