@@ -57,6 +57,11 @@ clean-§-¤:
 	rm -f $(§_¤_dep_files)
 	rm -f $(§_¤_output_file_path)
 	find build -type d 2> /dev/null | tac | xargs --no-run-if-empty rmdir --ignore-fail-on-non-empty
+ifeq ($(¤_target_type),executable)
+run-§-¤: $(§_¤_output_file_path)
+	./$(§_¤_output_file_path) $(¤_run_arguments)
+endif
+
 
 .PHONY: clean-¤ build-¤
 

@@ -54,6 +54,11 @@ $(guile (load "make_internal/utils.scm"))
 #      # source-dirs.
 #      # Optional, default to nothing.
 #     `(ignore ignore/*/fil?)
+#
+#      # Only does something for executable targets. Gives the given arguments
+#      # to the executable when running using the run-PROFILE-TARGET make rules.
+#      # Optional, default to empty string.
+#     `(run-args "arg1 --arg2 arg3" "-arg4")
 # ))
 #
 
@@ -85,7 +90,7 @@ $(guile (define-target "example_executable"\
 ))
 
 $(guile (define-target "tests"\
-	`(cflags "-DTEST_LIBS=$$(patsubst %,lib%.so,$$(test_targets))" "-ldl")\
+	`(run-args "$$(patsubst %,lib%.so,$$(test_targets))")\
 	`(deps "test-lib")\
 	`(target-type "executable")\
 	`(source-dirs "tests/runner")\

@@ -35,7 +35,7 @@ int execute_tests(const char *path) {
 
         void *dl_handle = dlopen(path, RTLD_LAZY);
         if (dl_handle == NULL)
-            errx(1, "Invalid test lib file: %s\n", dlerror());
+            errx(1, "Invalid test lib file: %s", dlerror());
         dlerror();
 
         // Loading the array of test functions (asumed valid).
@@ -43,6 +43,7 @@ int execute_tests(const char *path) {
         if ((error = dlerror()) != NULL)
             errx(1, "Invalid test lib file: %s", error);
 
+        // Changed if any test fails
         int result = 0;
         // Iteration through the array.
         for (char **counter = test_functions; *counter != 0; counter++) {
@@ -73,25 +74,10 @@ int execute_tests(const char *path) {
     return WEXITSTATUS(status);
 }
 
-int main() {
-    // Buffer for each test file names. (with i as counter into it)
-    char        lib[100];
-    int         i    = 0;
-    const char *text = values;
-
-    // Iterating through each space-separated list of test files.
-    while (*text != '\0') {
-        i = 0;
-        // Copy the current word until eol or a space is hit.
-        for (; *text != ' ' && *text != '\0' && i < 100; text++)
-            lib[i++] = *text;
-        assert(i < 100); // Assert not any file was larget than 100 characters
-        if (*text == ' ')
-            text++;
-        lib[i] = 0;
-
-        printf("Running tests for %s\n", lib);
-        int result = execute_tests(lib);
+int main(int argc, char **argv) {
+    for (int argi = 1; argi < argc; argi++) {
+        printf("Running tests for %s\n", argv[argi]);
+        int result = execute_tests(argv[argi]);
         if (result != 0)
             printf("Test failed\n");
         else
