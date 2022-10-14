@@ -1,6 +1,7 @@
 #pragma once
 #include <stdbool.h>
 #include <stddef.h>
+#include <stdint.h>
 
 /*! \file tests.h
  *  \brief Host of helper macros and functions for writing tests with the
@@ -25,17 +26,17 @@ void _h_assert_failed(
 
 #define h_assert(expr) h_assert_msg(expr, NULL)
 
-#define _h_assert_op(TYPE, FORMAT_FLAGS, X, OP, Y)    \
-    int _h_x = (X);                                   \
-    int _h_y = (Y);                                   \
-    h_assert_msg(                                     \
-        _h_x OP _h_y,                                 \
-        "Assertion '%s' failed: %s == %" FORMAT_FLAGS \
-        ", %s == %" FORMAT_FLAGS,                     \
-        #X " " #OP " " #Y, #X, _h_x, #Y, _h_y         \
-    );                                                \
-    }                                                 \
-    while (0)
+#define _h_assert_op(TYPE, FORMAT_FLAGS, X, OP, Y)        \
+    do {                                                  \
+        TYPE _h_x = (X);                                  \
+        TYPE _h_y = (Y);                                  \
+        h_assert_msg(                                     \
+            _h_x OP _h_y,                                 \
+            "Assertion '%s' failed: %s == %" FORMAT_FLAGS \
+            ", %s == %" FORMAT_FLAGS,                     \
+            #X " " #OP " " #Y, #X, _h_x, #Y, _h_y         \
+        );                                                \
+    } while (0)
 
 #define h_assert_int(X, OP, Y) _h_assert_op(intmax_t, "jd", X, OP, Y)
 #define h_assert_uint(X, OP, Y) _h_assert_op(uintmax_t, "ju", X, OP, Y)
