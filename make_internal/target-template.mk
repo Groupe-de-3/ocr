@@ -27,11 +27,11 @@ P=(
 M=)
 ¤_rec_depedencies += $(¤_depedencies) 
 ¤_rec_depedencies += $(foreach target,$(¤_depedencies), \
-	$(eval $$$P$(target)_rec_depedencies$M) \
+	$($(target)_rec_depedencies) \
 )
 
 ¤_depedencies_include_dirs = $(foreach target,$(sort $(¤_rec_depedencies)), \
-	$(eval $$$P$(target)_source_dirs$M) \
+	$($(target)_source_dirs) \
 )
 
 format-¤:

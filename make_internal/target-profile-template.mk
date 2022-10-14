@@ -23,19 +23,15 @@ endif
 # if ¤_link_in_deps is set to true, depedencies must be linked into the output
 # file, so we add the required flags to §_¤_cflags
 ifeq ($(¤_link_in_deps),true)
-# $(info $(foreach tname,$(¤_rec_depedencies), $(eval $$$P§_$(tname)_output_file_path$M)))
-
 §_¤_depedencies_files = $(foreach tname,$(¤_rec_depedencies),\
-	$$(§_$(tname)_output_file_path) \
+	$(§_$(tname)_output_file_path) \
 )
 
 # Adding depedencies search paths and remove duplicates
 # (which will happen if all depedencies are in the same folder)
 §_¤_depedencies_flags = $(foreach tname,$(sort $(¤_rec_depedencies)),\
-	-L$$(§_$(tname)_output_folder) \
+	-L$(§_$(tname)_output_folder) \
 )
-$(info $(value §_¤_depedencies_flags))
-
 # Adding libraries
 §_¤_depedencies_flags += $(addprefix -l,$(¤_rec_depedencies))
 
@@ -46,7 +42,7 @@ $(§_¤_obj_dir)/%.o: %.c
 	mkdir -p $(dir $@)
 	$(CC) $(§_¤_cflags) -MMD -c $< -o $@
 
-$(§_¤_output_file_path): $(§_¤_obj_files) $(§_¤_depedencies_files)
+$(§_¤_output_file_path): $$(§_¤_obj_files) $$(§_¤_depedencies_files)
 	mkdir -p $(dir $@)
 ifeq ($(¤_target_type),executable)
 	$(CC) $(§_¤_cflags) -Wl,-rpath,'$$ORIGIN' $^ -o $@
@@ -57,7 +53,7 @@ else
 	ranlib $@
 endif
 
-build-§-¤: $(§_¤_output_file_path)
+build-§-¤: $$(§_¤_output_file_path)
 clean-§-¤:
 	rm -f $(§_¤_obj_files)
 	rm -f $(§_¤_dep_files)
