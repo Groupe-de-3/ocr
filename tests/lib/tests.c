@@ -6,7 +6,7 @@
 void _h_assert_failed(
     const char *file, int line, const char *expr, const char *msg, ...
 ) {
-    printf("At %s:%d\n", file, line);
+    //printf("At %s:%d\n", file, line);
 
     if (msg != NULL) {
         va_list ap;
