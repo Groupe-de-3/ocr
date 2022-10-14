@@ -79,7 +79,7 @@ $(guile (define-target "ia"))
 
 $(guile (define-target "utils"))
 
-$(guile (define-target "test-lib" \
+$(guile (define-target "test_lib" \
 	`(source-dirs "tests/lib")\
 ))
 
@@ -92,7 +92,7 @@ $(guile (define-target "example_executable"\
 
 $(guile (define-target "tests"\
 	`(run-args "$$(patsubst %,lib%.so,$$(test_targets))")\
-	`(deps "test-lib")\
+	`(deps "test_lib")\
 	`(target-type "executable")\
 	`(source-dirs "tests/runner")\
 ))
@@ -162,7 +162,7 @@ clean: $(foreach profile,$(profiles),$(patsubst %,clean-$(profile)-%,$(targets))
 format: $(addprefix format-,$(targets))
 dev: run-debug-xor_nn
 
-build-all-tests: $(addprefix build-debug-,$(test_targets))
+$(addprefix all-tests-,$(profiles)): all-tests-%: $(addprefix build-%-,$(test_targets))
 
 doc:
 	mkdir -p build/doc
@@ -171,7 +171,7 @@ doc:
 open-html-doc: doc
 	xdg-open build/doc/html/index.html
 
-.PHONY: all doc open-doc clean dev build-all-tests \
+.PHONY: all doc open-doc clean dev $(addprefix all-tests-,$(profiles)) \
         $(addprefix all-,$(profiles)) format format-all
 .SILENT: build/generated.mk
 

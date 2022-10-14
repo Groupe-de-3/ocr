@@ -72,7 +72,7 @@
     (define-target (string-append "__"name"_tests")
         `(source-dirs ,(string-append "$(addsuffix /tests,$("name"_source_dirs))"))
         `(target-type "dynlib")
-        `(deps ,name "test-lib")
+        `(deps ,name "test_lib")
         `(link-in-deps #t)
     )
     (gmk-eval (string-append "test_targets += __"name"_tests"))
