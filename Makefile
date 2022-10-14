@@ -69,6 +69,7 @@ $(guile (define-target "example_library" \
 ))
 
 $(guile (define-target "matrices" \
+	`(enable-tests)\
 	`(deps "utils")\
 ))
 

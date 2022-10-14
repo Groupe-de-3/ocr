@@ -25,13 +25,13 @@ endif
 # Could not find how to escape parenthesis x)
 P=(
 M=)
-$(eval ¤_rec_depedencies_with_duplicates := $(¤_depedencies) \
-	$(addprefix $$$P,$(addsuffix _rec_depedencies$M,$(¤_depedencies)))\
+¤_rec_depedencies += $(¤_depedencies) 
+¤_rec_depedencies += $(foreach target,$(¤_depedencies), \
+	$(eval $$$P$(target)_rec_depedencies$M) \
 )
-¤_rec_depedencies := $(¤_rec_depedencies_with_duplicates)
 
-$(eval ¤_depedencies_include_dirs := \
-	$(addprefix $$$P,$(addsuffix _source_dirs$M,$(sort $(¤_rec_depedencies))))\
+¤_depedencies_include_dirs = $(foreach target,$(sort $(¤_rec_depedencies)), \
+	$(eval $$$P$(target)_source_dirs$M) \
 )
 
 format-¤:

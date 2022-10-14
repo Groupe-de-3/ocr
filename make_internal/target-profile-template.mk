@@ -23,13 +23,19 @@ endif
 # if ¤_link_in_deps is set to true, depedencies must be linked into the output
 # file, so we add the required flags to §_¤_cflags
 ifeq ($(¤_link_in_deps),true)
-$(foreach tname,$(¤_rec_depedencies), \
-	$(eval §_¤_depedencies_files += $$$$(§_$(tname)_output_file_path)) \
+# $(info $(foreach tname,$(¤_rec_depedencies), $(eval $$$P§_$(tname)_output_file_path$M)))
+
+§_¤_depedencies_files = $(foreach tname,$(¤_rec_depedencies),\
+	$$(§_$(tname)_output_file_path) \
 )
 
 # Adding depedencies search paths and remove duplicates
 # (which will happen if all depedencies are in the same folder)
-$(eval §_¤_depedencies_flags = $(sort $(addprefix -L$$$P§_,$(addsuffix _output_folder$M,$(¤_rec_depedencies)))))
+§_¤_depedencies_flags = $(foreach tname,$(sort $(¤_rec_depedencies)),\
+	-L$$(§_$(tname)_output_folder) \
+)
+$(info $(value §_¤_depedencies_flags))
+
 # Adding libraries
 §_¤_depedencies_flags += $(addprefix -l,$(¤_rec_depedencies))
 
