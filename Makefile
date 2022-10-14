@@ -1,74 +1,111 @@
+.SECONDEXPANSION:
 MAKEFLAGS += -rR
 
+$(guile (load "make_internal/utils.scm"))
+
 # -------------------
-# LIBRARIES
+# TARGETS
 #
-# Libraries are a collection of files all built together for them to be
-# used by another library and/or executable.
+# Targets are a bunch of C files compiled into either an executable, a dynamic
+# library or a static library. They can be depending on other targets, meaning
+# they can include their files, and reference functions defined in them.
 # -------------------
-
-libraries := example_library utils matrices sudoku ia
-libraries += example_library_tests
-
-# Required:
-# LIBRARY_NAME_source_dirs = libs/LIBRARY_NAME
-# LIBRARY_NAME_name = name
+#
+# Target example:
 # 
-# Optional:
-# LIBRARY_NAME_depedencies = OTHER_LIBRARY_NAME_1 OTHER_LIBRARY_NAME_2 ...
-# LIBRARY_NAME_cflags = -FLAG1 -FLAG2 value2
-# LIBRARY_NAME_ignore = path/to*/ignore/*
-# LIBRARY_NAME_target_type = dynlib # Defaults to static
-
-example_library_source_dirs = libs/example_library
-example_library_name = example_library
-example_library_ignore = libs/example_library/tests*
-example_library_tests_source_dirs = libs/example_library/tests
-example_library_tests_name = example_library_tests
-example_library_tests_depedencies = example_library
-example_library_tests_target_type = dynlib
-
-matrices_source_dirs = libs/matrices
-matrices_name = matrices
-matrices_depedencies = utils
-
-sudoku_source_dirs = libs/sudoku
-sudoku_name = sudoku
-
-ia_source_dirs = libs/ia
-ia_name = ia
-
-utils_source_dirs = libs/utils
-utils_name = utils
-
-# -------------------
-# EXECUTABLES
+# $(guile (define-target "example_library" \
+#      # If given, another target named __example_library_tests will also be
+#      # created. It will use as source folder, the one of the current target
+#      # to which is appended '/tests'. It will have as target-type 'dynlib'.
+#      # This also adds the 'ignore' option to the current target for the
+#      # tests folder(s).
+#     `(enable-tests)\         # Optional
 #
-# Executables are a collection of files all built together with depedencies
-# to create an executable file.
-# -------------------
+#      # Specified what kind of artefact should be created by the target.
+#      # Optional, defaults to staticlib
+#      # Possible values are 'dynlib', 'staticlib' or 'executable'
+#     `(target-type "dynlib")\
+#
+#      # If set to true, the final artefact will have all its depedencies
+#      # linked into it. Making depedents of the target not needing to link
+#      # them. Automatically enabled if target-type is executable, but can be
+#      # overwritten.
+#      # Optional, default to #f (false)
+#      # If no value is given, it default to #t.
+#     `(link-in-deps #t)
+#
+#      # List of one of more folder in which source files should be looked for,
+#      # this also will be the include folder for this target and its depedents.
+#      # Optional, defaults to:
+#      #   If target-type is executable         -> executables/NAME
+#      #   Otherwise (for dynlib and staticlib) -> libs/NAME
+#      # Where NAME is the target's name given at the begigning.
+#     `(source-dirs "source/folder" "other/source/folder")
+#      
+#      # List of targets which this target will depend on. This has for effect
+#      # for any other target depending directly, or not, on this target, to
+#      # link these depedencies if link-in-deps is true.
+#      # Optional, defaults to an empty list.
+#     `(deps "dep-one" "dep-two")
+#      
+#     `(cflags --flag-one -flags)
+#     
+#      # Blob of files to ignore while looking for source files in the given
+#      # source-dirs.
+#      # Optional, default to nothing.
+#     `(ignore ignore/*/fil?)
+#
+#      # Only does something for executable targets. Gives the given arguments
+#      # to the executable when running using the run-PROFILE-TARGET make rules.
+#      # Optional, default to empty string.
+#     `(run-args "arg1 --arg2 arg3" "-arg4")
+# ))
+#
 
-executables = example_executable tests matrix_tests sudoku_tests
+# LIBRARIES
 
-# EXECUTABLE_NAME_source_dirs := executables/EXECUTABLE_NAME
-# EXECUTABLE_NAME_executable_name := name_of_an_executable
-# EXECUTABLE_NAME_depedencies := LIBRARY_NAME_1 LIBRARY_NAME_2
+$(guile (define-target "example_library" \
+	`(enable-tests)\
+))
 
-example_executable_source_dirs := executables/example_executable
-example_executable_executable_name := example_executable
-example_executable_depedencies := example_library
+$(guile (define-target "matrices" \
+	`(enable-tests)\
+	`(deps "utils")\
+))
 
-tests_source_dirs := tests
-tests_executable_name := tests
-#tests_depedencies := $(libraries)
+$(guile (define-target "sudoku"))
 
-matrix_tests_source_dirs := executables/matrix_tests
-matrix_tests_executable_name := matrix_tests
-matrix_tests_depedencies := matrices
+$(guile (define-target "ia"))
 
-sudoku_tests_source_dirs := executables/sudoku_tests
-sudoku_tests_executable_name := sudoku_tests
-sudoku_tests_depedencies := sudoku
+$(guile (define-target "utils"))
+
+$(guile (define-target "test_lib" \
+	`(source-dirs "tests/lib")\
+))
+
+# EXECUTABLES
+
+$(guile (define-target "example_executable"\
+	`(target-type "executable")\
+	`(deps "example_library")\
+))
+
+$(guile (define-target "tests"\
+	`(run-args "$$(patsubst %,lib%.so,$$(test_targets))")\
+	`(deps "test_lib")\
+	`(target-type "executable")\
+	`(source-dirs "tests/runner")\
+))
+
+$(guile (define-target "matrix_tests"\
+	`(target-type "executable")\
+	`(deps "matrices")\
+))
+
+$(guile (define-target "sudoku_tests"\
+	`(target-type "executable")\
+	`(deps "sudoku")\
+))
 
 # -------------------
 # (Build) PROFILES
@@ -90,15 +127,13 @@ default_cflags = $(c_warnings) $(c_errors) -std=gnu17 -lm
 disable_asserts_cflags = -DNDEBUG -Wno-unused-variable -Wno-unused-parameter
 
 profiles = valgrind-debug debug release
-# Targets gave to libraries or executables that don't precise them
-default_profiles = valgrind-debug debug release
 
-# Avaible but not required variables for a profile
+# Available but not required variables for a profile
 # PROFILE_NAME_cflags - List of flags to give to $CC
 
-debug_cflags = $(default_cflags) -fsanitize=address  -static-libsan -g -Og
+debug_cflags = $(default_cflags) -fsanitize=address -static-libsan -g -Og
 valgrind-debug_cflags = $(default_cflags) -gdwarf-4 -g -Og $(disable_asserts_cflags)
-release_cflags = $(default_cflags) -O3 $(disable_asserts_cflags)
+release_cflags = $(default_cflags) -O3 -flto $(disable_asserts_cflags)
 
 # -------------------
 # SPECIAL RULES
@@ -115,15 +150,19 @@ MODE=release
 all: all-release
 endif
 
-$(addprefix all-,$(profiles)): all-%: $(patsubst %,build-\%-%,$(libraries) $(executables))
-clean: $(foreach profile,$(profiles),$(patsubst %,clean-$(profile)-%,$(libraries) $(executables)))
+# Creates every all-profile rules
+$(addprefix all-,$(profiles)): all-%: $(patsubst %,build-\%-%,$(targets))
+
+clean: $(foreach profile,$(profiles),$(patsubst %,clean-$(profile)-%,$(targets)))
 	rm build/generated.mk
 	rm -rf build/doc
+# 	Delete every non empty directory in the build folder
 	find build -type d 2> /dev/null | tac | xargs --no-run-if-empty rmdir --ignore-fail-on-non-empty
 
-format: $(addprefix format-,$(libraries) $(executables))
+format: $(addprefix format-,$(targets))
 dev: run-debug-xor_nn
-test: run-debug-tests
+
+$(addprefix all-tests-,$(profiles)): all-tests-%: $(addprefix build-%-,$(test_targets))
 
 doc:
 	mkdir -p build/doc
@@ -132,36 +171,33 @@ doc:
 open-html-doc: doc
 	xdg-open build/doc/html/index.html
 
-.PHONY: all doc open-doc clean dev test $(addprefix all-,$(profiles)) format-all
+.PHONY: all doc open-doc clean dev $(addprefix all-tests-,$(profiles)) \
+        $(addprefix all-,$(profiles)) format format-all
 .SILENT: build/generated.mk
 
 # Generates a new Makefile (build/generated.mk) that have rules for building 
-# all libraries and executables.
-# To do this it takes the files executable-template.mk and library-template.mk
+# all targets.
+# To do this it takes the file target-template.mk
 # and replaces all occurences of the characters '§' and '¤' with the profile
-# name and executable or library name respectively.
-# And does that for evey library or executable respectively times all profiles.
-build/generated.mk: make_internal/library-target-template.mk make_internal/executable-target-template.mk Makefile
+# name and target name respectively.
+# And does that for evey target/profile pair.
+build/generated.mk: make_internal/target-template.mk make_internal/target-profile-template.mk Makefile
 	mkdir -p build
 	touch $@
-	echo "# THIS IS AN AUTO-GENERATED FILE" > $@
-	echo "# DO NOT EDIT DIRECTLY" >> $@
+	echo "" > $@
 	
 	# Normal templates of libraries
-	for LIBRARY_NAME in $(libraries); do \
-		cat make_internal/library-template.mk | sed "s/^#.*$$//" | sed "s/¤/$$LIBRARY_NAME/g" >> $@; \
-	done
-	# Normal templates of executables
-	for EXECUTABLE_NAME in $(executables); do \
-		cat make_internal/executable-template.mk | sed "s/^#.*$$//" | sed "s/¤/$$EXECUTABLE_NAME/g"  | sed "s/§/$$PROFILE_NAME/g" >> $@; \
+	for TARGET_NAME in $(targets); do \
+		echo "# THIS IS AN AUTO-GENERATED FILE" >> $@; \
+		echo "# DO NOT EDIT DIRECTLY" >> $@; \
+		cat make_internal/target-template.mk | sed "s/^#.*$$//" | sed "s/¤/$$TARGET_NAME/g" >> $@; \
 	done
 	for PROFILE_NAME in $(profiles); do \
-		for LIBRARY_NAME in $(libraries); do \
-			cat make_internal/library-target-template.mk | sed "s/^#.*$$//" | sed "s/¤/$$LIBRARY_NAME/g"  | sed "s/§/$$PROFILE_NAME/g" >> $@; \
+		for TARGET_NAME in $(targets); do \
+			echo "# THIS IS AN AUTO-GENERATED FILE" >> $@; \
+			echo "# DO NOT EDIT DIRECTLY" >> $@; \
+			cat make_internal/target-profile-template.mk | sed "s/^#.*$$//" | sed "s/¤/$$TARGET_NAME/g"  | sed "s/§/$$PROFILE_NAME/g" >> $@; \
 		done; \
-		for EXECUTABLE_NAME in $(executables); do \
-			cat make_internal/executable-target-template.mk | sed "s/^#.*$$//" | sed "s/¤/$$EXECUTABLE_NAME/g"  | sed "s/§/$$PROFILE_NAME/g" >> $@; \
-		done \
 	done
 
 # Including the generated makefile will trigged its generation if not present
