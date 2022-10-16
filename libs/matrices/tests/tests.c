@@ -1,17 +1,20 @@
 #include "tests.h"
 
-#include <stdio.h>
 #include <assert.h>
+#include <stdio.h>
 
 #include "matrices.h"
 
 const char *test_functions[] = {
-    "test_mul2", "test_mul2_vec", "test_add2",
-    "test_add2_transposed",
-     NULL
-};
+    "test_mul2",
+    "test_mul2_vec",
+    "test_int_add2",
+    "test_int_add2_transposed",
+    "test_double_add2",
+    "test_double_mul2",
+    NULL};
 
-void test_add2(void) {
+void test_int_add2(void) {
     Matrix(int) a = m_new(int, 2, 2);
     // clang-format off
     m_copy(a, (int[]){
@@ -38,7 +41,7 @@ void test_add2(void) {
     m_destroy(b);
 }
 
-void test_add2_transposed(void) {
+void test_int_add2_transposed(void) {
     Matrix(int) a = m_new(int, 2, 1);
     // clang-format off
     m_copy(a, (int[]){
@@ -57,6 +60,33 @@ void test_add2_transposed(void) {
     m_add(a, b);
     h_assert_int(a[0], ==, 300);
     h_assert_int(a[1], ==, 5);
+
+    m_destroy(a);
+    m_destroy(b);
+}
+
+void test_double_add2(void) {
+    Matrix(double) a = m_new(double, 2, 2);
+    // clang-format off
+    m_copy(a, (double[]){
+       -78.5,  48.2,
+        498.2, 42.128,
+    });
+    // clang-format on
+
+    Matrix(double) b = m_new(double, 2, 2);
+    // clang-format off
+    m_copy(b, (double[]){
+         22.4894, 43.1123,
+        -7.495,   3.186,
+    });
+    // clang-format on
+
+    m_add(a, b);
+    h_assert_double_eq(m_get2(a, 0, 0), -56.0106, 0.0001);
+    h_assert_double_eq(m_get2(a, 1, 0), 91.3123, 0.0001);
+    h_assert_double_eq(m_get2(a, 0, 1), 490.705, 0.001);
+    h_assert_double_eq(m_get2(a, 1, 1), 45.314, 0.001);
 
     m_destroy(a);
     m_destroy(b);
@@ -114,6 +144,36 @@ void test_mul2_vec(void) {
 
     h_assert_int(m_get2(out, 0, 0), ==, 221);
     h_assert_int(m_get2(out, 0, 1), ==, 320);
+
+    m_destroy(a);
+    m_destroy(b);
+    m_destroy(out);
+}
+
+void test_double_mul2(void) {
+    Matrix(double) a = m_new(double, 2, 2);
+    // clang-format off
+    m_copy(a, (double[]){
+        84.2,  45.156,
+        49.5,  54.581,
+    });
+    // clang-format on
+
+    Matrix(double) b = m_new(double, 2, 2);
+    // clang-format off
+    m_copy(b, (double[]){
+        22.45, 42.69,
+        798.5,  480.2,
+    });
+    // clang-format on
+
+    Matrix(double) out = m_new(double, 2, 2);
+
+    m_mul(a, b, out);
+    h_assert_double_eq(m_get2(out, 0, 0), 37947.356, 0.001);
+    h_assert_double_eq(m_get2(out, 1, 0), 25278.4092, 0.0001);
+    h_assert_double_eq(m_get2(out, 0, 1), 44694.2035, 0.0001);
+    h_assert_double_eq(m_get2(out, 1, 1), 28322.9512, 0.0001);
 
     m_destroy(a);
     m_destroy(b);

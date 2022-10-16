@@ -40,3 +40,14 @@ void _h_assert_failed(
 
 #define h_assert_int(X, OP, Y) _h_assert_op(intmax_t, "jd", X, OP, Y)
 #define h_assert_uint(X, OP, Y) _h_assert_op(uintmax_t, "ju", X, OP, Y)
+
+#define h_assert_double_eq(X, Y, delta)                                      \
+    do {                                                                     \
+        double _h_x    = (X);                                                \
+        double _h_y    = (Y);                                                \
+        double _h_diff = _h_x > _h_y ? _h_x - _h_y : _h_y - _h_x;            \
+        h_assert_msg(                                                        \
+            _h_diff <= (delta), "Assertion '%s' failed: %s == %f, %s == %f", \
+            #X " == " #Y, #X, _h_x, #Y, _h_y                                 \
+        );                                                                   \
+    } while (0)
