@@ -29,12 +29,15 @@ void img_destroy(Image image) {
     }
 }
 
-grayscale_pixel_t img_rbg8_to_gayscale(uint8_t r, uint8_t g, uint8_t b) {
+grayscale_pixel_t img_rbg8_to_grayscale(uint8_t r, uint8_t g, uint8_t b) {
     float gray_scale = 0.299f * ((float)r / 255.f) +
                        0.587f * ((float)g / 255.f) +
                        0.114f * ((float)b / 255.f);
     // Only if grayscale_pixel_t is a float
     return gray_scale;
+}
+uint8_t img_grayscale_to_rgb8(grayscale_pixel_t value) {
+    return (uint8_t)(value * 255.f);
 }
 
 grayscale_pixel_t img_get_pixel_grayscale(Image *image, size_t x, size_t y) {

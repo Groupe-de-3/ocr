@@ -64,7 +64,7 @@ enum BmpLoadResult bmp_load_file(FILE *file, Image *image_out) {
             fread(current_pixel, 1, 3, file);
             img_set_pixel_grayscale(
                 image_out, x, y,
-                img_rbg8_to_gayscale(
+                img_rbg8_to_grayscale(
                     current_pixel[0], current_pixel[1], current_pixel[1]
                 )
             );
@@ -73,4 +73,58 @@ enum BmpLoadResult bmp_load_file(FILE *file, Image *image_out) {
     }
 
     return BmpLoadResult_Ok;
+}
+
+static void writeu8(FILE *file, uint8_t value) {
+    fwrite(&value, sizeof(uint8_t), 1, file);
+}
+static void writeu32(FILE *file, uint32_t value) {
+    fwrite(&value, sizeof(uint32_t), 1, file);
+}
+static void writeu16(FILE *file, uint16_t value) {
+    fwrite(&value, sizeof(uint16_t), 1, file);
+}
+
+void bmp_save_to_file(FILE *file, Image *image) {
+    writeu8(file, (uint8_t)'B');
+    writeu8(file, (uint8_t)'M'); // Magic first bytes
+    writeu32(file,
+        14 + // Size of bitmap header
+        40 + // size of info header
+        3 * (uint32_t)image->width * (uint32_t)image->height // Size of pixel data
+    ); // The size of the whole file
+    writeu32(file, 0); // Useless
+    writeu32(file, 14 + 40); // Starting address of image data
+
+    writeu32(file, 40); // The size of the BITMAPINFOHEADER
+    writeu32(file, (uint32_t)image->width);
+    writeu32(file, (uint32_t)image->height);
+    writeu16(file, 1); // Color panes are hard coded
+    writeu16(file, 24); // Bits per pixel here always 24
+    writeu32(file, 0); // No compression
+    writeu32(file, 0); // Image size is ignored since there is not compression
+    writeu32(file, 3780); // X Resolution (here set to equivalent of 96dpi)
+    writeu32(file, 3780); // Y Resolution
+    writeu32(file, 0); // Empty palette
+    writeu32(file, 0); // No important colors
+
+    long row_size = (long)image->width * 3;
+    long row_padding = 0;
+    while (((row_size + row_padding) & 0x3) != 0)
+        row_padding++;
+ 
+    for (uint32_t y = 0; y < image->height; y++) {
+        for (uint32_t x = 0; x < image->width; x++) { // pixels are still left to right so no problem there
+            grayscale_pixel_t gray_scale = img_get_pixel_grayscale(
+                image, x,
+                // BMP files have pixel bottom to top, while we want to save to top to bottom
+                image->height - y - 1
+            );
+            uint8_t pixel_value = (uint8_t)floor(gray_scale * 255);
+            // All colors are the same value
+            writeu8(file, pixel_value); writeu8(file, pixel_value); writeu8(file, pixel_value);
+        }
+        for (int i = 0; i < row_padding; i++)
+            writeu8(file, 0);
+    }
 }

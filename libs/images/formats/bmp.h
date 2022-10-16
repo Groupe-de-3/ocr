@@ -9,3 +9,4 @@ enum BmpLoadResult {
 };
 
 enum BmpLoadResult bmp_load_file(FILE *file, Image *image_out);
+void               bmp_save_to_file(FILE *file, Image *image);
