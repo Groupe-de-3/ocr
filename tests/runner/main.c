@@ -91,14 +91,17 @@ int execute_tests(const char *path) {
     if ((error = dlerror()) != NULL)
         errx(1, "Invalid test lib file: %s", error);
 
+    // Count the amount of tests
+    int test_count = 0;
+    for (; test_functions[test_count] != 0; test_count++);
+            
     // Changed if any test fails
     int result = 0;
-    // Iteration through the array.
-    for (char **counter = test_functions; *counter != 0; counter++) {
-        printf("  '%s' > ", *counter);
+    for (int test_i = 0; test_i < test_count; test_i++) {
+        printf("  (%d/%d) '%s' > ", test_i+1, test_count, test_functions[test_i]);
         fflush(stdout);
 
-        TestFunction tst_fun = (TestFunction)dlsym(dl_handle, *counter);
+        TestFunction tst_fun = (TestFunction)dlsym(dl_handle, test_functions[test_i]);
         if ((error = dlerror()) != NULL)
             errx(1, "Invalid test lib file: %s", error);
 
