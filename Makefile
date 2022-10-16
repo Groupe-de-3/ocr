@@ -79,6 +79,8 @@ $(guile (define-target "ia"))
 
 $(guile (define-target "utils"))
 
+$(guile (define-target "images"))
+
 $(guile (define-target "test_lib" \
 	`(source-dirs "tests/lib")\
 ))
