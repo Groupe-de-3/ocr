@@ -1,3 +1,5 @@
+#pragma once
+
 /*! \file utils_countargs.h
  *
  *  This file only contains the definition of the #utils_countargs macro.
