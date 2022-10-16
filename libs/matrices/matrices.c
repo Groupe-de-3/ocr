@@ -98,53 +98,37 @@ bool m_eq(Matrix(void) a, Matrix(void) b) {
 
 #define matrix_mul(name, type)                                                \
     void name(Matrix(type) a, Matrix(type) b, Matrix(type) out) {             \
-        assert(m_width(a) == m_height(b));                                    \
-        assert(m_height(a) == m_height(out));                                 \
-        assert(m_width(b) == m_width(out));                                   \
+        assert(m_dimc(a) >= 2);                                               \
+        assert(m_dimc(b) >= 2);                                               \
+        assert(m_dimc(out) >= 2);                                             \
                                                                               \
         size_t c1 = m_height(a);                                              \
         size_t c2 = m_width(b);                                               \
                                                                               \
-        for (size_t row_i = 0; row_i < m_width(a); row_i++) {                 \
-            for (size_t col_i = 0; col_i < m_height(b); col_i++) {            \
+        assert(m_width(a) == m_height(b));                                    \
+        assert(c1 == m_height(out));                                          \
+        assert(c2 == m_width(out));                                           \
+                                                                              \
+        for (size_t row_i = 0; row_i < c1; row_i++) {                         \
+            for (size_t col_i = 0; col_i < c2; col_i++) {                     \
                 type sum = 0.;                                                \
                 for (size_t row_and_col = 0; row_and_col < c1; row_and_col++) \
-                    sum += a[row_and_col + row_i * c1] *                      \
-                           b[col_i + row_and_col * c2];                       \
-                out[col_i + row_i * c2] = sum;                                \
+                    sum += m_get2(a, row_and_col, row_i) *                    \
+                           m_get2(b, col_i, row_and_col);                     \
+                m_get2(out, col_i, row_i) = sum;                              \
             }                                                                 \
         }                                                                     \
     }
 matrix_mul(m_imul, int) matrix_mul(m_fmul, double) matrix_mul(m_fmulf, float)
 
-#define matrix_add(name, type, op)                                    \
-    void name(Matrix(type) a, Matrix(type) out) {                     \
-        MatrixMetadata *meta_a = m_metadata(a);                       \
-        MatrixMetadata *meta_b = m_metadata(out);                     \
-        assert(meta_a->dimc == meta_b->dimc);                         \
-        for (size_t i = 0; i < meta_a->dimc; i++) {                   \
-            assert(meta_a->dimv[i] == meta_b->dimv[i]);               \
-        }                                                             \
-                                                                      \
-        size_t current_position[MATRIX_MAX_DIMS] = {0};               \
-        for (;;) {                                                    \
-            size_t index = meta_a->dimv[0];                           \
-            for (ssize_t dim_i = (ssize_t)meta_a->dimc - 1;           \
-                 dim_i > 0 /* Not processing last one*/; dim_i--) {   \
-                index *= meta_a->dimv[dim_i];                         \
-                index += current_position[dim_i];                     \
-            }                                                         \
-            out[index] = out[index] op a[index];                      \
-                                                                      \
-            current_position[meta_a->dimc - 1] = 0;                   \
-            for (ssize_t dim_i = (ssize_t)meta_a->dimc - 1;           \
-                 dim_i > 0 /* Not processing last one*/; dim_i--) {   \
-                if (current_position[dim_i] == meta_a->dimv[dim_i]) { \
-                    current_position[dim_i - 1] += 1;                 \
-                    current_position[dim_i] = 0;                      \
-                }                                                     \
-            }                                                         \
-        }                                                             \
+#define matrix_add(name, type, op)                           \
+    void name(Matrix(type) out, Matrix(type) b) {            \
+        size_t total_length = m_length(out);                 \
+        /* Ensures both matrices have the same total size */ \
+        assert(total_length == m_length(b));                 \
+        for (size_t i = 0; i < total_length; i++) {          \
+            out[i] += b[i];                                  \
+        }                                                    \
     }
     // clang-format off
 matrix_add(m_iadd, int, +)

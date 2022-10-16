@@ -250,9 +250,9 @@ void m_fmulf(Matrix(float) a, Matrix(float) b, Matrix(float) out);
  */
 #define m_add(A, B)                   \
     _Generic((A), Matrix(int)         \
-             : m_imul, Matrix(double) \
-             : m_fmul, Matrix(float)  \
-             : m_fmulf)(A, B)
+             : m_iadd, Matrix(double) \
+             : m_fadd, Matrix(float)  \
+             : m_faddf)(A, B)
 
 /*! \brief Adds the given int matrices of together, see #m_add.
  *

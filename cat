@@ -1,0 +1,10 @@
+Running tests for /home/malo/Dev/EpitaTP/ocr/build/debug/lib__matrices_tests.so
+  'test_mul2' > Passed!
+  'test_mul2_vec' > Passed!
+  'test_add2' > Passed!
+  'test_add2_transposed' > tests.out: libs/matrices/tests/tests.c:49: void test_add2_transposed(void): Assertion `false' failed.
+Failed:
+------------- Program's output:
+-------------------------------
+
+Some tests for '/home/malo/Dev/EpitaTP/ocr/build/debug/lib__matrices_tests.so' failed :(

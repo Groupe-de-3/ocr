@@ -49,10 +49,10 @@ static int execute_test(TestFunction test_function, int *output_fd) {
 
     pid_t pid = fork();
     if (pid == 0) {
-        // Captures the fork's stdout (0) and stderr (1)
+        // Captures the fork's stdout (1) and stderr (2)
         // into the write end of the pipe.
-        dup2(out_pipe[1], 0);
         dup2(out_pipe[1], 1);
+        dup2(out_pipe[1], 2);
 
         test_function();
 
@@ -72,7 +72,10 @@ static int execute_test(TestFunction test_function, int *output_fd) {
     waitpid(pid, &status, 0);
     if (output_fd != NULL)
         *output_fd = out_pipe[0];
-    return WEXITSTATUS(status);
+    if (WIFEXITED(status))
+        return WTERMSIG(status);
+    else
+        return 1;
 }
 
 int execute_tests(const char *path) {
