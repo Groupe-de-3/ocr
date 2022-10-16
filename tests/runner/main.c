@@ -24,7 +24,7 @@ static void print_fd(int fd) {
     fcntl(fd, F_SETFL, O_NONBLOCK);
     while (1) {
         char    output[128];
-        ssize_t read_size = read(fd, output, sizeof(output));
+        ssize_t read_size = read(fd, output, sizeof(output) - sizeof(char));
         if (read_size <= 0)
             break;
         output[read_size] = 0;
