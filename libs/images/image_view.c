@@ -4,6 +4,8 @@
 #include <err.h>
 #include <stdbool.h>
 
+#include "utils_math.h"
+
 _Bool imgv_in_bound(ImageView *imagev, int x, int y) {
     return x >= 0 && y >= 0 && x < (int)imagev->width &&
            y < (int)imagev->height;
@@ -24,16 +26,10 @@ ImageView imgv_default(Image *image) {
 static void wrap_coords(ImageView *imagev, int *x, int *y) {
     switch (imagev->wraping_mode) {
     case WrappingMode_Clamp:
-        if (*x >= imagev->width)
-            *x = imagev->width - 1;
-        else if (*x < 0)
-            *x = 0;
-
-        if (*y >= imagev->height)
-            *y = imagev->height - 1;
-        else if (*y < 0)
-            *y = 0;
+        *x = clamp(*x, 0, imagev->width);
+        *y = clamp(*y, 0, imagev->height);
     case WrappingMode_Repeat:
+        // Weird modulo for negative values
         *x = (*x % imagev->width + imagev->width) % imagev->width;
         *y = (*y % imagev->height + imagev->height) % imagev->height;
     default:
