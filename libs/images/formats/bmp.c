@@ -24,7 +24,9 @@ enum BmpLoadResult bmp_load_file(FILE *file, Image *image_out) {
     uint32_t header_size       = readu32(file);
 
     if (header_size < 40) {
-        printf("Could not decode bmp: Unsuported header size\n");
+        printf(
+            "Could not decode bmp: Unsuported header size (%d)\n", header_size
+        );
         return BmpLoadResult_UnsuportedBmp;
     }
 
@@ -38,11 +40,17 @@ enum BmpLoadResult bmp_load_file(FILE *file, Image *image_out) {
     uint32_t palette_size = readu32(file);
 
     if (bits_per_pixel != 24 || palette_size != 0) {
-        printf("Could not decode bmp: Unsuported bits per pixels\n");
+        printf(
+            "Could not decode bmp: Unsuported bits per pixels (%d)\n",
+            bits_per_pixel
+        );
         return BmpLoadResult_UnsuportedBmp;
     }
     if (compression_method != 0) {
-        printf("Could not decode bmp: Unsuported compression method\n");
+        printf(
+            "Could not decode bmp: Unsuported compression method (%d)\n",
+            compression_method
+        );
         return BmpLoadResult_UnsuportedBmp;
     }
     // Seeking to the image data
@@ -56,14 +64,11 @@ enum BmpLoadResult bmp_load_file(FILE *file, Image *image_out) {
         row_padding++;
 
     uint8_t current_pixel[3];
-    for (uint32_t y = 0; y < img_height;
-         y++) { // BMP files have pixel bottom to top, while we want to save to
-                // top to bottom
-        for (uint32_t x = 0; x < img_width;
-             x++) { // pixels are still left to right so no problem there
+    for (uint32_t y = 0; y < img_height; y++) {
+        for (uint32_t x = 0; x < img_width; x++) {
             fread(current_pixel, 1, 3, file);
             img_set_pixel_grayscale(
-                image_out, x, y,
+                image_out, x, img_height - y - 1,
                 img_rbg8_to_grayscale(
                     current_pixel[0], current_pixel[1], current_pixel[1]
                 )
@@ -88,10 +93,12 @@ static void writeu16(FILE *file, uint16_t value) {
 void bmp_save_to_file(FILE *file, Image *image) {
     writeu8(file, (uint8_t)'B');
     writeu8(file, (uint8_t)'M'); // Magic first bytes
-    writeu32(file,
+    writeu32(
+        file,
         14 + // Size of bitmap header
-        40 + // size of info header
-        3 * (uint32_t)image->width * (uint32_t)image->height // Size of pixel data
+            40 + // size of info header
+            3 * (uint32_t)image->width *
+                (uint32_t)image->height // Size of pixel data
     ); // The size of the whole file
     writeu32(file, 0); // Useless
     writeu32(file, 14 + 40); // Starting address of image data
@@ -108,21 +115,25 @@ void bmp_save_to_file(FILE *file, Image *image) {
     writeu32(file, 0); // Empty palette
     writeu32(file, 0); // No important colors
 
-    long row_size = (long)image->width * 3;
+    long row_size    = (long)image->width * 3;
     long row_padding = 0;
     while (((row_size + row_padding) & 0x3) != 0)
         row_padding++;
- 
+
     for (uint32_t y = 0; y < image->height; y++) {
-        for (uint32_t x = 0; x < image->width; x++) { // pixels are still left to right so no problem there
+        for (uint32_t x = 0; x < image->width;
+             x++) { // pixels are still left to right so no problem there
             grayscale_pixel_t gray_scale = img_get_pixel_grayscale(
                 image, x,
-                // BMP files have pixel bottom to top, while we want to save to top to bottom
+                // BMP files have pixel bottom to top, while we want to save to
+                // top to bottom
                 image->height - y - 1
             );
             uint8_t pixel_value = (uint8_t)floor(gray_scale * 255);
             // All colors are the same value
-            writeu8(file, pixel_value); writeu8(file, pixel_value); writeu8(file, pixel_value);
+            writeu8(file, pixel_value);
+            writeu8(file, pixel_value);
+            writeu8(file, pixel_value);
         }
         for (int i = 0; i < row_padding; i++)
             writeu8(file, 0);

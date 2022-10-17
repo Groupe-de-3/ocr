@@ -109,6 +109,11 @@ $(guile (define-target "sudoku_tests"\
 	`(deps "sudoku")\
 ))
 
+$(guile (define-target "images_tests"\
+	`(target-type "executable")\
+	`(deps "images")\
+))
+
 # -------------------
 # (Build) PROFILES
 #

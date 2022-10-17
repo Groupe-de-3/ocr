@@ -2,6 +2,11 @@
 
 #include <assert.h>
 #include <err.h>
+#include <stdbool.h>
+#include <stdint.h>
+#include <stdio.h>
+
+#include "formats/bmp.h"
 
 Image img_new(size_t width, size_t height, enum ImageType type) {
     Image image = {
@@ -27,6 +32,28 @@ void img_destroy(Image image) {
     default:
         errx(1, "image_destroy: Invalid ImageType");
     }
+}
+
+ImageLoadResult img_load_file(char *filename, Image *image_out) {
+    FILE *file = fopen(filename, "rb");
+
+    uint8_t magic_header[3];
+    size_t  read = fread(magic_header, sizeof(uint8_t), 3, file);
+    if (read >= 2 && magic_header[0] == 'B' && magic_header[1] == 'M') {
+        fseek(
+            file, 0, SEEK_SET
+        ); // Go back to the start of the file as expected by bmp_load_file
+        enum BmpLoadResult bmp_result = bmp_load_file(file, image_out);
+        fclose(file);
+        return (ImageLoadResult){
+            .success = bmp_result == BmpLoadResult_Ok,
+        };
+    }
+
+    fclose(file);
+    return (ImageLoadResult){
+        .success = false,
+    };
 }
 
 grayscale_pixel_t img_rbg8_to_grayscale(uint8_t r, uint8_t g, uint8_t b) {
@@ -61,7 +88,8 @@ void img_set_pixel_grayscale(
     switch (image->type) {
     case ImageType_GrayScale:
         image->data.grayscale[y * image->width + x] = new_value;
+        break;
     default:
-        errx(1, "img_get_pixel_grayscale: Invalid ImageType");
+        errx(1, "img_set_pixel_grayscale: Invalid ImageType");
     }
 }

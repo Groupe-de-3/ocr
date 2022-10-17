@@ -20,6 +20,11 @@ typedef struct {
 Image img_new(size_t width, size_t height, enum ImageType type);
 void  img_destroy(Image image);
 
+typedef struct {
+    _Bool success;
+} ImageLoadResult;
+ImageLoadResult img_load_file(char *filename, Image *image_out);
+
 grayscale_pixel_t img_rbg8_to_grayscale(uint8_t r, uint8_t g, uint8_t b);
 uint8_t           img_grayscale_to_rgb8(grayscale_pixel_t value);
 
