@@ -7,20 +7,10 @@ int    iclamp(int x, int min, int max);
 float  fclampf(float x, float min, float max);
 double fclamp(double x, double min, double max);
 
-#define min(X, Y) _Generic((X), \
-    int: imin, \
-    float: fmin, \
-    double: fminf               \
-    }                           \
-    (X, Y)
+#define min(X, Y) _Generic((X), int : imin, float : fmin, double : fminf)(X, Y)
 
 int imin(int x, int y);
 
-#define max(X, Y) _Generic((X), \
-    int: imax, \
-    float: fmax, \
-    double: fmaxf               \
-    }                           \
-    (X, Y)
+#define max(X, Y) _Generic((X), int : imax, float : fmax, double : fmaxf)(X, Y)
 
 int imax(int x, int y);

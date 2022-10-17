@@ -79,6 +79,8 @@ $(guile (define-target "ia"))
 
 $(guile (define-target "utils"))
 
+$(guile (define-target "vec"))
+
 $(guile (define-target "images" \
 	`(deps "utils")\
 ))
