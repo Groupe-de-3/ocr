@@ -93,7 +93,7 @@ enum BmpLoadResult bmp_load_file(FILE *file, Image *image_out) {
             }
             img_set_pixel_rgb8(
                 image_out, x, img_height - y - 1,
-                (rgb8_pixel_t) {
+                (rgb8_pixel_t){
                     // RGB is acutally saved as BGR
                     .r = current_pixel[2],
                     .g = current_pixel[1],
