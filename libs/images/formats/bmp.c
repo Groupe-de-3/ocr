@@ -1,7 +1,9 @@
 #include "bmp.h"
 
 #include <math.h>
+#include <stdbool.h>
 #include <stdint.h>
+#include <string.h>
 
 #include "images.h"
 
@@ -37,9 +39,13 @@ enum BmpLoadResult bmp_load_file(FILE *file, Image *image_out) {
     uint32_t compression_method = readu32(file);
     fseek(file, 4, SEEK_CUR); // Skip image data size
     fseek(file, 8, SEEK_CUR); // Skip image resolution
-    uint32_t palette_size = readu32(file);
 
-    if (bits_per_pixel != 24 || palette_size != 0) {
+    uint32_t palette_length = readu32(file);
+    if (palette_length == 0) // 0 is for the default value
+        palette_length = 1 << bits_per_pixel;
+    bool has_pallette = bits_per_pixel <= 8;
+
+    if (bits_per_pixel != 24 && bits_per_pixel != 8) {
         printf(
             "Could not decode bmp: Unsuported bits per pixels (%d)\n",
             bits_per_pixel
@@ -53,12 +59,21 @@ enum BmpLoadResult bmp_load_file(FILE *file, Image *image_out) {
         );
         return BmpLoadResult_UnsuportedBmp;
     }
+
+    // Seeking to the color palette
+    fseek(file, 14 + header_size, SEEK_SET);
+    uint8_t color_palette[palette_length][4];
+    if (palette_length > 0)
+        fread(color_palette, sizeof(uint8_t[4]), palette_length, file);
+
     // Seeking to the image data
     fseek(file, image_data_offset, SEEK_SET);
 
     *image_out = img_new(img_width, img_height, ImageType_GrayScale);
 
-    long row_size    = img_width * 3;
+    // Calculating row padding, beacuse each row must be a multiple of 4 bytes
+    // in size.
+    long row_size    = img_width * (bits_per_pixel / 8);
     long row_padding = 0;
     while (((row_size + row_padding) & 0x3) != 0)
         row_padding++;
@@ -66,7 +81,16 @@ enum BmpLoadResult bmp_load_file(FILE *file, Image *image_out) {
     uint8_t current_pixel[3];
     for (uint32_t y = 0; y < img_height; y++) {
         for (uint32_t x = 0; x < img_width; x++) {
-            fread(current_pixel, 1, 3, file);
+            if (has_pallette) {
+                uint8_t index;
+                fread(&index, sizeof(uint8_t), bits_per_pixel / 8, file);
+                memcpy(
+                    current_pixel, &color_palette[index], sizeof(uint8_t) * 3
+                );
+            }
+            else {
+                fread(current_pixel, 1, 3, file);
+            }
             img_set_pixel_grayscale(
                 image_out, x, img_height - y - 1,
                 img_rbg8_to_grayscale(
