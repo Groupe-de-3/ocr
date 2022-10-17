@@ -69,7 +69,7 @@ enum BmpLoadResult bmp_load_file(FILE *file, Image *image_out) {
     // Seeking to the image data
     fseek(file, image_data_offset, SEEK_SET);
 
-    *image_out = img_new(img_width, img_height, ImageType_GrayScale);
+    *image_out = img_new(img_width, img_height, ImageType_Rgb8);
 
     // Calculating row padding, beacuse each row must be a multiple of 4 bytes
     // in size.
@@ -91,11 +91,13 @@ enum BmpLoadResult bmp_load_file(FILE *file, Image *image_out) {
             else {
                 fread(current_pixel, 1, 3, file);
             }
-            img_set_pixel_grayscale(
+            img_set_pixel_rgb8(
                 image_out, x, img_height - y - 1,
-                img_rbg8_to_grayscale(
-                    current_pixel[0], current_pixel[1], current_pixel[1]
-                )
+                (rgb8_pixel_t){
+                    .r = current_pixel[0],
+                    .g = current_pixel[1],
+                    .b = current_pixel[2],
+                }
             );
         }
         fseek(file, row_padding, SEEK_CUR);
@@ -147,17 +149,15 @@ void bmp_save_to_file(FILE *file, Image *image) {
     for (uint32_t y = 0; y < image->height; y++) {
         for (uint32_t x = 0; x < image->width;
              x++) { // pixels are still left to right so no problem there
-            grayscale_pixel_t gray_scale = img_get_pixel_grayscale(
+            rgb8_pixel_t pixel_value = img_get_pixel_rgb8(
                 image, x,
-                // BMP files have pixel bottom to top, while we want to save to
+                // BMP files have pixel bottom to top, while we want to load to
                 // top to bottom
                 image->height - y - 1
             );
-            uint8_t pixel_value = (uint8_t)floor(gray_scale * 255);
-            // All colors are the same value
-            writeu8(file, pixel_value);
-            writeu8(file, pixel_value);
-            writeu8(file, pixel_value);
+            writeu8(file, pixel_value.r);
+            writeu8(file, pixel_value.g);
+            writeu8(file, pixel_value.b);
         }
         for (int i = 0; i < row_padding; i++)
             writeu8(file, 0);
