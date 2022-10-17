@@ -24,8 +24,21 @@ typedef struct {
     size_t height;
 } Image;
 
+#define GRAYSCALE_BLACK 0.f
+#define GRAYSCALE_WHITE 1.f
+#define RGB8_BLACK             \
+    (rgb8_pixel_t) {           \
+        .r = 0, .g = 0, .b = 0 \
+    }
+#define RGB8_WHITE                   \
+    (rgb8_pixel_t) {                 \
+        .r = 255, .g = 255, .b = 255 \
+    }
+
 Image img_new(size_t width, size_t height, enum ImageType type);
 void  img_destroy(Image image);
+
+_Bool img_in_bound(Image *image, size_t x, size_t y);
 
 typedef struct {
     _Bool success;

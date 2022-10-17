@@ -41,6 +41,10 @@ void img_destroy(Image image) {
     }
 }
 
+_Bool img_in_bound(Image *image, size_t x, size_t y) {
+    return x < image->width && y < image->height;
+}
+
 ImageLoadResult img_load_file(char *filename, Image *image_out) {
     FILE *file = fopen(filename, "rb");
 
@@ -75,8 +79,7 @@ uint8_t img_grayscale_to_rgb8(grayscale_pixel_t value) {
 }
 
 grayscale_pixel_t img_get_pixel_grayscale(Image *image, size_t x, size_t y) {
-    assert(x < image->width);
-    assert(y < image->height);
+    assert(img_in_bound(image, x, y));
 
     size_t linear_index = y * image->width + x;
 
@@ -96,8 +99,7 @@ grayscale_pixel_t img_get_pixel_grayscale(Image *image, size_t x, size_t y) {
 void img_set_pixel_grayscale(
     Image *image, size_t x, size_t y, grayscale_pixel_t new_value
 ) {
-    assert(x < image->width);
-    assert(y < image->height);
+    assert(img_in_bound(image, x, y));
 
     size_t linear_index = y * image->width + x;
 
@@ -121,8 +123,7 @@ void img_set_pixel_grayscale(
 }
 
 rgb8_pixel_t img_get_pixel_rgb8(Image *image, size_t x, size_t y) {
-    assert(x < image->width);
-    assert(y < image->height);
+    assert(img_in_bound(image, x, y));
 
     size_t linear_index = y * image->width + x;
 
@@ -146,8 +147,7 @@ rgb8_pixel_t img_get_pixel_rgb8(Image *image, size_t x, size_t y) {
 void img_set_pixel_rgb8(
     Image *image, size_t x, size_t y, rgb8_pixel_t new_value
 ) {
-    assert(x < image->width);
-    assert(y < image->height);
+    assert(img_in_bound(image, x, y));
 
     size_t linear_index = y * image->width + x;
 
