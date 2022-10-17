@@ -2,10 +2,23 @@
 
 #include <assert.h>
 #include <err.h>
+#include <stdbool.h>
 
 _Bool imgv_in_bound(ImageView *imagev, int x, int y) {
     return x >= 0 && y >= 0 && x < (int)imagev->width &&
            y < (int)imagev->height;
+}
+
+ImageView imgv_default(Image *image) {
+    return (ImageView){
+        .image              = image,
+        .wraping_mode       = WrappingMode_None,
+        .ignore_invalid_set = false,
+        .x                  = 0,
+        .y                  = 0,
+        .width              = (int)image->width,
+        .height             = (int)image->height,
+    };
 }
 
 static void wrap_coords(ImageView *imagev, int *x, int *y) {

@@ -19,6 +19,8 @@ typedef struct {
 
 _Bool imgv_in_bound(ImageView *imagev, int x, int y);
 
+ImageView imgv_default(Image *image);
+
 grayscale_pixel_t imgv_get_pixel_grayscale(ImageView *imagev, int x, int y);
 void              imgv_set_pixel_grayscale(
                  ImageView *image, int x, int y, grayscale_pixel_t new_value
