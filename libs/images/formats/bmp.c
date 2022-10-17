@@ -93,10 +93,11 @@ enum BmpLoadResult bmp_load_file(FILE *file, Image *image_out) {
             }
             img_set_pixel_rgb8(
                 image_out, x, img_height - y - 1,
-                (rgb8_pixel_t){
-                    .r = current_pixel[0],
+                (rgb8_pixel_t) {
+                    // RGB is acutally saved as BGR
+                    .r = current_pixel[2],
                     .g = current_pixel[1],
-                    .b = current_pixel[2],
+                    .b = current_pixel[0],
                 }
             );
         }
@@ -155,9 +156,10 @@ void bmp_save_to_file(FILE *file, Image *image) {
                 // top to bottom
                 image->height - y - 1
             );
-            writeu8(file, pixel_value.r);
-            writeu8(file, pixel_value.g);
+            // Stored in reverse order
             writeu8(file, pixel_value.b);
+            writeu8(file, pixel_value.g);
+            writeu8(file, pixel_value.r);
         }
         for (int i = 0; i < row_padding; i++)
             writeu8(file, 0);
