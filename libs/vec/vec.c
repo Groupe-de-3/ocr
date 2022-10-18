@@ -73,7 +73,7 @@ void *vec_try_new_slot(void *vec) {
 
     if (metadata->capacity <= metadata->size)
         return NULL;
-    
+
     void *last_slot =
         (void *)((char *)vec + metadata->size * metadata->elem_size);
     metadata->size++;
