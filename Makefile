@@ -73,7 +73,9 @@ $(guile (define-target "matrices" \
 	`(deps "utils")\
 ))
 
-$(guile (define-target "sudoku"))
+$(guile (define-target "sudoku" \
+	`(deps "vec")\
+))
 
 $(guile (define-target "ia"))
 
