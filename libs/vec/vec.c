@@ -52,8 +52,8 @@ size_t vec_elem_size(void *vec) {
 
 void *vec_reserve(void *vec, size_t n) {
     VecMetaData *real_ptr = (VecMetaData *)vec - 1;
-    if (real_ptr->capacity - real_ptr->size >=
-        n) // Making sure alocation is required
+    // Making sure alocation is required
+    if (real_ptr->capacity - real_ptr->size >= n)
         return vec;
 
     size_t next_po2_capacity = 1;
@@ -71,7 +71,9 @@ void *vec_reserve(void *vec, size_t n) {
 void *vec_try_new_slot(void *vec) {
     VecMetaData *metadata = vec_get_metadata(vec);
 
-    assert(metadata->size < metadata->capacity);
+    if (metadata->capacity <= metadata->size)
+        return NULL;
+    
     void *last_slot =
         (void *)((char *)vec + metadata->size * metadata->elem_size);
     metadata->size++;
