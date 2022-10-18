@@ -23,8 +23,6 @@ Image img_new(size_t width, size_t height, enum ImageType type) {
     case ImageType_Rgb8:
         image.data.rgb8 = calloc(sizeof(rgb8_pixel_t), width * height);
         return image;
-    default:
-        errx(1, "image_new: Invalid ImageType");
     }
 }
 
@@ -36,8 +34,6 @@ void img_destroy(Image image) {
     case ImageType_Rgb8:
         free(image.data.rgb8);
         break;
-    default:
-        errx(1, "image_destroy: Invalid ImageType");
     }
 }
 
@@ -91,8 +87,6 @@ grayscale_pixel_t img_get_pixel_grayscale(Image *image, size_t x, size_t y) {
             rgb8_pixel_t pixel = image->data.rgb8[linear_index];
             return img_rbg8_to_grayscale(pixel.r, pixel.g, pixel.b);
         }
-    default:
-        errx(1, "img_get_pixel_grayscale: Invalid ImageType");
     }
 }
 
@@ -117,8 +111,6 @@ void img_set_pixel_grayscale(
             };
             break;
         }
-    default:
-        errx(1, "img_set_pixel_grayscale: Invalid ImageType");
     }
 }
 
@@ -140,8 +132,6 @@ rgb8_pixel_t img_get_pixel_rgb8(Image *image, size_t x, size_t y) {
         }
     case ImageType_Rgb8:
         return image->data.rgb8[linear_index];
-    default:
-        errx(1, "img_get_pixel_grayscale: Invalid ImageType");
     }
 }
 void img_set_pixel_rgb8(
@@ -159,7 +149,5 @@ void img_set_pixel_rgb8(
     case ImageType_Rgb8:
         image->data.rgb8[linear_index] = new_value;
         break;
-    default:
-        errx(1, "img_get_pixel_grayscale: Invalid ImageType");
     }
 }
