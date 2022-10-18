@@ -8,30 +8,30 @@
 
 #include "formats/bmp.h"
 
-Image img_new(size_t width, size_t height, enum ImageType type) {
+Image img_new(size_t width, size_t height, enum ImageFormat format) {
     Image image = {
         .width  = width,
         .height = height,
-        .type   = type,
+        .format   = format,
     };
 
-    switch (type) {
-    case ImageType_GrayScale:
+    switch (format) {
+    case ImageFormat_GrayScale:
         image.data.grayscale =
             calloc(sizeof(grayscale_pixel_t), width * height);
         return image;
-    case ImageType_Rgb8:
+    case ImageFormat_Rgb8:
         image.data.rgb8 = calloc(sizeof(rgb8_pixel_t), width * height);
         return image;
     }
 }
 
 void img_destroy(Image image) {
-    switch (image.type) {
-    case ImageType_GrayScale:
+    switch (image.format) {
+    case ImageFormat_GrayScale:
         free(image.data.grayscale);
         break;
-    case ImageType_Rgb8:
+    case ImageFormat_Rgb8:
         free(image.data.rgb8);
         break;
     }
@@ -79,10 +79,10 @@ grayscale_pixel_t img_get_pixel_grayscale(Image *image, size_t x, size_t y) {
 
     size_t linear_index = y * image->width + x;
 
-    switch (image->type) {
-    case ImageType_GrayScale:
+    switch (image->format) {
+    case ImageFormat_GrayScale:
         return image->data.grayscale[linear_index];
-    case ImageType_Rgb8:
+    case ImageFormat_Rgb8:
         {
             rgb8_pixel_t pixel = image->data.rgb8[linear_index];
             return img_rbg8_to_grayscale(pixel.r, pixel.g, pixel.b);
@@ -97,11 +97,11 @@ void img_set_pixel_grayscale(
 
     size_t linear_index = y * image->width + x;
 
-    switch (image->type) {
-    case ImageType_GrayScale:
+    switch (image->format) {
+    case ImageFormat_GrayScale:
         image->data.grayscale[linear_index] = new_value;
         break;
-    case ImageType_Rgb8:
+    case ImageFormat_Rgb8:
         {
             uint8_t rgb_value              = img_grayscale_to_rgb8(new_value);
             image->data.rgb8[linear_index] = (rgb8_pixel_t){
@@ -119,8 +119,8 @@ rgb8_pixel_t img_get_pixel_rgb8(Image *image, size_t x, size_t y) {
 
     size_t linear_index = y * image->width + x;
 
-    switch (image->type) {
-    case ImageType_GrayScale:
+    switch (image->format) {
+    case ImageFormat_GrayScale:
         {
             uint8_t value =
                 img_grayscale_to_rgb8(image->data.grayscale[linear_index]);
@@ -130,7 +130,7 @@ rgb8_pixel_t img_get_pixel_rgb8(Image *image, size_t x, size_t y) {
                 .b = value,
             };
         }
-    case ImageType_Rgb8:
+    case ImageFormat_Rgb8:
         return image->data.rgb8[linear_index];
     }
 }
@@ -141,12 +141,12 @@ void img_set_pixel_rgb8(
 
     size_t linear_index = y * image->width + x;
 
-    switch (image->type) {
-    case ImageType_GrayScale:
+    switch (image->format) {
+    case ImageFormat_GrayScale:
         image->data.grayscale[linear_index] =
             img_rbg8_to_grayscale(new_value.r, new_value.g, new_value.b);
         break;
-    case ImageType_Rgb8:
+    case ImageFormat_Rgb8:
         image->data.rgb8[linear_index] = new_value;
         break;
     }

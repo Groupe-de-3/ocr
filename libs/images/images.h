@@ -2,9 +2,9 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-enum ImageType {
-    ImageType_GrayScale,
-    ImageType_Rgb8,
+enum ImageFormat {
+    ImageFormat_GrayScale,
+    ImageFormat_Rgb8,
 };
 typedef float grayscale_pixel_t;
 typedef struct {
@@ -14,7 +14,7 @@ typedef struct {
 } rgb8_pixel_t;
 
 typedef struct {
-    enum ImageType type;
+    enum ImageFormat format;
     union {
         grayscale_pixel_t *grayscale;
         rgb8_pixel_t      *rgb8;
@@ -35,7 +35,7 @@ typedef struct {
         .r = 255, .g = 255, .b = 255 \
     }
 
-Image img_new(size_t width, size_t height, enum ImageType type);
+Image img_new(size_t width, size_t height, enum ImageFormat format);
 void  img_destroy(Image image);
 
 _Bool img_in_bound(Image *image, size_t x, size_t y);

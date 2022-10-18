@@ -69,7 +69,7 @@ enum BmpLoadResult bmp_load_file(FILE *file, Image *image_out) {
     // Seeking to the image data
     fseek(file, image_data_offset, SEEK_SET);
 
-    *image_out = img_new(img_width, img_height, ImageType_Rgb8);
+    *image_out = img_new(img_width, img_height, ImageFormat_Rgb8);
 
     // Calculating row padding, beacuse each row must be a multiple of 4 bytes
     // in size.
