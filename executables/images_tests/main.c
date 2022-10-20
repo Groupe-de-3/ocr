@@ -2,8 +2,8 @@
 #include <err.h>
 #include <stdio.h>
 
-#include "formats/bmp.h"
 #include "images.h"
+#include "img_formats/bmp.h"
 
 int main(int argc, char **argv) {
     assert(argc >= 2);

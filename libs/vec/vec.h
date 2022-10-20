@@ -116,8 +116,7 @@ void *vec_try_new_slot(void *vec);
  *
  *  \param vec The Vec from which to remove the last element.
  *  \returns Vector to the removed element, should be considered invalid after
- *  any call to another vec function.
- */
+ *  any call to another vec function. */
 void *vec_remove_last(void *vec);
 
 /*! \brief Removes all elements from the Vec.

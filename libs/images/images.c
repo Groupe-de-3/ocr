@@ -6,13 +6,13 @@
 #include <stdint.h>
 #include <stdio.h>
 
-#include "formats/bmp.h"
+#include "img_formats/bmp.h"
 
 Image img_new(size_t width, size_t height, enum ImageFormat format) {
     Image image = {
         .width  = width,
         .height = height,
-        .format   = format,
+        .format = format,
     };
 
     switch (format) {
