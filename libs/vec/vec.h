@@ -112,10 +112,11 @@ void *vec_try_new_slot(void *vec);
  *
  *  The returned pointer should be used immediately as it will be invalidated
  *  by many other vec operations.
+ *  You may want to use the convinient macro #vec_pop.
  *
  *  \param vec The Vec from which to remove the last element.
  *  \returns Vector to the removed element, should be considered invalid after
- * any call to another vec function.
+ *  any call to another vec function.
  */
 void *vec_remove_last(void *vec);
 
