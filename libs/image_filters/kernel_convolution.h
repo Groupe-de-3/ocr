@@ -9,7 +9,7 @@
  * The pixel's y coordinate.
  */
 grayscale_pixel_t
-filter_run_kernel_at(ImageView *src, float *kernel, int x, int y);
+filter_kernel_run_at(ImageView *src, float *kernel, int x, int y);
 /*! \brief Applies a Kernel convolution on the entire image.
  *
  *  This calls #filter_run_kernel_at on every pixel of src, storing the result
@@ -20,4 +20,4 @@ filter_run_kernel_at(ImageView *src, float *kernel, int x, int y);
  * same size of src. \param kernel The kernel matrix (see #matrices.h). It must
  * have 2 dimensions of odd sizes.
  */
-void filter_kernel_convolution(ImageView *src, ImageView *out, float *kernel);
+void filter_kernel_run(ImageView *src, ImageView *out, float *kernel);

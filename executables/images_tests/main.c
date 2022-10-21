@@ -36,13 +36,13 @@ int main(int argc, char **argv) {
     size_t kernel_size = gaussian_blur_optimal_kernel_size(target_blur);
 
     float *blur_kernel = m_new(float, kernel_size, kernel_size);
-    populate_gaussian_blur_kernel(blur_kernel, target_blur);
+    gaussian_blur_populate_kernel(blur_kernel, target_blur);
     print_m(blur_kernel);
 
     ImageView in_view    = imgv_default(&image);
     in_view.wraping_mode = WrappingMode_Repeat;
     ImageView out_view   = imgv_default(&blured);
-    filter_kernel_convolution(&in_view, &out_view, blur_kernel);
+    filter_kernel_run(&in_view, &out_view, blur_kernel);
 
     bmp_save_to_path("blured.bmp", &blured);
 

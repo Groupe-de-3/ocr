@@ -11,7 +11,7 @@ size_t gaussian_blur_optimal_kernel_size(float param) {
     size_t size = (size_t)ceil(6.f * param);
     return size + (1 - size & 0x1); // Make sure we return an odd value.
 }
-void populate_gaussian_blur_kernel(float *kernel_mat, float param) {
+void gaussian_blur_populate_kernel(float *kernel_mat, float param) {
     float factor = 1.f / (2.f * M_PIf * param * param);
 
     size_t w     = m_width(kernel_mat);

@@ -6,7 +6,7 @@
 #include "matrices.h"
 
 grayscale_pixel_t
-filter_run_kernel_at(ImageView *src, float *kernel, int x, int y) {
+filter_kernel_run_at(ImageView *src, float *kernel, int x, int y) {
     assert(m_dimc(kernel) == 2);
     assert((m_dimv(kernel)[0] & 0x1) == 1); // Kernel must have odd dimensions
     assert((m_dimv(kernel)[1] & 0x1) == 1);
@@ -31,7 +31,7 @@ filter_run_kernel_at(ImageView *src, float *kernel, int x, int y) {
     return total_value;
 }
 
-void filter_kernel_convolution(ImageView *src, ImageView *out, float *kernel) {
+void filter_kernel_run(ImageView *src, ImageView *out, float *kernel) {
     assert(src->width == out->width);
     assert(src->height == out->height);
 
@@ -42,7 +42,7 @@ void filter_kernel_convolution(ImageView *src, ImageView *out, float *kernel) {
     for (int y = 0; y < src->height; y++) {
         for (int x = 0; x < src->width; x++) {
             imgv_set_pixel_grayscale(
-                out, x, y, filter_run_kernel_at(src, kernel, x, y)
+                out, x, y, filter_kernel_run_at(src, kernel, x, y)
             );
         }
     }
