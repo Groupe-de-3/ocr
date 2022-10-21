@@ -62,7 +62,7 @@ enum BmpLoadResult bmp_load_file(FILE *file, Image *image_out) {
 
     // Seeking to the color palette
     fseek(file, 14 + header_size, SEEK_SET);
-    uint8_t (*color_palette)[4] = malloc(sizeof(uint8_t[4]) * palette_length);
+    uint8_t(*color_palette)[4] = malloc(sizeof(uint8_t[4]) * palette_length);
     if (palette_length > 0)
         fread(color_palette, sizeof(uint8_t[4]), palette_length, file);
 

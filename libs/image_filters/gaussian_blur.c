@@ -20,6 +20,7 @@ void populate_gaussian_blur_kernel(float *kernel_mat, float param) {
     size_t haf_h = h / 2;
     assert((w & 0x1) == 1 && (h & 0x1) == 1);
 
+    float sum = 0.;
     for (size_t y = 0; y < h; y++) {
         float dy = (float)y - (float)haf_h;
         for (size_t x = 0; x < w; x++) {
@@ -27,6 +28,11 @@ void populate_gaussian_blur_kernel(float *kernel_mat, float param) {
             float value =
                 factor * expf(-(dx * dx + dy * dy) / (2.f * param * param));
             m_get2(kernel_mat, x, y) = value;
+            sum += value;
         }
     }
+
+    for (size_t y = 0; y < h; y++)
+        for (size_t x = 0; x < w; x++)
+            m_get2(kernel_mat, x, y) /= sum;
 }
