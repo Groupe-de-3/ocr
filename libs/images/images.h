@@ -2,7 +2,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-enum ImageFormat {
+enum PixelFormat {
     ImageFormat_GrayScale,
     ImageFormat_Rgb8,
 };
@@ -13,8 +13,18 @@ typedef struct {
     uint8_t b;
 } rgb8_pixel_t;
 
+typedef union {
+    grayscale_pixel_t grayscale;
+    rgb8_pixel_t      rgb8;
+} any_pixel_t;
+
 typedef struct {
-    enum ImageFormat format;
+    enum PixelFormat format;
+    any_pixel_t      value;
+} some_pixel_t;
+
+typedef struct {
+    enum PixelFormat format;
     union {
         grayscale_pixel_t *grayscale;
         rgb8_pixel_t      *rgb8;
@@ -35,7 +45,7 @@ typedef struct {
         .r = 255, .g = 255, .b = 255 \
     }
 
-Image img_new(size_t width, size_t height, enum ImageFormat format);
+Image img_new(size_t width, size_t height, enum PixelFormat format);
 void  img_destroy(Image image);
 
 _Bool img_in_bound(Image *image, size_t x, size_t y);
@@ -47,6 +57,14 @@ ImageLoadResult img_load_file(char *filename, Image *image_out);
 
 grayscale_pixel_t img_rbg8_to_grayscale(uint8_t r, uint8_t g, uint8_t b);
 uint8_t           img_grayscale_to_rgb8(grayscale_pixel_t value);
+
+any_pixel_t img_get_pixel_any(Image *image, size_t x, size_t y);
+void img_set_pixel_any(Image *image, size_t x, size_t y, any_pixel_t new_value);
+
+some_pixel_t img_get_pixel_some(Image *image, size_t x, size_t y);
+void         img_set_pixel_some(
+            Image *image, size_t x, size_t y, some_pixel_t new_value
+        );
 
 grayscale_pixel_t img_get_pixel_grayscale(Image *image, size_t x, size_t y);
 void              img_set_pixel_grayscale(
