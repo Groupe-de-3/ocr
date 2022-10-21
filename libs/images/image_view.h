@@ -38,3 +38,8 @@ rgb8_pixel_t imgv_get_pixel_rgb8(ImageView *imagev, int x, int y);
 void         imgv_set_pixel_rgb8(
             ImageView *imagev, int x, int y, rgb8_pixel_t new_value
         );
+
+rgbf_pixel_t imgv_get_pixel_rgbf(ImageView *imagev, int x, int y);
+void         imgv_set_pixel_rgbf(
+            ImageView *imagev, int x, int y, rgbf_pixel_t new_value
+        );

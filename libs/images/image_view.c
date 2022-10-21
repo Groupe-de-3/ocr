@@ -130,6 +130,19 @@ void imgv_set_pixel_rgb8(
     imgv_set_pixel_some(
         imagev, x, y,
         (some_pixel_t
-        ){.format = PixelFormat_GrayScale, .value = {.rgb8 = new_value}}
+        ){.format = PixelFormat_Rgb8, .value = {.rgb8 = new_value}}
+    );
+}
+
+rgbf_pixel_t imgv_get_pixel_rgbf(ImageView *imagev, int x, int y) {
+    return img_some_to_rgbf(imgv_get_pixel_some(imagev, x, y));
+}
+void imgv_set_pixel_rgbf(
+    ImageView *imagev, int x, int y, rgbf_pixel_t new_value
+) {
+    imgv_set_pixel_some(
+        imagev, x, y,
+        (some_pixel_t
+        ){.format = PixelFormat_Rgbf, .value = {.rgbf = new_value}}
     );
 }

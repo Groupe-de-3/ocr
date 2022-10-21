@@ -23,6 +23,9 @@ Image img_new(size_t width, size_t height, enum PixelFormat format) {
     case PixelFormat_Rgb8:
         image.data.rgb8 = calloc(sizeof(rgb8_pixel_t), width * height);
         return image;
+    case PixelFormat_Rgbf:
+        image.data.rgbf = calloc(sizeof(rgbf_pixel_t), width * height);
+        return image;
     }
 }
 
@@ -33,6 +36,9 @@ void img_destroy(Image image) {
         break;
     case PixelFormat_Rgb8:
         free(image.data.rgb8);
+        break;
+    case PixelFormat_Rgbf:
+        free(image.data.rgbf);
         break;
     }
 }
@@ -69,6 +75,8 @@ any_pixel_t img_some_to_any(some_pixel_t value, enum PixelFormat target) {
         return (any_pixel_t){.rgb8 = img_some_to_rgb8(value)};
     case PixelFormat_GrayScale:
         return (any_pixel_t){.grayscale = img_some_to_grayscale(value)};
+    case PixelFormat_Rgbf:
+        return (any_pixel_t){.rgbf = img_some_to_rgbf(value)};
     }
 }
 grayscale_pixel_t img_some_to_grayscale(some_pixel_t value) {
@@ -80,6 +88,10 @@ grayscale_pixel_t img_some_to_grayscale(some_pixel_t value) {
           0.114f * ((float)value.value.rgb8.b / 255.f)};
     case PixelFormat_GrayScale:
         return value.value.grayscale;
+    case PixelFormat_Rgbf:
+        return (grayscale_pixel_t
+        ){0.299f * value.value.rgbf.r + 0.587f * value.value.rgbf.g +
+          0.114f * value.value.rgbf.b};
     }
 }
 rgb8_pixel_t img_some_to_rgb8(some_pixel_t value) {
@@ -92,6 +104,27 @@ rgb8_pixel_t img_some_to_rgb8(some_pixel_t value) {
                 (uint8_t)(value.value.grayscale * (grayscale_pixel_t)255);
             return (rgb8_pixel_t){v, v, v};
         }
+    case PixelFormat_Rgbf:
+        return (rgb8_pixel_t){
+            (uint8_t)(value.value.rgbf.r * 255.f),
+            (uint8_t)(value.value.rgbf.g * 255.f),
+            (uint8_t)(value.value.rgbf.b * 255.f),
+        };
+    }
+}
+rgbf_pixel_t img_some_to_rgbf(some_pixel_t value) {
+    switch (value.format) {
+    case PixelFormat_Rgb8:
+        return (rgbf_pixel_t){
+            ((float)value.value.rgb8.r / 255.f),
+            ((float)value.value.rgb8.g / 255.f),
+            ((float)value.value.rgb8.b / 255.f),
+        };
+    case PixelFormat_GrayScale:
+        return (rgbf_pixel_t
+        ){value.value.grayscale, value.value.grayscale, value.value.grayscale};
+    case PixelFormat_Rgbf:
+        return value.value.rgbf;
     }
 }
 
@@ -104,6 +137,8 @@ any_pixel_t img_get_pixel_any(Image *image, size_t x, size_t y) {
         return (any_pixel_t){.rgb8 = image->data.rgb8[linear_index]};
     case PixelFormat_GrayScale:
         return (any_pixel_t){.grayscale = image->data.grayscale[linear_index]};
+    case PixelFormat_Rgbf:
+        return (any_pixel_t){.rgbf = image->data.rgbf[linear_index]};
     }
 }
 void img_set_pixel_any(
@@ -118,6 +153,9 @@ void img_set_pixel_any(
         break;
     case PixelFormat_GrayScale:
         image->data.grayscale[linear_index] = new_value.grayscale;
+        break;
+    case PixelFormat_Rgbf:
+        image->data.rgbf[linear_index] = new_value.rgbf;
         break;
     }
 }
@@ -162,6 +200,22 @@ void img_set_pixel_rgb8(
         img_some_to_any(
             (some_pixel_t
             ){.format = PixelFormat_Rgb8, .value = {.rgb8 = new_value}},
+            image->format
+        )
+    );
+}
+
+rgbf_pixel_t img_get_pixel_rgbf(Image *image, size_t x, size_t y) {
+    return img_some_to_rgbf(img_get_pixel_some(image, x, y));
+}
+void img_set_pixel_rgbf(
+    Image *image, size_t x, size_t y, rgbf_pixel_t new_value
+) {
+    img_set_pixel_any(
+        image, x, y,
+        img_some_to_any(
+            (some_pixel_t
+            ){.format = PixelFormat_Rgbf, .value = {.rgbf = new_value}},
             image->format
         )
     );
