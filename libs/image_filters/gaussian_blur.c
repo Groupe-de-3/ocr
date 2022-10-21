@@ -19,7 +19,7 @@ void gaussian_blur_populate_kernel(float *kernel_mat, float param) {
     size_t haf_w = w / 2;
     size_t h     = m_height(kernel_mat);
     size_t haf_h = h / 2;
-    
+
     // Make sure the dimensions are odd
     assert((w & 0x1) == 1 && (h & 0x1) == 1);
 

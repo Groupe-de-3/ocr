@@ -21,7 +21,11 @@ void print_m(float *m) {
 
 int main(int argc, char **argv) {
     if (argc < 2) {
-        errx(1, "Expected at least one argument\n   Usage: %s <input_image_path>", argv[0]);
+        errx(
+            1,
+            "Expected at least one argument\n   Usage: %s <input_image_path>",
+            argv[0]
+        );
     }
 
     Image           image;
