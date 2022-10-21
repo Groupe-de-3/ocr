@@ -45,6 +45,15 @@ typedef struct {
         .r = 255, .g = 255, .b = 255 \
     }
 
+#define ANY_BLACK(FORMAT)                                                    \
+    (((any_pixel_t[]                                                         \
+    ){[ImageFormat_GrayScale] = (any_pixel_t){.grayscale = GRAYSCALE_BLACK}, \
+      [ImageFormat_Rgb8]      = (any_pixel_t){.rgb8 = RGB8_BLACK}})[FORMAT])
+#define ANY_WHITE(FORMAT)                                                    \
+    (((any_pixel_t[]                                                         \
+    ){[ImageFormat_GrayScale] = (any_pixel_t){.grayscale = GRAYSCALE_WHITE}, \
+      [ImageFormat_Rgb8]      = (any_pixel_t){.rgb8 = RGB8_WHITE}})[FORMAT])
+
 Image img_new(size_t width, size_t height, enum PixelFormat format);
 void  img_destroy(Image image);
 
