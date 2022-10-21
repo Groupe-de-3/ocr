@@ -20,7 +20,9 @@ void print_m(float *m) {
 }
 
 int main(int argc, char **argv) {
-    assert(argc >= 2);
+    if (argc < 2) {
+        errx(1, "Expected at least one argument\n   Usage: %s <input_image_path>", argv[0]);
+    }
 
     Image           image;
     ImageLoadResult rslt = img_load_file(argv[1], &image);
