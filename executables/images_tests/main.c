@@ -37,7 +37,7 @@ int main(int argc, char **argv) {
     ImageView image_view    = imgv_default(&image);
     image_view.wraping_mode = WrappingMode_Repeat;
     bmp_save_to_path("in.bmp", &image);
-    
+
     Image blured = img_new(image.width, image.height, image.format);
     imgv_default(&blured);
 

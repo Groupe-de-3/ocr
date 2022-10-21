@@ -129,8 +129,7 @@ void imgv_set_pixel_rgb8(
 ) {
     imgv_set_pixel_some(
         imagev, x, y,
-        (some_pixel_t
-        ){.format = PixelFormat_Rgb8, .value = {.rgb8 = new_value}}
+        (some_pixel_t){.format = PixelFormat_Rgb8, .value = {.rgb8 = new_value}}
     );
 }
 
@@ -142,7 +141,6 @@ void imgv_set_pixel_rgbf(
 ) {
     imgv_set_pixel_some(
         imagev, x, y,
-        (some_pixel_t
-        ){.format = PixelFormat_Rgbf, .value = {.rgbf = new_value}}
+        (some_pixel_t){.format = PixelFormat_Rgbf, .value = {.rgbf = new_value}}
     );
 }

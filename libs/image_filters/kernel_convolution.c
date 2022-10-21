@@ -12,7 +12,8 @@ some_pixel_t filter_kernel_run_at(ImageView *src, float *kernel, int x, int y) {
     assert((m_dimv(kernel)[1] & 0x1) == 1);
 
     // RGB8 have a difference behavior
-    if (src->image->format == PixelFormat_Rgb8 || src->image->format == PixelFormat_Rgbf) {
+    if (src->image->format == PixelFormat_Rgb8 ||
+        src->image->format == PixelFormat_Rgbf) {
         int half_size_x = (int)m_dimv(kernel)[0] / 2;
         int half_size_y = (int)m_dimv(kernel)[1] / 2;
 
@@ -33,11 +34,7 @@ some_pixel_t filter_kernel_run_at(ImageView *src, float *kernel, int x, int y) {
 
         return (some_pixel_t
         ){.format = PixelFormat_Rgbf,
-          .value  = {
-               .rgbf = {
-                   .r = acc[0],
-                   .g = acc[1],
-                   .b = acc[2]}}};
+          .value  = {.rgbf = {.r = acc[0], .g = acc[1], .b = acc[2]}}};
     }
     else {
         int half_size_x = (int)m_dimv(kernel)[0] / 2;

@@ -56,7 +56,7 @@ void sobel_execute(
         }
     );
 
-    float max_gradient[3] = { 0.f, 0.f, 0.f };
+    float max_gradient[3] = {0.f, 0.f, 0.f};
     for (int y = 0; y < in->height; y++) {
         for (int x = 0; x < in->width; x++) {
             rgbf_pixel_t x_gradient =
@@ -74,9 +74,18 @@ void sobel_execute(
             }
             if (gradient_out != NULL) {
                 rgbf_pixel_t gradient_val = {
-                    .r = sqrtf(x_gradient.r*x_gradient.r + y_gradient.r*y_gradient.r),
-                    .g = sqrtf(x_gradient.g*x_gradient.g + y_gradient.g*y_gradient.g),
-                    .b = sqrtf(x_gradient.b*x_gradient.b + y_gradient.b*y_gradient.b),
+                    .r = sqrtf(
+                        x_gradient.r * x_gradient.r +
+                        y_gradient.r * y_gradient.r
+                    ),
+                    .g = sqrtf(
+                        x_gradient.g * x_gradient.g +
+                        y_gradient.g * y_gradient.g
+                    ),
+                    .b = sqrtf(
+                        x_gradient.b * x_gradient.b +
+                        y_gradient.b * y_gradient.b
+                    ),
                 };
                 imgv_set_pixel_rgbf(gradient_out, x, y, gradient_val);
                 if (gradient_val.r > max_gradient[0])
@@ -94,7 +103,7 @@ void sobel_execute(
                 rgbf_pixel_t value = imgv_get_pixel_rgbf(gradient_out, x, y);
                 imgv_set_pixel_rgbf(
                     gradient_out, x, y,
-                    (rgbf_pixel_t) {
+                    (rgbf_pixel_t){
                         value.r / max_gradient[0],
                         value.g / max_gradient[1],
                         value.b / max_gradient[2],
