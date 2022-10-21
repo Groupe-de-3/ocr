@@ -56,33 +56,49 @@ void sobel_execute(
         }
     );
 
-    float max_gradient = 0.;
+    float max_gradient[3] = { 0.f, 0.f, 0.f };
     for (int y = 0; y < in->height; y++) {
         for (int x = 0; x < in->width; x++) {
-            float x_gradient =
-                img_some_to_grayscale(filter_kernel_run_at(in, x_kernel, x, y));
-            float y_gradient =
-                img_some_to_grayscale(filter_kernel_run_at(in, y_kernel, x, y));
+            rgbf_pixel_t x_gradient =
+                img_some_to_rgbf(filter_kernel_run_at(in, x_kernel, x, y));
+            rgbf_pixel_t y_gradient =
+                img_some_to_rgbf(filter_kernel_run_at(in, y_kernel, x, y));
 
             if (gradient_dir_out != NULL) {
-                float gradient_dir = atan2f(x_gradient, y_gradient);
-                imgv_set_pixel_grayscale(gradient_dir_out, x, y, gradient_dir);
+                rgbf_pixel_t gradient_dir = {
+                    .r = atan2f(x_gradient.r, y_gradient.r),
+                    .g = atan2f(x_gradient.b, y_gradient.g),
+                    .b = atan2f(x_gradient.b, y_gradient.b),
+                };
+                imgv_set_pixel_rgbf(gradient_dir_out, x, y, gradient_dir);
             }
             if (gradient_out != NULL) {
-                float gradient_val =
-                    sqrtf(x_gradient * x_gradient + y_gradient * y_gradient);
-                imgv_set_pixel_grayscale(gradient_out, x, y, gradient_val);
-                if (gradient_val > max_gradient)
-                    max_gradient = gradient_val;
+                rgbf_pixel_t gradient_val = {
+                    .r = sqrtf(x_gradient.r*x_gradient.r + y_gradient.r*y_gradient.r),
+                    .g = sqrtf(x_gradient.g*x_gradient.g + y_gradient.g*y_gradient.g),
+                    .b = sqrtf(x_gradient.b*x_gradient.b + y_gradient.b*y_gradient.b),
+                };
+                imgv_set_pixel_rgbf(gradient_out, x, y, gradient_val);
+                if (gradient_val.r > max_gradient[0])
+                    max_gradient[0] = gradient_val.r;
+                if (gradient_val.g > max_gradient[1])
+                    max_gradient[1] = gradient_val.g;
+                if (gradient_val.b > max_gradient[2])
+                    max_gradient[2] = gradient_val.b;
             }
         }
     }
     if (gradient_out != NULL) {
         for (int y = 0; y < in->height; y++) {
             for (int x = 0; x < in->width; x++) {
-                imgv_set_pixel_grayscale(
+                rgbf_pixel_t value = imgv_get_pixel_rgbf(gradient_out, x, y);
+                imgv_set_pixel_rgbf(
                     gradient_out, x, y,
-                    imgv_get_pixel_grayscale(gradient_out, x, y) / max_gradient
+                    (rgbf_pixel_t) {
+                        value.r / max_gradient[0],
+                        value.g / max_gradient[1],
+                        value.b / max_gradient[2],
+                    }
                 );
             }
         }
