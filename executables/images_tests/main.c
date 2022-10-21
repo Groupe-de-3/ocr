@@ -38,7 +38,7 @@ int main(int argc, char **argv) {
     image_view.wraping_mode = WrappingMode_Repeat;
     bmp_save_to_path("in.bmp", &image);
 
-    Image blured = img_new(image.width, image.height, ImageFormat_GrayScale);
+    Image blured = img_new(image.width, image.height, image.format);
     imgv_default(&blured);
 
     float  target_blur = 1.f;
@@ -52,7 +52,7 @@ int main(int argc, char **argv) {
 
     bmp_save_to_path("blured.bmp", &blured);
 
-    Image gradient = img_new(image.width, image.height, ImageFormat_GrayScale);
+    Image     gradient = img_new(image.width, image.height, PixelFormat_Rgb8);
     ImageView gradient_view = imgv_default(&gradient);
 
     sobel_execute(&image_view, &gradient_view, NULL);

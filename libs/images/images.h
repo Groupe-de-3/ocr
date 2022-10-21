@@ -3,8 +3,8 @@
 #include <stdlib.h>
 
 enum PixelFormat {
-    ImageFormat_GrayScale,
-    ImageFormat_Rgb8,
+    PixelFormat_GrayScale,
+    PixelFormat_Rgb8,
 };
 typedef float grayscale_pixel_t;
 typedef struct {
@@ -47,12 +47,12 @@ typedef struct {
 
 #define ANY_BLACK(FORMAT)                                                    \
     (((any_pixel_t[]                                                         \
-    ){[ImageFormat_GrayScale] = (any_pixel_t){.grayscale = GRAYSCALE_BLACK}, \
-      [ImageFormat_Rgb8]      = (any_pixel_t){.rgb8 = RGB8_BLACK}})[FORMAT])
+    ){[PixelFormat_GrayScale] = (any_pixel_t){.grayscale = GRAYSCALE_BLACK}, \
+      [PixelFormat_Rgb8]      = (any_pixel_t){.rgb8 = RGB8_BLACK}})[FORMAT])
 #define ANY_WHITE(FORMAT)                                                    \
     (((any_pixel_t[]                                                         \
-    ){[ImageFormat_GrayScale] = (any_pixel_t){.grayscale = GRAYSCALE_WHITE}, \
-      [ImageFormat_Rgb8]      = (any_pixel_t){.rgb8 = RGB8_WHITE}})[FORMAT])
+    ){[PixelFormat_GrayScale] = (any_pixel_t){.grayscale = GRAYSCALE_WHITE}, \
+      [PixelFormat_Rgb8]      = (any_pixel_t){.rgb8 = RGB8_WHITE}})[FORMAT])
 
 Image img_new(size_t width, size_t height, enum PixelFormat format);
 void  img_destroy(Image image);

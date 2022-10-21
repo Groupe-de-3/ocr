@@ -16,11 +16,11 @@ Image img_new(size_t width, size_t height, enum PixelFormat format) {
     };
 
     switch (format) {
-    case ImageFormat_GrayScale:
+    case PixelFormat_GrayScale:
         image.data.grayscale =
             calloc(sizeof(grayscale_pixel_t), width * height);
         return image;
-    case ImageFormat_Rgb8:
+    case PixelFormat_Rgb8:
         image.data.rgb8 = calloc(sizeof(rgb8_pixel_t), width * height);
         return image;
     }
@@ -28,10 +28,10 @@ Image img_new(size_t width, size_t height, enum PixelFormat format) {
 
 void img_destroy(Image image) {
     switch (image.format) {
-    case ImageFormat_GrayScale:
+    case PixelFormat_GrayScale:
         free(image.data.grayscale);
         break;
-    case ImageFormat_Rgb8:
+    case PixelFormat_Rgb8:
         free(image.data.rgb8);
         break;
     }
@@ -65,28 +65,28 @@ ImageLoadResult img_load_file(char *filename, Image *image_out) {
 
 any_pixel_t img_some_to_any(some_pixel_t value, enum PixelFormat target) {
     switch (target) {
-    case ImageFormat_Rgb8:
+    case PixelFormat_Rgb8:
         return (any_pixel_t){.rgb8 = img_some_to_rgb8(value)};
-    case ImageFormat_GrayScale:
+    case PixelFormat_GrayScale:
         return (any_pixel_t){.grayscale = img_some_to_grayscale(value)};
     }
 }
 grayscale_pixel_t img_some_to_grayscale(some_pixel_t value) {
     switch (value.format) {
-    case ImageFormat_Rgb8:
+    case PixelFormat_Rgb8:
         return (grayscale_pixel_t
         ){0.299f * ((float)value.value.rgb8.r / 255.f) +
           0.587f * ((float)value.value.rgb8.g / 255.f) +
           0.114f * ((float)value.value.rgb8.b / 255.f)};
-    case ImageFormat_GrayScale:
+    case PixelFormat_GrayScale:
         return value.value.grayscale;
     }
 }
 rgb8_pixel_t img_some_to_rgb8(some_pixel_t value) {
     switch (value.format) {
-    case ImageFormat_Rgb8:
+    case PixelFormat_Rgb8:
         return value.value.rgb8;
-    case ImageFormat_GrayScale:
+    case PixelFormat_GrayScale:
         {
             uint8_t v =
                 (uint8_t)(value.value.grayscale * (grayscale_pixel_t)255);
@@ -100,9 +100,9 @@ any_pixel_t img_get_pixel_any(Image *image, size_t x, size_t y) {
 
     size_t linear_index = y * image->width + x;
     switch (image->format) {
-    case ImageFormat_Rgb8:
+    case PixelFormat_Rgb8:
         return (any_pixel_t){.rgb8 = image->data.rgb8[linear_index]};
-    case ImageFormat_GrayScale:
+    case PixelFormat_GrayScale:
         return (any_pixel_t){.grayscale = image->data.grayscale[linear_index]};
     }
 }
@@ -113,10 +113,10 @@ void img_set_pixel_any(
 
     size_t linear_index = y * image->width + x;
     switch (image->format) {
-    case ImageFormat_Rgb8:
+    case PixelFormat_Rgb8:
         image->data.rgb8[linear_index] = new_value.rgb8;
         break;
-    case ImageFormat_GrayScale:
+    case PixelFormat_GrayScale:
         image->data.grayscale[linear_index] = new_value.grayscale;
         break;
     }
@@ -144,7 +144,7 @@ void img_set_pixel_grayscale(
         image, x, y,
         img_some_to_any(
             (some_pixel_t
-            ){.format = ImageFormat_GrayScale,
+            ){.format = PixelFormat_GrayScale,
               .value  = {.grayscale = new_value}},
             image->format
         )
@@ -161,7 +161,7 @@ void img_set_pixel_rgb8(
         image, x, y,
         img_some_to_any(
             (some_pixel_t
-            ){.format = ImageFormat_Rgb8, .value = {.rgb8 = new_value}},
+            ){.format = PixelFormat_Rgb8, .value = {.rgb8 = new_value}},
             image->format
         )
     );

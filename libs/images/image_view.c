@@ -109,23 +109,27 @@ void imgv_set_pixel_some(
 }
 
 grayscale_pixel_t imgv_get_pixel_grayscale(ImageView *imagev, int x, int y) {
-    return img_some_to_grayscale(imgv_get_pixel_some(
-        imagev, x, y
-    ));
+    return img_some_to_grayscale(imgv_get_pixel_some(imagev, x, y));
 }
 void imgv_set_pixel_grayscale(
     ImageView *imagev, int x, int y, grayscale_pixel_t new_value
 ) {
-    imgv_set_pixel_some(imagev, x, y, (some_pixel_t){ .format = ImageFormat_GrayScale, .value = { .grayscale = new_value }});
+    imgv_set_pixel_some(
+        imagev, x, y,
+        (some_pixel_t
+        ){.format = PixelFormat_GrayScale, .value = {.grayscale = new_value}}
+    );
 }
 
 rgb8_pixel_t imgv_get_pixel_rgb8(ImageView *imagev, int x, int y) {
-    return img_some_to_rgb8(imgv_get_pixel_some(
-        imagev, x, y
-    ));
+    return img_some_to_rgb8(imgv_get_pixel_some(imagev, x, y));
 }
 void imgv_set_pixel_rgb8(
     ImageView *imagev, int x, int y, rgb8_pixel_t new_value
 ) {
-    imgv_set_pixel_some(imagev, x, y, (some_pixel_t){ .format = ImageFormat_GrayScale, .value = { .rgb8 = new_value }});
+    imgv_set_pixel_some(
+        imagev, x, y,
+        (some_pixel_t
+        ){.format = PixelFormat_GrayScale, .value = {.rgb8 = new_value}}
+    );
 }
