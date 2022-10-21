@@ -63,42 +63,61 @@ ImageLoadResult img_load_file(char *filename, Image *image_out) {
     };
 }
 
-grayscale_pixel_t img_rbg8_to_grayscale(uint8_t r, uint8_t g, uint8_t b) {
-    float gray_scale = 0.299f * ((float)r / 255.f) +
-                       0.587f * ((float)g / 255.f) +
-                       0.114f * ((float)b / 255.f);
-    // Only if grayscale_pixel_t is a float
-    return gray_scale;
+any_pixel_t img_some_to_any(some_pixel_t value, enum PixelFormat target) {
+    switch (target) {
+    case ImageFormat_Rgb8:
+        return (any_pixel_t){.rgb8 = img_some_to_rgb8(value)};
+    case ImageFormat_GrayScale:
+        return (any_pixel_t){.grayscale = img_some_to_grayscale(value)};
+    }
 }
-uint8_t img_grayscale_to_rgb8(grayscale_pixel_t value) {
-    return (uint8_t)(value * 255.f);
+grayscale_pixel_t img_some_to_grayscale(some_pixel_t value) {
+    switch (value.format) {
+    case ImageFormat_Rgb8:
+        return (grayscale_pixel_t
+        ){0.299f * ((float)value.value.rgb8.r / 255.f) +
+          0.587f * ((float)value.value.rgb8.g / 255.f) +
+          0.114f * ((float)value.value.rgb8.b / 255.f)};
+    case ImageFormat_GrayScale:
+        return value.value.grayscale;
+    }
+}
+rgb8_pixel_t img_some_to_rgb8(some_pixel_t value) {
+    switch (value.format) {
+    case ImageFormat_Rgb8:
+        return value.value.rgb8;
+    case ImageFormat_GrayScale:
+        {
+            uint8_t v =
+                (uint8_t)(value.value.grayscale * (grayscale_pixel_t)255);
+            return (rgb8_pixel_t){v, v, v};
+        }
+    }
 }
 
 any_pixel_t img_get_pixel_any(Image *image, size_t x, size_t y) {
-    size_t linear_index = y * image->width + x;
+    assert(img_in_bound(image, x, y));
 
+    size_t linear_index = y * image->width + x;
     switch (image->format) {
-    case ImageFormat_GrayScale:
-        return (any_pixel_t){
-            .grayscale = image->data.grayscale[linear_index],
-        };
     case ImageFormat_Rgb8:
-        return (any_pixel_t){
-            .rgb8 = image->data.rgb8[linear_index],
-        };
+        return (any_pixel_t){.rgb8 = image->data.rgb8[linear_index]};
+    case ImageFormat_GrayScale:
+        return (any_pixel_t){.grayscale = image->data.grayscale[linear_index]};
     }
 }
 void img_set_pixel_any(
     Image *image, size_t x, size_t y, any_pixel_t new_value
 ) {
-    size_t linear_index = y * image->width + x;
+    assert(img_in_bound(image, x, y));
 
+    size_t linear_index = y * image->width + x;
     switch (image->format) {
-    case ImageFormat_GrayScale:
-        image->data.grayscale[linear_index] = new_value.grayscale;
-        break;
     case ImageFormat_Rgb8:
         image->data.rgb8[linear_index] = new_value.rgb8;
+        break;
+    case ImageFormat_GrayScale:
+        image->data.grayscale[linear_index] = new_value.grayscale;
         break;
     }
 }
@@ -112,86 +131,38 @@ some_pixel_t img_get_pixel_some(Image *image, size_t x, size_t y) {
 void img_set_pixel_some(
     Image *image, size_t x, size_t y, some_pixel_t new_value
 ) {
-    assert(new_value.format == image->format);
-    img_set_pixel_any(image, x, y, new_value.value);
+    img_set_pixel_any(image, x, y, img_some_to_any(new_value, image->format));
 }
 
 grayscale_pixel_t img_get_pixel_grayscale(Image *image, size_t x, size_t y) {
-    assert(img_in_bound(image, x, y));
-
-    any_pixel_t pixel = img_get_pixel_any(image, x, y);
-
-    switch (image->format) {
-    case ImageFormat_GrayScale:
-        return pixel.grayscale;
-    case ImageFormat_Rgb8:
-        return img_rbg8_to_grayscale(pixel.rgb8.r, pixel.rgb8.g, pixel.rgb8.b);
-    }
+    return img_some_to_grayscale(img_get_pixel_some(image, x, y));
 }
-
 void img_set_pixel_grayscale(
     Image *image, size_t x, size_t y, grayscale_pixel_t new_value
 ) {
-    assert(img_in_bound(image, x, y));
-
-    switch (image->format) {
-    case ImageFormat_GrayScale:
-        img_set_pixel_any(image, x, y, (any_pixel_t){.grayscale = new_value});
-        break;
-    case ImageFormat_Rgb8:
-        {
-            uint8_t rgb_value = img_grayscale_to_rgb8(new_value);
-            img_set_pixel_any(
-                image, x, y,
-                (any_pixel_t){
-                    .rgb8 =
-                        (rgb8_pixel_t){
-                                       .r = rgb_value,
-                                       .g = rgb_value,
-                                       .b = rgb_value,
-                                       }
-            }
-            );
-            break;
-        }
-    }
+    img_set_pixel_any(
+        image, x, y,
+        img_some_to_any(
+            (some_pixel_t
+            ){.format = ImageFormat_GrayScale,
+              .value  = {.grayscale = new_value}},
+            image->format
+        )
+    );
 }
 
 rgb8_pixel_t img_get_pixel_rgb8(Image *image, size_t x, size_t y) {
-    assert(img_in_bound(image, x, y));
-
-    any_pixel_t pixel = img_get_pixel_any(image, x, y);
-
-    switch (image->format) {
-    case ImageFormat_GrayScale:
-        {
-            uint8_t value = img_grayscale_to_rgb8(pixel.grayscale);
-            return (rgb8_pixel_t){
-                .r = value,
-                .g = value,
-                .b = value,
-            };
-        }
-    case ImageFormat_Rgb8:
-        return pixel.rgb8;
-    }
+    return img_some_to_rgb8(img_get_pixel_some(image, x, y));
 }
 void img_set_pixel_rgb8(
     Image *image, size_t x, size_t y, rgb8_pixel_t new_value
 ) {
-    assert(img_in_bound(image, x, y));
-
-    switch (image->format) {
-    case ImageFormat_GrayScale:
-        img_set_pixel_any(
-            image, x, y,
-            (any_pixel_t
-            ){.grayscale =
-                  img_rbg8_to_grayscale(new_value.r, new_value.g, new_value.b)}
-        );
-        break;
-    case ImageFormat_Rgb8:
-        img_set_pixel_any(image, x, y, (any_pixel_t){.rgb8 = new_value});
-        break;
-    }
+    img_set_pixel_any(
+        image, x, y,
+        img_some_to_any(
+            (some_pixel_t
+            ){.format = ImageFormat_Rgb8, .value = {.rgb8 = new_value}},
+            image->format
+        )
+    );
 }

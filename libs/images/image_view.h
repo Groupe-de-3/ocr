@@ -21,6 +21,14 @@ _Bool imgv_in_bound(ImageView *imagev, int x, int y);
 
 ImageView imgv_default(Image *image);
 
+any_pixel_t imgv_get_pixel_any(ImageView *imagev, int x, int y);
+void imgv_set_pixel_any(ImageView *image, int x, int y, any_pixel_t new_value);
+
+some_pixel_t imgv_get_pixel_some(ImageView *imagev, int x, int y);
+void         imgv_set_pixel_some(
+            ImageView *image, int x, int y, some_pixel_t new_value
+        );
+
 grayscale_pixel_t imgv_get_pixel_grayscale(ImageView *imagev, int x, int y);
 void              imgv_set_pixel_grayscale(
                  ImageView *image, int x, int y, grayscale_pixel_t new_value

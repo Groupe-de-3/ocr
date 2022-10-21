@@ -64,8 +64,9 @@ typedef struct {
 } ImageLoadResult;
 ImageLoadResult img_load_file(char *filename, Image *image_out);
 
-grayscale_pixel_t img_rbg8_to_grayscale(uint8_t r, uint8_t g, uint8_t b);
-uint8_t           img_grayscale_to_rgb8(grayscale_pixel_t value);
+any_pixel_t       img_some_to_any(some_pixel_t value, enum PixelFormat target);
+grayscale_pixel_t img_some_to_grayscale(some_pixel_t value);
+rgb8_pixel_t      img_some_to_rgb8(some_pixel_t value);
 
 any_pixel_t img_get_pixel_any(Image *image, size_t x, size_t y);
 void img_set_pixel_any(Image *image, size_t x, size_t y, any_pixel_t new_value);
