@@ -8,10 +8,9 @@
  * dimensions of odd sizes.
  *  \param[in] x The pixel's x coordinate.
  *  \param[in] y The pixel's y coordinate.
- *  \returns The computed value.
+ *  \returns The computed new pixel value.
  */
-grayscale_pixel_t
-filter_kernel_run_at(ImageView *src, float *kernel, int x, int y);
+some_pixel_t filter_kernel_run_at(ImageView *src, float *kernel, int x, int y);
 /*! \brief Applies a Kernel convolution on the entire image.
  *
  *  This calls #filter_run_kernel_at on every pixel of src, storing the result

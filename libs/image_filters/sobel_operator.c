@@ -59,8 +59,10 @@ void sobel_execute(
     float max_gradient = 0.;
     for (int y = 0; y < in->height; y++) {
         for (int x = 0; x < in->width; x++) {
-            float x_gradient = (float)filter_kernel_run_at(in, x_kernel, x, y);
-            float y_gradient = (float)filter_kernel_run_at(in, y_kernel, x, y);
+            float x_gradient =
+                img_some_to_grayscale(filter_kernel_run_at(in, x_kernel, x, y));
+            float y_gradient =
+                img_some_to_grayscale(filter_kernel_run_at(in, y_kernel, x, y));
 
             if (gradient_dir_out != NULL) {
                 float gradient_dir = atan2f(x_gradient, y_gradient);
