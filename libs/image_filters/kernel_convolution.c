@@ -1,6 +1,7 @@
 #include "kernel_convolution.h"
 
 #include <assert.h>
+#include <stdio.h>
 
 #include "image_view.h"
 #include "matrices.h"
@@ -11,11 +12,11 @@ some_pixel_t filter_kernel_run_at(ImageView *src, float *kernel, int x, int y) {
     assert((m_dimv(kernel)[1] & 0x1) == 1);
 
     // RGB8 have a difference behavior
-    if (src->image->format == ImageFormat_Rgb8 && false) {
+    if (src->image->format == ImageFormat_Rgb8) {
         int half_size_x = (int)m_dimv(kernel)[0] / 2;
         int half_size_y = (int)m_dimv(kernel)[1] / 2;
 
-        float acc[3];
+        float acc[3] = { 0., 0., 0. };
         for (int dx = -half_size_x; dx <= half_size_x; dx++) {
             int kx = dx + half_size_x;
             for (int dy = -half_size_y; dy <= half_size_y; dy++) {
@@ -29,9 +30,9 @@ some_pixel_t filter_kernel_run_at(ImageView *src, float *kernel, int x, int y) {
                 acc[2] += (float)pixel_value.b * kernel_weight;
             }
         }
-
+        
         return (some_pixel_t
-        ){.format = src->image->format,
+        ){.format = ImageFormat_Rgb8,
           .value  = {
                .rgb8 = {
                    .r = (uint8_t)acc[0],
@@ -56,7 +57,7 @@ some_pixel_t filter_kernel_run_at(ImageView *src, float *kernel, int x, int y) {
             }
         }
         return (some_pixel_t
-        ){.format = src->image->format, .value = {.grayscale = total_value}};
+        ){.format = ImageFormat_GrayScale, .value = {.grayscale = total_value}};
     }
 }
 
