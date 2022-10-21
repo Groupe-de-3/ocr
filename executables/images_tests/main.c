@@ -42,7 +42,6 @@ int main(int argc, char **argv) {
 
     float *blur_kernel = m_new(float, kernel_size, kernel_size);
     gaussian_blur_populate_kernel(blur_kernel, target_blur);
-    print_m(blur_kernel);
 
     ImageView out_view = imgv_default(&blured);
     filter_kernel_run(&image_view, &out_view, blur_kernel);
