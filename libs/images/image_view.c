@@ -28,10 +28,12 @@ static void wrap_coords(ImageView *imagev, int *x, int *y) {
     case WrappingMode_Clamp:
         *x = clamp(*x, 0, imagev->width);
         *y = clamp(*y, 0, imagev->height);
+        break;
     case WrappingMode_Repeat:
         // Weird modulo for negative values
         *x = (*x % imagev->width + imagev->width) % imagev->width;
         *y = (*y % imagev->height + imagev->height) % imagev->height;
+        break;
     default:
         errx(1, "Cannot wrap with given wraping mode");
     }

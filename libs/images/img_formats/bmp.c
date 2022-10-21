@@ -62,7 +62,7 @@ enum BmpLoadResult bmp_load_file(FILE *file, Image *image_out) {
 
     // Seeking to the color palette
     fseek(file, 14 + header_size, SEEK_SET);
-    uint8_t color_palette[palette_length][4];
+    uint8_t (*color_palette)[4] = malloc(sizeof(uint8_t[4]) * palette_length);
     if (palette_length > 0)
         fread(color_palette, sizeof(uint8_t[4]), palette_length, file);
 
@@ -104,6 +104,7 @@ enum BmpLoadResult bmp_load_file(FILE *file, Image *image_out) {
         fseek(file, row_padding, SEEK_CUR);
     }
 
+    free(color_palette);
     return BmpLoadResult_Ok;
 }
 
@@ -164,4 +165,10 @@ void bmp_save_to_file(FILE *file, Image *image) {
         for (int i = 0; i < row_padding; i++)
             writeu8(file, 0);
     }
+}
+
+void bmp_save_to_path(const char *filepath, Image *image) {
+    FILE *file = fopen(filepath, "wb");
+    bmp_save_to_file(file, image);
+    fclose(file);
 }

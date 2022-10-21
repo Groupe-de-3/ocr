@@ -122,7 +122,7 @@ $(guile (define-target "sudoku_tests"\
 
 $(guile (define-target "images_tests"\
 	`(target-type "executable")\
-	`(deps "images")\
+	`(deps "images" "image_filters")\
 ))
 
 # -------------------
