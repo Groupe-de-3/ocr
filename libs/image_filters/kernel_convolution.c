@@ -2,6 +2,7 @@
 
 #include <assert.h>
 #include <stdio.h>
+#include <string.h>
 
 #include "image_view.h"
 #include "matrices.h"
@@ -12,50 +13,34 @@ some_pixel_t filter_kernel_run_at(ImageView *src, float *kernel, int x, int y) {
     assert((m_dimv(kernel)[1] & 0x1) == 1);
 
     // RGB8 have a difference behavior
-    if (src->image->format == PixelFormat_Rgb8 ||
-        src->image->format == PixelFormat_Rgbf) {
-        int half_size_x = (int)m_dimv(kernel)[0] / 2;
-        int half_size_y = (int)m_dimv(kernel)[1] / 2;
+    int half_size_x = (int)m_dimv(kernel)[0] / 2;
+    int half_size_y = (int)m_dimv(kernel)[1] / 2;
 
-        float acc[3] = {0., 0., 0.};
-        for (int dx = -half_size_x; dx <= half_size_x; dx++) {
-            int kx = dx + half_size_x;
-            for (int dy = -half_size_y; dy <= half_size_y; dy++) {
-                int ky = dy + half_size_y;
+    enum PixelFormat target_format = img_equivalent_float_channels_format(src->image->format);
+    size_t channel_length = img_float_channels_length(target_format);
 
-                rgbf_pixel_t pixel_value =
-                    imgv_get_pixel_rgbf(src, x + dx, y + dy);
-                float kernel_weight = m_get2(kernel, (size_t)kx, (size_t)ky);
-                acc[0] += pixel_value.r * kernel_weight;
-                acc[1] += pixel_value.g * kernel_weight;
-                acc[2] += pixel_value.b * kernel_weight;
-            }
+    // channel_length won't ever go above 4 or 5 so no stack problem.
+    // The accumulator for the channel's values
+    float acc[channel_length];
+    memset(acc, 0, sizeof(float) * channel_length);
+
+    for (int dx = -half_size_x; dx <= half_size_x; dx++) {
+        int kx = dx + half_size_x;
+        for (int dy = -half_size_y; dy <= half_size_y; dy++) {
+            int ky = dy + half_size_y;
+
+            any_pixel_t pixel_value =
+                img_some_to_any(imgv_get_pixel_some(src, x + dx, y + dy), target_format);
+            float kernel_weight = m_get2(kernel, (size_t)kx, (size_t)ky);
+            for (size_t c = 0; c < channel_length; c++)
+                acc[c] += pixel_value.float_channels[c] * kernel_weight;
         }
-
-        return (some_pixel_t
-        ){.format = PixelFormat_Rgbf,
-          .value  = {.rgbf = {.r = acc[0], .g = acc[1], .b = acc[2]}}};
     }
-    else {
-        int half_size_x = (int)m_dimv(kernel)[0] / 2;
-        int half_size_y = (int)m_dimv(kernel)[1] / 2;
 
-        grayscale_pixel_t total_value = 0.;
-        for (int dx = -half_size_x; dx <= half_size_x; dx++) {
-            int kx = dx + half_size_x;
-            for (int dy = -half_size_y; dy <= half_size_y; dy++) {
-                int ky = dy + half_size_y;
-
-                grayscale_pixel_t pixel_value =
-                    imgv_get_pixel_grayscale(src, x + dx, y + dy);
-                float kernel_weight = m_get2(kernel, (size_t)kx, (size_t)ky);
-                total_value +=
-                    (grayscale_pixel_t)((float)pixel_value * kernel_weight);
-            }
-        }
-        return (some_pixel_t
-        ){.format = PixelFormat_GrayScale, .value = {.grayscale = total_value}};
-    }
+    some_pixel_t output = { .format = target_format };
+    for (size_t c = 0; c < channel_length; c++)
+        output.value.float_channels[c] = acc[c];
+    return output;
 }
 
 void filter_kernel_run(ImageView *src, ImageView *out, float *kernel) {
