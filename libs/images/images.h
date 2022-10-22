@@ -20,11 +20,11 @@ typedef struct {
 } rgbf_pixel_t;
 
 typedef union {
+    float             float_channels[1];
     grayscale_pixel_t grayscale;
     rgb8_pixel_t      rgb8;
     rgbf_pixel_t      rgbf;
 } any_pixel_t;
-
 typedef struct {
     enum PixelFormat format;
     any_pixel_t      value;
@@ -84,6 +84,9 @@ ImageLoadResult img_load_file(
     char *filename, Image *image_out, _Bool detect_format,
     enum PixelFormat target_format
 );
+
+size_t            img_float_channels_length(enum PixelFormat format);
+enum PixelFormat  img_equivalent_float_channels_format(enum PixelFormat from);
 
 any_pixel_t       img_some_to_any(some_pixel_t value, enum PixelFormat target);
 grayscale_pixel_t img_some_to_grayscale(some_pixel_t value);

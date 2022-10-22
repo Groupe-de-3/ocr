@@ -73,6 +73,26 @@ ImageLoadResult img_load_file(
     };
 }
 
+size_t img_float_channels_length(enum PixelFormat format) {
+    switch (format) {
+    case PixelFormat_GrayScale:
+        return 1;
+    case PixelFormat_Rgbf:
+        return 3;
+    default:
+        return 0;
+    }
+}
+enum PixelFormat img_equivalent_float_channels_format(enum PixelFormat from) {
+    switch (from) {
+    case PixelFormat_Rgb8:
+        return PixelFormat_Rgbf;
+    case PixelFormat_GrayScale:
+    case PixelFormat_Rgbf:
+        return from;
+    }
+}
+
 any_pixel_t img_some_to_any(some_pixel_t value, enum PixelFormat target) {
     switch (target) {
     case PixelFormat_Rgb8:
