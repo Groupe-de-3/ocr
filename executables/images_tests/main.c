@@ -7,6 +7,7 @@
 #include "img_formats/bmp.h"
 #include "kernel_convolution.h"
 #include "matrices.h"
+#include "box_blur.h"
 #include "sobel_operator.h"
 
 void print_m(float *m) {
@@ -40,6 +41,24 @@ int main(int argc, char **argv) {
 
     // Save input
     bmp_save_to_path("in.bmp", &image);
+    
+    if (false) {
+        // Bluring image using box blur
+        Image box_blur = img_new(image.width, image.height, image.format);
+        imgv_default(&box_blur);
+
+        ImageView box_blur_view    = imgv_default(&box_blur);
+        box_blur_view.wraping_mode = WrappingMode_Clamp;
+
+        // Executing blur
+        printf("Box Bluring image\n");
+        box_blur_run(&image_view, &box_blur_view, 11);
+
+        // Saving blur
+        bmp_save_to_path("box_blured.bmp", &box_blur);
+        
+        img_destroy(box_blur);
+    }
 
     // Bluring image
     Image blured = img_new(image.width, image.height, image.format);
