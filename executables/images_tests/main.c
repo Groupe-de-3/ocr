@@ -45,21 +45,12 @@ int main(int argc, char **argv) {
     Image blured = img_new(image.width, image.height, image.format);
     imgv_default(&blured);
 
-    float  target_blur = 3.f;
-    size_t kernel_size = gaussian_blur_optimal_kernel_size(target_blur);
-
-    float *blur_kernel = m_new(float, kernel_size, kernel_size);
-    gaussian_blur_populate_kernel(blur_kernel, target_blur);
-
     ImageView blur_view    = imgv_default(&blured);
     blur_view.wraping_mode = WrappingMode_Clamp;
 
-    printf(
-        "Bluring image (using filter of size %zux%zu)\n", kernel_size,
-        kernel_size
-    );
     // Executing blur
-    filter_kernel_run(&image_view, &blur_view, blur_kernel);
+    printf("Bluring image\n");
+    gaussian_blur_run(&image_view, &blur_view, 2.f);
 
     // Saving blur
     bmp_save_to_path("blured.bmp", &blured);
@@ -75,6 +66,5 @@ int main(int argc, char **argv) {
     img_destroy(image);
     img_destroy(blured);
     img_destroy(gradient);
-    m_destroy(blur_kernel);
     return 0;
 }

@@ -1,19 +1,22 @@
 #include "gaussian_blur.h"
 
-#define _GNU_SOURCE
 #include <assert.h>
 #include <math.h>
 #include <stdio.h>
 
+#include "kernel_convolution.h"
 #include "matrices.h"
 
-size_t gaussian_blur_optimal_kernel_size(float param) {
+static const float PI = (float)M_PI;
+
+static size_t gaussian_blur_optimal_kernel_size(float param) {
     size_t size = (size_t)ceil(6.f * param);
     // Make sure we return an odd value.
     return size + (1 - size & 0x1);
 }
-void gaussian_blur_populate_kernel(float *kernel_mat, float param) {
-    float factor = 1.f / (2.f * M_PIf * param * param);
+
+static void gaussian_blur_populate_kernel(float *kernel_mat, float param) {
+    float factor = 1.f / (2.f * PI * param * param);
 
     size_t w     = m_width(kernel_mat);
     size_t haf_w = w / 2;
@@ -39,4 +42,14 @@ void gaussian_blur_populate_kernel(float *kernel_mat, float param) {
     for (size_t y = 0; y < h; y++)
         for (size_t x = 0; x < w; x++)
             m_get2(kernel_mat, x, y) /= sum;
+}
+
+void gaussian_blur_run(ImageView *in, ImageView *out, float std_deriv) {
+    size_t kernel_size = gaussian_blur_optimal_kernel_size(std_deriv);
+    float *kernel      = m_new(float, kernel_size, kernel_size);
+    gaussian_blur_populate_kernel(kernel, std_deriv);
+
+    filter_kernel_run(in, out, kernel);
+
+    m_destroy(kernel);
 }
