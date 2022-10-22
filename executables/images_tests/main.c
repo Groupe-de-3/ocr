@@ -28,34 +28,48 @@ int main(int argc, char **argv) {
         );
     }
 
+    printf("Reading file %s\n", argv[1]);
     Image           image;
-    ImageLoadResult rslt = img_load_file(argv[1], &image);
+    ImageLoadResult rslt =
+        img_load_file(argv[1], &image, false, PixelFormat_Rgbf);
     if (!rslt.success) {
         errx(1, "Could not load");
     }
-
     ImageView image_view    = imgv_default(&image);
-    image_view.wraping_mode = WrappingMode_Repeat;
+    image_view.wraping_mode = WrappingMode_Clamp;
+
+    // Save input
     bmp_save_to_path("in.bmp", &image);
 
+    // Bluring image
     Image blured = img_new(image.width, image.height, image.format);
     imgv_default(&blured);
 
-    float  target_blur = 1.f;
+    float  target_blur = 3.f;
     size_t kernel_size = gaussian_blur_optimal_kernel_size(target_blur);
 
     float *blur_kernel = m_new(float, kernel_size, kernel_size);
     gaussian_blur_populate_kernel(blur_kernel, target_blur);
 
-    ImageView out_view = imgv_default(&blured);
-    filter_kernel_run(&image_view, &out_view, blur_kernel);
+    ImageView blur_view    = imgv_default(&blured);
+    blur_view.wraping_mode = WrappingMode_Clamp;
 
+    printf(
+        "Bluring image (using filter of size %zux%zu)\n", kernel_size,
+        kernel_size
+    );
+    // Executing blur
+    filter_kernel_run(&image_view, &blur_view, blur_kernel);
+
+    // Saving blur
     bmp_save_to_path("blured.bmp", &blured);
 
-    Image     gradient = img_new(image.width, image.height, PixelFormat_Rgbf);
+    printf("Computing gradient\n");
+    // Computing image's gradient
+    Image     gradient      = img_new(image.width, image.height, image.format);
     ImageView gradient_view = imgv_default(&gradient);
 
-    sobel_execute(&image_view, &gradient_view, NULL);
+    sobel_execute(&blur_view, &gradient_view, NULL);
     bmp_save_to_path("gradient.bmp", &gradient);
 
     img_destroy(image);

@@ -47,7 +47,10 @@ _Bool img_in_bound(Image *image, size_t x, size_t y) {
     return x < image->width && y < image->height;
 }
 
-ImageLoadResult img_load_file(char *filename, Image *image_out) {
+ImageLoadResult img_load_file(
+    char *filename, Image *image_out, bool detect_format,
+    enum PixelFormat target_format
+) {
     FILE *file = fopen(filename, "rb");
 
     uint8_t magic_header[3];
@@ -56,7 +59,8 @@ ImageLoadResult img_load_file(char *filename, Image *image_out) {
         fseek(
             file, 0, SEEK_SET
         ); // Go back to the start of the file as expected by bmp_load_file
-        enum BmpLoadResult bmp_result = bmp_load_file(file, image_out);
+        enum BmpLoadResult bmp_result =
+            bmp_load_file(file, image_out, detect_format, target_format);
         fclose(file);
         return (ImageLoadResult){
             .success = bmp_result == BmpLoadResult_Ok,

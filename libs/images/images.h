@@ -80,7 +80,10 @@ _Bool img_in_bound(Image *image, size_t x, size_t y);
 typedef struct {
     _Bool success;
 } ImageLoadResult;
-ImageLoadResult img_load_file(char *filename, Image *image_out);
+ImageLoadResult img_load_file(
+    char *filename, Image *image_out, _Bool detect_format,
+    enum PixelFormat target_format
+);
 
 any_pixel_t       img_some_to_any(some_pixel_t value, enum PixelFormat target);
 grayscale_pixel_t img_some_to_grayscale(some_pixel_t value);

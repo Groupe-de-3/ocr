@@ -26,8 +26,8 @@ ImageView imgv_default(Image *image) {
 static void wrap_coords(ImageView *imagev, int *x, int *y) {
     switch (imagev->wraping_mode) {
     case WrappingMode_Clamp:
-        *x = clamp(*x, 0, imagev->width);
-        *y = clamp(*y, 0, imagev->height);
+        *x = clamp(*x, 0, imagev->width - 1);
+        *y = clamp(*y, 0, imagev->height - 1);
         break;
     case WrappingMode_Repeat:
         // Weird modulo for negative values

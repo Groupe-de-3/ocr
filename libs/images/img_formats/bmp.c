@@ -18,7 +18,10 @@ static uint16_t readu16(FILE *file) {
     return value;
 }
 
-enum BmpLoadResult bmp_load_file(FILE *file, Image *image_out) {
+enum BmpLoadResult bmp_load_file(
+    FILE *file, Image *image_out, bool detect_format,
+    enum PixelFormat target_format
+) {
     // skiping useless values
     fseek(file, 10, SEEK_SET);
 
@@ -69,7 +72,9 @@ enum BmpLoadResult bmp_load_file(FILE *file, Image *image_out) {
     // Seeking to the image data
     fseek(file, image_data_offset, SEEK_SET);
 
-    *image_out = img_new(img_width, img_height, PixelFormat_Rgb8);
+    if (detect_format)
+        target_format = PixelFormat_Rgb8;
+    *image_out = img_new(img_width, img_height, target_format);
 
     // Calculating row padding, beacuse each row must be a multiple of 4 bytes
     // in size.
