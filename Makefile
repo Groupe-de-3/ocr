@@ -125,6 +125,10 @@ $(guile (define-target "images_tests"\
 	`(deps "images" "image_filters")\
 ))
 
+$(guile (define-target "ia_test"\
+	`(target-type "executable")\
+	`(deps "ia")\
+))
 # -------------------
 # (Build) PROFILES
 #

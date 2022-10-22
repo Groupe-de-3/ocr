@@ -71,3 +71,40 @@ int Classify(neural_network NN, double inputs[])
 
     return ind;
 }
+
+
+//---------------
+// Cost
+//---------------
+
+double NodeCost(double output, double expected)
+{
+    double error = output - expected;
+    return error * error;
+}
+
+double Cost(double* outputs, double* expects, int size)
+{
+    double cost = 0;
+    
+    for (int i = 0; i < size; i++)
+    {
+        cost += NodeCost(outputs[i], expects[i]);
+    }
+    
+    
+    return cost;
+}
+
+double Average_Cost(double** outputs, double** expects, int size)
+{
+    double cost = 0;
+    
+    for (int i = 0; i < size; i++)
+    {
+        cost += Cost(outputs[i], expects[i], size);
+    }
+    
+    
+    return cost / size;
+}
