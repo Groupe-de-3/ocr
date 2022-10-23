@@ -107,7 +107,7 @@ int main(int argc, char **argv) {
     blur_view.wraping_mode = WrappingMode_Clamp;
 
     // Executing blur
-    gaussian_blur_run(&resized_view, &blur_view, 2.f);
+    gaussian_blur_run(&resized_view, &blur_view, 1.f);
 
     printf("    Saving blur to blured.bmp\n");
     // Saving blur
@@ -148,12 +148,23 @@ int main(int argc, char **argv) {
     gettimeofday(&start, NULL);
     printf("Runnig Hough Transform\n");
     // Computing image's gradient
-    Image     hough      = img_new(500, 500, PixelFormat_GrayScale);
+    Image     hough      = img_new(2000, 2000, PixelFormat_GrayScale);
     ImageView hough_view = imgv_default(&hough);
 
-    hough_acc_space_run(&edges_view, &gradient_dir_view, &hough_view);
+    hough_acc_space_probabilistic_run(&edges_view, &gradient_dir_view, &hough_view, (resized.width * resized.height) / 5);
     printf("    Saving edges to hough.bmp\n");
     bmp_save_to_path("hough.bmp", &hough);
+    printf("    Done (%ldms)\n", timediff(start));
+
+    gettimeofday(&start, NULL);
+    printf("Drawing hough lines\n");
+    // Computing image's gradient
+    Image     hough_lines      = img_new(resized.width, resized.height, PixelFormat_GrayScale);
+    ImageView hough_lines_view = imgv_default(&hough_lines);
+
+    hough_acc_space_draw_lines(&hough_view, &hough_lines_view);
+    printf("    Saving edges to hough-lines.bmp\n");
+    bmp_save_to_path("hough-lines.bmp", &hough_lines);
     printf("    Done (%ldms)\n", timediff(start));
 
     img_destroy(image);
