@@ -5,13 +5,13 @@
 #include <time.h>
 
 #include "box_blur.h"
+#include "canny_edge_detector.h"
 #include "gaussian_blur.h"
 #include "images.h"
 #include "img_formats/bmp.h"
 #include "kernel_convolution.h"
 #include "matrices.h"
 #include "sobel_operator.h"
-#include "canny_edge_detector.h"
 
 static void print_m(float *m) {
     for (size_t y = 0; y < m_height(m); y++) {
@@ -102,8 +102,8 @@ int main(int argc, char **argv) {
     Image     gradient      = img_new(image.width, image.height, image.format);
     ImageView gradient_view = imgv_default(&gradient);
     gradient_view.wraping_mode = WrappingMode_Clamp;
-    Image     gradient_dir      = img_new(image.width, image.height, image.format);
-    ImageView gradient_dir_view = imgv_default(&gradient_dir);
+    Image     gradient_dir = img_new(image.width, image.height, image.format);
+    ImageView gradient_dir_view    = imgv_default(&gradient_dir);
     gradient_dir_view.wraping_mode = WrappingMode_Clamp;
 
     sobel_execute(&blur_view, &gradient_view, &gradient_dir_view);
@@ -114,11 +114,13 @@ int main(int argc, char **argv) {
     gettimeofday(&start, NULL);
     printf("Running Canny Edge Detector\n");
     // Computing image's gradient
-    Image     edges      = img_new(image.width, image.height, PixelFormat_GrayScale);
+    Image     edges = img_new(image.width, image.height, PixelFormat_GrayScale);
     ImageView edges_view = imgv_default(&edges);
 
     CannyParameters canny_parameters = canny_guess_parameters(&gradient_view);
-    canny_run(&gradient_view, &gradient_dir_view, &edges_view, canny_parameters);
+    canny_run(
+        &gradient_view, &gradient_dir_view, &edges_view, canny_parameters
+    );
     printf("    Saving edges to edges.bmp\n");
     bmp_save_to_path("edges.bmp", &edges);
     printf("    Done (%ldms)\n", timediff(start));
