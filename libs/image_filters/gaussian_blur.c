@@ -72,9 +72,14 @@ void gaussian_blur_run(ImageView *in, ImageView *out, float std_deriv) {
     buffer_view.wraping_mode = WrappingMode_Clamp;
     
     ImageView *current_source = in;
-    ImageView *current_target = out;
-    for (size_t i = 0; i < box_count; i++)
+    ImageView *current_target = (box_count & 0x1) == 1 ? out : &buffer_view;
+    for (size_t i = 0; i < box_count; i++) {
         box_blur_run(current_source, current_target, box_sizes[i]);
+        current_source = current_target;
+        current_target = current_target == out ? &buffer_view : out;
+    }
+    
+    assert(current_target == &buffer_view);
     
     img_destroy(buffer_img);
 }

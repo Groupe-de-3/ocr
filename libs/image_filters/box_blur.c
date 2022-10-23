@@ -95,7 +95,7 @@ void box_blur_run(ImageView *in, ImageView *out, size_t box_size) {
     enum PixelFormat target_format = img_equivalent_float_channels_format(out->image->format);
     size_t channel_length = img_float_channels_length(target_format);
     for (int x = 0; x < out->width; x++)
-        for (int y = 0; y < out->width; y++) {
+        for (int y = 0; y < out->height; y++) {
             any_pixel_t v = imgv_get_pixel_any(out, x, y);
             for (size_t c = 0; c < channel_length; c++)
                 v.float_channels[c] /= (float)box_size * (float)box_size;
