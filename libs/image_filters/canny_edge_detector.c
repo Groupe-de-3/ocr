@@ -10,7 +10,7 @@ static bool feq(double a, double b) {
     return fabs(a - b) <= DBL_EPSILON;
 }
 
-static void extend_edges(ImageView *canny, ImageView *gradient_directions) {
+static void extend_edges(ImageView *canny, ImageView *gradient_directions, float angle_limit) {
     int w = (int)canny->width;
     int h = (int)canny->height;
 
@@ -39,7 +39,7 @@ static void extend_edges(ImageView *canny, ImageView *gradient_directions) {
                         if (angle_dist > M_PI)
                             angle_dist = 2*M_PI - angle_dist;
                         if (
-                            angle_dist < M_PI_4 &&
+                            angle_dist < angle_limit &&
                             (feq(g, 0.25) || feq(g, 0.5))
                         ) {
                             *vec_push(&pixels, struct Pixel) = (struct Pixel) {
@@ -62,19 +62,7 @@ static void extend_edges(ImageView *canny, ImageView *gradient_directions) {
     vec_destroy(pixels);
 }
 
-void canny_run(ImageView *gradient, ImageView *gradient_direction, ImageView *out) {
-    double max_gradient = 0.;
-    for (int y = 0; y < (int)gradient->height; y++) {
-        for (int x = 0; x < (int)gradient->width; x++) {
-            double t = imgv_get_pixel_grayscale(gradient, x, y);
-            if (t > max_gradient)
-                max_gradient = t;
-        }
-    }
-    
-    double high_threshold = max_gradient / 2.5;
-    double low_threshold = high_threshold / 3.;
-
+void canny_run(ImageView *gradient, ImageView *gradient_direction, ImageView *out, CannyParameters parameters) {
     for (int y = 0; y < gradient_direction->height; y++) {
         for (int x = 0; x < gradient_direction->width; x++) {
             float d = (float)imgv_get_pixel_grayscale(gradient_direction, x, y);
@@ -83,13 +71,13 @@ void canny_run(ImageView *gradient, ImageView *gradient_direction, ImageView *ou
             int dx = (int)round(sinf(d));
             int dy = (int)round(cosf(d));
 
-            double left_gradient = (double)imgv_get_pixel_grayscale(gradient, x + dx, y + dy);
-            double right_gradient = (double)imgv_get_pixel_grayscale(gradient, x - dx, y - dy);
+            float left_gradient = (float)imgv_get_pixel_grayscale(gradient, x + dx, y + dy);
+            float right_gradient = (float)imgv_get_pixel_grayscale(gradient, x - dx, y - dy);
 
             if (g > left_gradient && g > right_gradient) {
-                if (g >= high_threshold)
+                if (g >= parameters.high_threshold)
                     imgv_set_pixel_grayscale(out, x, y, 0.5);
-                else if (g >= low_threshold)
+                else if (g >= parameters.low_threshold)
                     imgv_set_pixel_grayscale(out, x, y, 0.25);
                 else
                     imgv_set_pixel_grayscale(out, x, y, 0.);
@@ -99,12 +87,34 @@ void canny_run(ImageView *gradient, ImageView *gradient_direction, ImageView *ou
         }
     }
     
-    extend_edges(out, gradient_direction);
+    extend_edges(out, gradient_direction, parameters.extend_angle_limit);
 
     for (int y = 0; y < out->height; y++) {
         for (int x = 0; x < out->width; x++) {
-            if (imgv_get_pixel_grayscale(out, x, y) < 0.5)
-                imgv_set_pixel_grayscale(out, x, y, 0.);
+            grayscale_pixel_t v = imgv_get_pixel_grayscale(out, x, y);
+            if (v < 0.75 && v > 0.25)
+                imgv_set_pixel_grayscale(out, x, y, parameters.output_value_for_soft_edges);
         }
     }
+}
+
+CannyParameters canny_guess_parameters(ImageView *gradient) {
+    float max_gradient = 0.;
+    for (int y = 0; y < (int)gradient->height; y++) {
+        for (int x = 0; x < (int)gradient->width; x++) {
+            float t = (float)imgv_get_pixel_grayscale(gradient, x, y);
+            if (t > max_gradient)
+                max_gradient = t;
+        }
+    }
+    
+    float high_threshold = max_gradient / 2.5f;
+    
+    return (CannyParameters) {
+        .high_threshold = high_threshold,
+        .low_threshold = high_threshold / 3.f,
+        
+        .extend_angle_limit = (float)M_PI_4,
+        .output_value_for_soft_edges = 0.25f,
+    };
 }

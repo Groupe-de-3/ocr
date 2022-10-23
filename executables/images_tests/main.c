@@ -117,7 +117,8 @@ int main(int argc, char **argv) {
     Image     edges      = img_new(image.width, image.height, PixelFormat_GrayScale);
     ImageView edges_view = imgv_default(&edges);
 
-    canny_run(&gradient_view, &gradient_dir_view, &edges_view);
+    CannyParameters canny_parameters = canny_guess_parameters(&gradient_view);
+    canny_run(&gradient_view, &gradient_dir_view, &edges_view, canny_parameters);
     printf("    Saving edges to edges.bmp\n");
     bmp_save_to_path("edges.bmp", &edges);
     printf("    Done (%ldms)\n", timediff(start));
