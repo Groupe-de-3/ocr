@@ -3,8 +3,8 @@
 #include "image_view.h"
 
 typedef struct {
-    float distance;
-    float angle;
+    float r;
+    float theta;
 } HoughLine;
 
 void hough_acc_space_run_at(

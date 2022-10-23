@@ -4,11 +4,11 @@
 #include <sys/time.h>
 #include <time.h>
 
-#include "box_blur.h"
 #include "bilinear_sampling.h"
+#include "box_blur.h"
 #include "canny_edge_detector.h"
-#include "hough_transform.h"
 #include "gaussian_blur.h"
+#include "hough_transform.h"
 #include "images.h"
 #include "img_formats/bmp.h"
 #include "kernel_convolution.h"
@@ -60,13 +60,15 @@ int main(int argc, char **argv) {
     // Save input
     bmp_save_to_path("in.bmp", &image);
     printf("    Done (%ldms)\n", timediff(start));
-    
-    size_t target_width = image.width > image.height ? 800 : (image.width*800) / image.height;
-    size_t target_height = image.height > image.width ? 800 : (image.height*800) / image.width;
-    
+
+    size_t target_width =
+        image.width > image.height ? 800 : (image.width * 800) / image.height;
+    size_t target_height =
+        image.height > image.width ? 800 : (image.height * 800) / image.width;
+
     gettimeofday(&start, NULL);
     printf("Resizing image to %zu x %zu\n", target_width, target_height);
-    Image           resized = img_new(target_width, target_height, image.format);
+    Image     resized      = img_new(target_width, target_height, image.format);
     ImageView resized_view = imgv_default(&resized);
     resized_view.wraping_mode = WrappingMode_Clamp;
 
@@ -116,10 +118,10 @@ int main(int argc, char **argv) {
     printf("Computing gradient\n");
 
     // Computing image's gradient
-    Image     gradient      = img_new(resized.width, resized.height, resized.format);
-    ImageView gradient_view = imgv_default(&gradient);
+    Image     gradient = img_new(resized.width, resized.height, resized.format);
+    ImageView gradient_view    = imgv_default(&gradient);
     gradient_view.wraping_mode = WrappingMode_Clamp;
-    Image     gradient_dir = img_new(resized.width, resized.height, resized.format);
+    Image gradient_dir = img_new(resized.width, resized.height, resized.format);
     ImageView gradient_dir_view    = imgv_default(&gradient_dir);
     gradient_dir_view.wraping_mode = WrappingMode_Clamp;
 
@@ -131,8 +133,8 @@ int main(int argc, char **argv) {
     gettimeofday(&start, NULL);
     printf("Running Canny Edge Detector\n");
     // Computing image's gradient
-    Image     edges = img_new(resized.width, resized.height, PixelFormat_GrayScale);
-    ImageView edges_view = imgv_default(&edges);
+    Image edges = img_new(resized.width, resized.height, PixelFormat_GrayScale);
+    ImageView edges_view    = imgv_default(&edges);
     edges_view.wraping_mode = WrappingMode_Clamp;
 
     CannyParameters canny_parameters = canny_guess_parameters(&gradient_view);
@@ -146,12 +148,10 @@ int main(int argc, char **argv) {
     gettimeofday(&start, NULL);
     printf("Runnig Hough Transform\n");
     // Computing image's gradient
-    Image     hough = img_new(500, 500, PixelFormat_GrayScale);
+    Image     hough      = img_new(500, 500, PixelFormat_GrayScale);
     ImageView hough_view = imgv_default(&hough);
 
-    hough_acc_space_run(
-        &edges_view, &gradient_dir_view, &hough_view
-    );
+    hough_acc_space_run(&edges_view, &gradient_dir_view, &hough_view);
     printf("    Saving edges to hough.bmp\n");
     bmp_save_to_path("hough.bmp", &hough);
     printf("    Done (%ldms)\n", timediff(start));

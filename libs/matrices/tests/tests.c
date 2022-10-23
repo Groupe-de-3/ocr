@@ -21,7 +21,7 @@ void test_basics(void) {
     Matrix(int) c = m_new(int, 10, 3, 5);
     Matrix(int) d = m_new(int, 93, 0);
     Matrix(int) e = m_new(int, 8, 1);
-    
+
     // m_width
     h_assert(m_width(a) == 0);
     h_assert(m_width(b) == 0);
@@ -58,7 +58,7 @@ void test_basics(void) {
 
     h_assert(m_dimv(e)[0] == 8);
     h_assert(m_dimv(e)[1] == 1);
-    
+
     m_destroy(a);
     m_destroy(b);
     m_destroy(c);
