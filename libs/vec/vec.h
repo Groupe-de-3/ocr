@@ -30,7 +30,7 @@
  *  \param type The type of the elements the array will contain.
  *  \returns A new Vec for elements of the given type.
  */
-#define vec_new(type) (type *)vec_new(sizeof(type))
+#define vec_new(type) (type *)vec_create(sizeof(type), 0)
 /*! \brief Get a new empty space at the end of the vec.
  *
  *  \param vec Pointer to the Vec (=> a double pointer!!) into which to push.

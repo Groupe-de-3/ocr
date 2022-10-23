@@ -1,6 +1,66 @@
 #include "canny_edge_detector.h"
 
 #include <math.h>
+#include <stdbool.h>
+#include <float.h>
+
+#include "vec.h"
+
+static bool feq(double a, double b) {
+    return fabs(a - b) <= DBL_EPSILON;
+}
+
+static void extend_edges(ImageView *canny, ImageView *gradient_directions) {
+    int w = (int)canny->width;
+    int h = (int)canny->height;
+
+    struct Pixel { int x; int y; double strong_direction; };
+    struct Pixel *pixels = vec_new(struct Pixel);
+
+    for (int x = 0; x < w; x++) {
+        for (int y = 0; y < h; y++) {
+            while (vec_size(pixels) > 0) {
+                struct Pixel pixel = vec_pop(pixels, struct Pixel);
+                imgv_set_pixel_grayscale(canny, pixel.x, pixel.y, 1.);
+
+                for (int dy = -1; dy <= 1; dy++) {
+                    int py = pixel.y + dy;
+                    for (int dx = -1; dx <= 1; dx++) {
+                        int px = pixel.x + dx;
+                        if (py == pixel.y && px == pixel.x)
+                            continue;
+
+                        // % for negative value isn't like a mathematic remainder
+                        px = ((px % w) + w) % w;
+                        py = ((py % h) + h) % h;
+                        double g = imgv_get_pixel_grayscale(canny, px, py);
+                        double d = imgv_get_pixel_grayscale(gradient_directions, px, py);
+                        double angle_dist = fmod(fabs(d - pixel.strong_direction), 2*M_PI);
+                        if (angle_dist > M_PI)
+                            angle_dist = 2*M_PI - angle_dist;
+                        if (
+                            angle_dist < M_PI_4 &&
+                            (feq(g, 0.25) || feq(g, 0.5))
+                        ) {
+                            *vec_push(&pixels, struct Pixel) = (struct Pixel) {
+                                .x = px, .y = py, .strong_direction = d
+                            };
+                        }
+                    }
+                }
+            }
+
+            if (feq(imgv_get_pixel_grayscale(canny, x, y), 0.5)) {
+                double direction = imgv_get_pixel_grayscale(gradient_directions, x, y);
+                *vec_push(&pixels, struct Pixel) = (struct Pixel) {
+                    .x = x, .y = y, .strong_direction = direction,
+                };
+            }
+        }
+    }
+    
+    vec_destroy(pixels);
+}
 
 void canny_run(ImageView *gradient, ImageView *gradient_direction, ImageView *out) {
     double max_gradient = 0.;
@@ -28,7 +88,7 @@ void canny_run(ImageView *gradient, ImageView *gradient_direction, ImageView *ou
 
             if (g > left_gradient && g > right_gradient) {
                 if (g >= high_threshold)
-                    imgv_set_pixel_grayscale(out, x, y, 1.);
+                    imgv_set_pixel_grayscale(out, x, y, 0.5);
                 else if (g >= low_threshold)
                     imgv_set_pixel_grayscale(out, x, y, 0.25);
                 else
@@ -38,4 +98,6 @@ void canny_run(ImageView *gradient, ImageView *gradient_direction, ImageView *ou
                 imgv_set_pixel_grayscale(out, x, y, 0.);
         }
     }
+    
+    extend_edges(out, gradient_direction);
 }

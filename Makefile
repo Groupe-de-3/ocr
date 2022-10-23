@@ -88,8 +88,7 @@ $(guile (define-target "images" \
 ))
 
 $(guile (define-target "image_filters" \
-	`(deps "matrices")\
-	`(deps "images")\
+	`(deps "images" "matrices" "vec")\
 ))
 
 $(guile (define-target "test_lib" \
