@@ -6,6 +6,7 @@
 
 #include "box_blur.h"
 #include "canny_edge_detector.h"
+#include "hough_transform.h"
 #include "gaussian_blur.h"
 #include "images.h"
 #include "img_formats/bmp.h"
@@ -116,6 +117,7 @@ int main(int argc, char **argv) {
     // Computing image's gradient
     Image     edges = img_new(image.width, image.height, PixelFormat_GrayScale);
     ImageView edges_view = imgv_default(&edges);
+    edges_view.wraping_mode = WrappingMode_Clamp;
 
     CannyParameters canny_parameters = canny_guess_parameters(&gradient_view);
     canny_run(
@@ -125,10 +127,24 @@ int main(int argc, char **argv) {
     bmp_save_to_path("edges.bmp", &edges);
     printf("    Done (%ldms)\n", timediff(start));
 
+    gettimeofday(&start, NULL);
+    printf("Runnig Hough Transform\n");
+    // Computing image's gradient
+    Image     hough = img_new(500, 500, PixelFormat_GrayScale);
+    ImageView hough_view = imgv_default(&hough);
+
+    hough_acc_space_run(
+        &edges_view, &gradient_dir_view, &hough_view
+    );
+    printf("    Saving edges to hough.bmp\n");
+    bmp_save_to_path("hough.bmp", &hough);
+    printf("    Done (%ldms)\n", timediff(start));
+
     img_destroy(image);
     img_destroy(blured);
     img_destroy(gradient);
     img_destroy(gradient_dir);
     img_destroy(edges);
+    img_destroy(hough);
     return 0;
 }
