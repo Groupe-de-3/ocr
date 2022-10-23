@@ -17,7 +17,7 @@ static MatrixMetadata *m_metadata(Matrix(void) m) {
 }
 
 Matrix(void) m_create(size_t elem_size, size_t dimc, size_t dimv[]) {
-    assert(dimc < MATRIX_MAX_DIMS);
+    assert(dimc <= MATRIX_MAX_DIMS);
 
     size_t total_size = 1;
     for (size_t i = 0; i < dimc; i++)

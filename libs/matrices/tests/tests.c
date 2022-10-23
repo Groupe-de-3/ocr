@@ -6,6 +6,7 @@
 #include "matrices.h"
 
 const char *test_functions[] = {
+    "test_basics",
     "test_mul2",
     "test_mul2_vec",
     "test_int_add2",
@@ -13,6 +14,57 @@ const char *test_functions[] = {
     "test_double_add2",
     "test_double_mul2",
     NULL};
+
+void test_basics(void) {
+    Matrix(int) a = m_new(int, 0);
+    Matrix(int) b = m_new(int, 0, 2, 0);
+    Matrix(int) c = m_new(int, 10, 3, 5);
+    Matrix(int) d = m_new(int, 93, 0);
+    Matrix(int) e = m_new(int, 8, 1);
+    
+    // m_width
+    h_assert(m_width(a) == 0);
+    h_assert(m_width(b) == 0);
+    h_assert(m_width(c) == 10);
+    h_assert(m_width(d) == 93);
+    h_assert(m_width(e) == 8);
+
+    // m_height
+    h_assert(m_height(b) == 2);
+    h_assert(m_height(c) == 3);
+    h_assert(m_height(d) == 0);
+    h_assert(m_height(e) == 1);
+
+    // m_dimc
+    h_assert(m_dimc(a) == 1);
+    h_assert(m_dimc(b) == 3);
+    h_assert(m_dimc(c) == 3);
+    h_assert(m_dimc(d) == 2);
+    h_assert(m_dimc(e) == 2);
+
+    // m_dimv
+    h_assert(m_dimv(a)[0] == 0);
+
+    h_assert(m_dimv(b)[0] == 0);
+    h_assert(m_dimv(b)[1] == 2);
+    h_assert(m_dimv(b)[2] == 0);
+
+    h_assert(m_dimv(c)[0] == 10);
+    h_assert(m_dimv(c)[1] == 3);
+    h_assert(m_dimv(c)[2] == 5);
+
+    h_assert(m_dimv(d)[0] == 93);
+    h_assert(m_dimv(d)[1] == 0);
+
+    h_assert(m_dimv(e)[0] == 8);
+    h_assert(m_dimv(e)[1] == 1);
+    
+    m_destroy(a);
+    m_destroy(b);
+    m_destroy(c);
+    m_destroy(d);
+    m_destroy(e);
+}
 
 void test_int_add2(void) {
     Matrix(int) a = m_new(int, 2, 2);
