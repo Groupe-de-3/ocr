@@ -88,10 +88,64 @@ ImageLoadResult img_load_file(
 size_t            img_float_channels_length(enum PixelFormat format);
 enum PixelFormat  img_equivalent_float_channels_format(enum PixelFormat from);
 
-any_pixel_t       img_some_to_any(some_pixel_t value, enum PixelFormat target);
-grayscale_pixel_t img_some_to_grayscale(some_pixel_t value);
-rgb8_pixel_t      img_some_to_rgb8(some_pixel_t value);
-rgbf_pixel_t      img_some_to_rgbf(some_pixel_t value);
+inline grayscale_pixel_t img_some_to_grayscale(some_pixel_t value) {
+    switch (value.format) {
+    case PixelFormat_Rgb8:
+        return (grayscale_pixel_t
+        ){0.299f * ((float)value.value.rgb8.r / 255.f) +
+          0.587f * ((float)value.value.rgb8.g / 255.f) +
+          0.114f * ((float)value.value.rgb8.b / 255.f)};
+    case PixelFormat_GrayScale:
+        return value.value.grayscale;
+    case PixelFormat_Rgbf:
+        return (grayscale_pixel_t
+        ){0.299f * value.value.rgbf.r + 0.587f * value.value.rgbf.g +
+          0.114f * value.value.rgbf.b};
+    }
+}
+inline rgb8_pixel_t img_some_to_rgb8(some_pixel_t value) {
+    switch (value.format) {
+    case PixelFormat_Rgb8:
+        return value.value.rgb8;
+    case PixelFormat_GrayScale:
+        {
+            uint8_t v =
+                (uint8_t)(value.value.grayscale * (grayscale_pixel_t)255);
+            return (rgb8_pixel_t){v, v, v};
+        }
+    case PixelFormat_Rgbf:
+        return (rgb8_pixel_t){
+            (uint8_t)(value.value.rgbf.r * 255.f),
+            (uint8_t)(value.value.rgbf.g * 255.f),
+            (uint8_t)(value.value.rgbf.b * 255.f),
+        };
+    }
+}
+inline rgbf_pixel_t img_some_to_rgbf(some_pixel_t value) {
+    switch (value.format) {
+    case PixelFormat_Rgb8:
+        return (rgbf_pixel_t){
+            ((float)value.value.rgb8.r / 255.f),
+            ((float)value.value.rgb8.g / 255.f),
+            ((float)value.value.rgb8.b / 255.f),
+        };
+    case PixelFormat_GrayScale:
+        return (rgbf_pixel_t
+        ){value.value.grayscale, value.value.grayscale, value.value.grayscale};
+    case PixelFormat_Rgbf:
+        return value.value.rgbf;
+    }
+}
+inline any_pixel_t img_some_to_any(some_pixel_t value, enum PixelFormat target) {
+    switch (target) {
+    case PixelFormat_Rgb8:
+        return (any_pixel_t){.rgb8 = img_some_to_rgb8(value)};
+    case PixelFormat_GrayScale:
+        return (any_pixel_t){.grayscale = img_some_to_grayscale(value)};
+    case PixelFormat_Rgbf:
+        return (any_pixel_t){.rgbf = img_some_to_rgbf(value)};
+    }
+}
 
 any_pixel_t img_get_pixel_any(Image *image, size_t x, size_t y);
 void img_set_pixel_any(Image *image, size_t x, size_t y, any_pixel_t new_value);
