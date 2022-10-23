@@ -5,6 +5,7 @@
 #include <time.h>
 
 #include "box_blur.h"
+#include "bilinear_sampling.h"
 #include "canny_edge_detector.h"
 #include "hough_transform.h"
 #include "gaussian_blur.h"
@@ -59,10 +60,25 @@ int main(int argc, char **argv) {
     // Save input
     bmp_save_to_path("in.bmp", &image);
     printf("    Done (%ldms)\n", timediff(start));
+    
+    size_t target_width = image.width > image.height ? 800 : (image.width*800) / image.height;
+    size_t target_height = image.height > image.width ? 800 : (image.height*800) / image.width;
+    
+    gettimeofday(&start, NULL);
+    printf("Resizing image to %zu x %zu\n", target_width, target_height);
+    Image           resized = img_new(target_width, target_height, image.format);
+    ImageView resized_view = imgv_default(&resized);
+    resized_view.wraping_mode = WrappingMode_Clamp;
+
+    bilinear_resize(&image_view, &resized_view);
+
+    printf("    Saving to resized.bmp\n");
+    bmp_save_to_path("resized.bmp", &resized);
+    printf("    Done (%ldms)\n", timediff(start));
 
     if (false) {
         // Bluring image using box blur
-        Image box_blur = img_new(image.width, image.height, image.format);
+        Image box_blur = img_new(resized.width, resized.height, resized.format);
         imgv_default(&box_blur);
 
         ImageView box_blur_view    = imgv_default(&box_blur);
@@ -70,7 +86,7 @@ int main(int argc, char **argv) {
 
         // Executing blur
         printf("Box Bluring image\n");
-        box_blur_run(&image_view, &box_blur_view, 11);
+        box_blur_run(&resized_view, &box_blur_view, 11);
 
         // Saving blur
         bmp_save_to_path("box_blured.bmp", &box_blur);
@@ -82,14 +98,14 @@ int main(int argc, char **argv) {
     printf("Bluring image\n");
 
     // Bluring image
-    Image blured = img_new(image.width, image.height, image.format);
+    Image blured = img_new(resized.width, resized.height, resized.format);
     imgv_default(&blured);
 
     ImageView blur_view    = imgv_default(&blured);
     blur_view.wraping_mode = WrappingMode_Clamp;
 
     // Executing blur
-    gaussian_blur_run(&image_view, &blur_view, 2.f);
+    gaussian_blur_run(&resized_view, &blur_view, 2.f);
 
     printf("    Saving blur to blured.bmp\n");
     // Saving blur
@@ -100,10 +116,10 @@ int main(int argc, char **argv) {
     printf("Computing gradient\n");
 
     // Computing image's gradient
-    Image     gradient      = img_new(image.width, image.height, image.format);
+    Image     gradient      = img_new(resized.width, resized.height, resized.format);
     ImageView gradient_view = imgv_default(&gradient);
     gradient_view.wraping_mode = WrappingMode_Clamp;
-    Image     gradient_dir = img_new(image.width, image.height, image.format);
+    Image     gradient_dir = img_new(resized.width, resized.height, resized.format);
     ImageView gradient_dir_view    = imgv_default(&gradient_dir);
     gradient_dir_view.wraping_mode = WrappingMode_Clamp;
 
@@ -115,7 +131,7 @@ int main(int argc, char **argv) {
     gettimeofday(&start, NULL);
     printf("Running Canny Edge Detector\n");
     // Computing image's gradient
-    Image     edges = img_new(image.width, image.height, PixelFormat_GrayScale);
+    Image     edges = img_new(resized.width, resized.height, PixelFormat_GrayScale);
     ImageView edges_view = imgv_default(&edges);
     edges_view.wraping_mode = WrappingMode_Clamp;
 
@@ -141,6 +157,7 @@ int main(int argc, char **argv) {
     printf("    Done (%ldms)\n", timediff(start));
 
     img_destroy(image);
+    img_destroy(resized);
     img_destroy(blured);
     img_destroy(gradient);
     img_destroy(gradient_dir);
