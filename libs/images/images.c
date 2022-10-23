@@ -95,9 +95,9 @@ enum PixelFormat img_equivalent_float_channels_format(enum PixelFormat from) {
 
 // Inline function definitions
 grayscale_pixel_t img_some_to_grayscale(some_pixel_t value);
-rgb8_pixel_t img_some_to_rgb8(some_pixel_t value);
-rgbf_pixel_t img_some_to_rgbf(some_pixel_t value);
-any_pixel_t img_some_to_any(some_pixel_t value, enum PixelFormat target);
+rgb8_pixel_t      img_some_to_rgb8(some_pixel_t value);
+rgbf_pixel_t      img_some_to_rgbf(some_pixel_t value);
+any_pixel_t       img_some_to_any(some_pixel_t value, enum PixelFormat target);
 
 any_pixel_t img_get_pixel_any(Image *image, size_t x, size_t y) {
     assert(img_in_bound(image, x, y));

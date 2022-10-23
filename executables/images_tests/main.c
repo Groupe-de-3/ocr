@@ -2,12 +2,12 @@
 #include <err.h>
 #include <stdio.h>
 
+#include "box_blur.h"
 #include "gaussian_blur.h"
 #include "images.h"
 #include "img_formats/bmp.h"
 #include "kernel_convolution.h"
 #include "matrices.h"
-#include "box_blur.h"
 #include "sobel_operator.h"
 
 void print_m(float *m) {
@@ -41,7 +41,7 @@ int main(int argc, char **argv) {
 
     // Save input
     bmp_save_to_path("in.bmp", &image);
-    
+
     if (false) {
         // Bluring image using box blur
         Image box_blur = img_new(image.width, image.height, image.format);
@@ -56,7 +56,7 @@ int main(int argc, char **argv) {
 
         // Saving blur
         bmp_save_to_path("box_blured.bmp", &box_blur);
-        
+
         img_destroy(box_blur);
     }
 

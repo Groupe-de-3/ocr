@@ -85,8 +85,8 @@ ImageLoadResult img_load_file(
     enum PixelFormat target_format
 );
 
-size_t            img_float_channels_length(enum PixelFormat format);
-enum PixelFormat  img_equivalent_float_channels_format(enum PixelFormat from);
+size_t           img_float_channels_length(enum PixelFormat format);
+enum PixelFormat img_equivalent_float_channels_format(enum PixelFormat from);
 
 inline grayscale_pixel_t img_some_to_grayscale(some_pixel_t value) {
     switch (value.format) {
@@ -136,7 +136,8 @@ inline rgbf_pixel_t img_some_to_rgbf(some_pixel_t value) {
         return value.value.rgbf;
     }
 }
-inline any_pixel_t img_some_to_any(some_pixel_t value, enum PixelFormat target) {
+inline any_pixel_t
+img_some_to_any(some_pixel_t value, enum PixelFormat target) {
     switch (target) {
     case PixelFormat_Rgb8:
         return (any_pixel_t){.rgb8 = img_some_to_rgb8(value)};
