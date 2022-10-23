@@ -1,8 +1,8 @@
 #include <assert.h>
 #include <err.h>
 #include <stdio.h>
-#include <time.h>
 #include <sys/time.h>
+#include <time.h>
 
 #include "box_blur.h"
 #include "gaussian_blur.h"
@@ -25,7 +25,8 @@ static void print_m(float *m) {
 static long timediff(struct timeval start) {
     struct timeval now;
     gettimeofday(&now, NULL);
-    return (now.tv_sec - start.tv_sec) * 1000 + now.tv_usec / 1000 - start.tv_usec / 1000;
+    return (now.tv_sec - start.tv_sec) * 1000 + now.tv_usec / 1000 -
+           start.tv_usec / 1000;
 }
 
 int main(int argc, char **argv) {
@@ -36,7 +37,7 @@ int main(int argc, char **argv) {
             argv[0]
         );
     }
-    
+
     struct timeval start;
 
     gettimeofday(&start, NULL);
@@ -49,7 +50,7 @@ int main(int argc, char **argv) {
     }
     ImageView image_view    = imgv_default(&image);
     image_view.wraping_mode = WrappingMode_Clamp;
-    
+
     printf("    Loaded image of size %zu x %zu\n", image.width, image.height);
 
     printf("    Saving input to in.bmp\n");
