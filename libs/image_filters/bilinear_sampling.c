@@ -1,9 +1,10 @@
 #include "bilinear_sampling.h"
 
-#include "utils_math.h"
 #include <assert.h>
-#include <string.h>
 #include <stdio.h>
+#include <string.h>
+
+#include "utils_math.h"
 
 some_pixel_t bilinear_sample(ImageView *img, float x, float y) {
     // Image must be in a "float channel" format
@@ -11,8 +12,8 @@ some_pixel_t bilinear_sample(ImageView *img, float x, float y) {
     assert(float_channels != 0);
 
     // Splitting fractional and int part of the coordinates
-    int xI = (int)x;
-    int yI = (int)y;
+    int   xI = (int)x;
+    int   yI = (int)y;
     float xF = x - (float)xI;
     float yF = y - (float)yI;
 
@@ -24,8 +25,8 @@ some_pixel_t bilinear_sample(ImageView *img, float x, float y) {
         any_pixel_t a = imgv_get_pixel_any(img, xI, yI);
         any_pixel_t b = imgv_get_pixel_any(img, x_plus, yI);
         for (size_t c = 0; c < float_channels; c++) {
-            top_value[c] = a.float_channels[c] * (1.f - xF)
-                         + b.float_channels[c] * xF;
+            top_value[c] =
+                a.float_channels[c] * (1.f - xF) + b.float_channels[c] * xF;
         }
     }
     float bottom_value[float_channels];
@@ -33,19 +34,20 @@ some_pixel_t bilinear_sample(ImageView *img, float x, float y) {
         any_pixel_t a = imgv_get_pixel_any(img, xI, y_plus);
         any_pixel_t b = imgv_get_pixel_any(img, x_plus, y_plus);
         for (size_t c = 0; c < float_channels; c++) {
-            bottom_value[c] = a.float_channels[c] * (1.f - xF)
-                         + b.float_channels[c] * xF;
+            bottom_value[c] =
+                a.float_channels[c] * (1.f - xF) + b.float_channels[c] * xF;
         }
     }
     float final_value[float_channels];
     for (size_t c = 0; c < float_channels; c++) {
-        final_value[c] = top_value[c] * (1.f - yF)
-                       + bottom_value[c] * yF;
+        final_value[c] = top_value[c] * (1.f - yF) + bottom_value[c] * yF;
         final_value[c] = clamp(final_value[c], 0.f, 1.f);
     }
-    
-    some_pixel_t out = { .format = img->image->format };
-    memcpy(out.value.float_channels, final_value, sizeof(float) * float_channels);
+
+    some_pixel_t out = {.format = img->image->format};
+    memcpy(
+        out.value.float_channels, final_value, sizeof(float) * float_channels
+    );
     return out;
 }
 
@@ -54,7 +56,10 @@ void bilinear_resize(ImageView *from, ImageView *to) {
     float y_scale = (float)from->height / (float)to->height;
     for (int y = 0; y < to->height; y++) {
         for (int x = 0; x < to->width; x++) {
-            imgv_set_pixel_some(to, x, y, bilinear_sample(from, (float)x * x_scale, (float)y * y_scale));
+            imgv_set_pixel_some(
+                to, x, y,
+                bilinear_sample(from, (float)x * x_scale, (float)y * y_scale)
+            );
         }
     }
 }

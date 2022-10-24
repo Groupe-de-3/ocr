@@ -2,6 +2,8 @@
 #include <stdint.h>
 #include <stdlib.h>
 
+#include "utils_math.h"
+
 enum PixelFormat {
     PixelFormat_GrayScale,
     PixelFormat_Rgb8,
@@ -110,14 +112,14 @@ inline rgb8_pixel_t img_some_to_rgb8(some_pixel_t value) {
     case PixelFormat_GrayScale:
         {
             uint8_t v =
-                (uint8_t)(value.value.grayscale * (grayscale_pixel_t)255);
+                (uint8_t)(clamp(value.value.grayscale, 0., 1.) * (grayscale_pixel_t)255);
             return (rgb8_pixel_t){v, v, v};
         }
     case PixelFormat_Rgbf:
         return (rgb8_pixel_t){
-            (uint8_t)(value.value.rgbf.r * 255.f),
-            (uint8_t)(value.value.rgbf.g * 255.f),
-            (uint8_t)(value.value.rgbf.b * 255.f),
+            (uint8_t)(clamp(value.value.rgbf.r, 0., 1.) * 255.f),
+            (uint8_t)(clamp(value.value.rgbf.g, 0., 1.) * 255.f),
+            (uint8_t)(clamp(value.value.rgbf.b, 0., 1.) * 255.f),
         };
     }
 }
