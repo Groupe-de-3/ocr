@@ -8,6 +8,7 @@
 #include <stdlib.h>
 #include <time.h>
 
+/*
 //---------------
 //Layer
 //---------------
@@ -107,4 +108,6 @@ double Average_Cost(double** outputs, double** expects, int size)
     
     
     return cost / size;
-}
+} 
+
+*/

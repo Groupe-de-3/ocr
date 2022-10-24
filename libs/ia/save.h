@@ -22,7 +22,7 @@
  * 
  *  \return neural_wetwork
  */
-neural_network init(int layers_number, int layers_sizes[]);
+neural_network ia_init(size_t layers_number, size_t layers_sizes[]);
 
 /*! \brief Load of the neural network
  *
@@ -32,7 +32,7 @@ neural_network init(int layers_number, int layers_sizes[]);
  * 
  *  \return neural_wetwork
  */
-neural_network * load(char* file_name);
+neural_network * ia_load(char* file_name);
 
 
 /*! \brief Save the neural network
@@ -44,12 +44,12 @@ neural_network * load(char* file_name);
  *
  *  \return void
  */
-void save(neural_network *NN);
+void ia_save(neural_network *NN);
 
 /*! \brief Deletes files created by #save
  */
-void clear(void);
+void ia_clear(void);
 
 
-void memory_free(neural_network *NN);
+void ia_memory_free(neural_network *NN);
 

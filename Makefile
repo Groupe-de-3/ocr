@@ -77,7 +77,9 @@ $(guile (define-target "sudoku" \
 	`(deps "vec")\
 ))
 
-$(guile (define-target "ia"))
+$(guile (define-target "ia" \
+	`(deps "matrices")\
+))
 
 $(guile (define-target "utils"))
 
@@ -126,7 +128,7 @@ $(guile (define-target "images_tests"\
 
 $(guile (define-target "ia_test"\
 	`(target-type "executable")\
-	`(deps "ia")\
+	`(deps "ia" "matrices")\
 ))
 # -------------------
 # (Build) PROFILES

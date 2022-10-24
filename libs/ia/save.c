@@ -6,14 +6,17 @@
 #include <stdlib.h>
 #include <time.h>
 
+#include <stdio.h>
+
 // TRAITEMENT FICHIER / neural network
 
-void clear() {
+void ia_clear() {
     if (remove("neural_network.txt") != 0)
         errx(1, "Could not delete file neural_network.txt");
 }
 
-void save(neural_network *NN) // save the neural network in the file "neural_network"
+/*
+void ia_save(neural_network *NN) // save the neural network in the file "neural_network"
 {
     FILE *f = NULL;
     if ((f = fopen("neural_network.txt", "r")))
@@ -55,7 +58,7 @@ void save(neural_network *NN) // save the neural network in the file "neural_net
     fclose(fichier);
 }
 
-neural_network * load(char* file_name) // initialisation of the neural network from a file
+neural_network * ia_load(char* file_name) // initialisation of the neural network from a file
 {
     neural_network NN;
 
@@ -119,28 +122,23 @@ neural_network * load(char* file_name) // initialisation of the neural network f
     return &NN;
 }
 
+*/
 
-
-void memory_free(neural_network *NN)
+void ia_memory_free(neural_network *NN)
 {
-    free(NN->layers_sizes);
+    //free(NN->layers_sizes);
     
-    for (int i = 0; i < NN->layers_number ; i++)
+    for (size_t i = 0; i < NN->layers_number ; i++)
     {   
-        
-        for (int j = 0; j < NN->layers_sizes[i]; j++)
-        {
-            free(NN->layers_[i].neural_list[j].weights);
-        }
-
-        free(NN->layers_[i].neural_list);
+        m_destroy(NN->layers_[i].m_bias);
+        m_destroy(NN->layers_[i].m_weight);
     }
 
     free(NN->layers_);
     
 }
 
-neural_network init(int layers_number, int* layers_sizes)// initialisation of a new neural network
+neural_network ia_init(size_t layers_number, size_t* layers_sizes)// initialisation of a new neural network
 {
     
     neural_network NN;
@@ -152,39 +150,28 @@ neural_network init(int layers_number, int* layers_sizes)// initialisation of a 
     
     
     
-    for (int layer_ind = 0; layer_ind < layers_number; layer_ind++) {
+    for (size_t layer_ind = 1; layer_ind < layers_number; layer_ind++) {
         
         Layer Layer_;
         
         Layer_.layer_size = layers_sizes[layer_ind]; // ini size of the layer
+
+        Layer_.m_bias = m_new(double, Layer_.layer_size, 1);
+        Layer_.m_weight = m_new(double, Layer_.layer_size,  layers_sizes[layer_ind-1]);
+
+        //printf("%zu", m_height(Layer_.m_weight));
+
         
-        Neurone *array_neural = malloc((uint) layers_sizes[layer_ind] * sizeof(Neurone));
+        for (size_t i = 0; i < Layer_.layer_size; i++) {
 
-        for (int i = 0; i < layers_sizes[layer_ind]; i++) {
-
-            Neurone new_neurone; //create neural
-            //new_neurone.weights = malloc(sizeof(double) * layers_sizes[layer_ind]);
-            //new_neurone.weights[0] = (rand() / ((double)RAND_MAX));
+            m_get2(Layer_.m_bias, i, 0) = (double) (rand() / ((double)RAND_MAX)); // ini biais
             
-            new_neurone.bias = (double) (rand() / ((double)RAND_MAX)); // ini biais
-            
-            double *array_weight = malloc(sizeof(double) * (uint) layers_sizes[layer_ind]); // a modif
-            for (int j = 0; j < layers_sizes[layer_ind]; j++)
+            for (size_t j = 0; j < layers_sizes[layer_ind-1]; j++)
             {
-                //double d = (rand() / ((double)RAND_MAX));
-                array_weight[j] = 0.5;
+                m_get2(Layer_.m_weight, i, j) = (double) (rand() / ((double)RAND_MAX)); // ini weights
             }
-                
-            
-
-            new_neurone.weights = array_weight;
-
-            array_neural[i] = new_neurone; //add neurone
-            
         }
-
-
-        Layer_.neural_list = array_neural;
+        
         array_layer[layer_ind] = Layer_; //add layer
     }
 
