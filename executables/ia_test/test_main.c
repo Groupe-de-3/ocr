@@ -11,18 +11,13 @@ int main() {
      double inputs[] = {0,1};
 
      neural_network NN = ia_init(layers_number, layers_sizes);
-     //save(&NN);
-     printf("test\n");
+     ia_save(&NN);
 
-     printf("%zu", NN.layers_number);
-     //printf("%d",NN->layers_[0].neural_list[0].bias);
+     printf("%zu\n", NN.layers_number);
 
      ia_memory_free(&NN); // free the memory
     
 
-    //neural_network * NN = init("neural_network.txt");
-
-    //memory_free(NN);
     printf("fin\n");
 
     return 0;
