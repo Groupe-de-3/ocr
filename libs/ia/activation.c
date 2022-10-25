@@ -8,11 +8,11 @@ double single_relu_Activate(double val)
     return val;
 }
 
-void Relu_Activate(Matrix(double) * m)
+void Relu_Activate(Matrix(double) m)
 {
     for (size_t i = 0; i < m_length(m); i++)
     {
-        *m[i] = single_relu_Activate(*m[i]);
+        m[i] = single_relu_Activate(m[i]);
     }
 }
 

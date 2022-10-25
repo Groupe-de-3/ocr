@@ -1,7 +1,7 @@
 #pragma once
 #include "struct.h"
 
-Matrix(double)* CalculateOutputs_NN(Matrix(double) input, neural_network NN);
+Matrix(double) CalculateOutputs_NN(Matrix(double) input, neural_network NN);
 
 size_t Classify(neural_network NN, double inputs[]);
 
