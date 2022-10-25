@@ -8,60 +8,42 @@
 #include <stdlib.h>
 #include <time.h>
 
-/*
-//---------------
-//Layer
-//---------------
-double* CalculateOutputs_layer(double inputs[], Layer layer)
-{
-    double output[layer.layer_size];
-    
-    for (int i = 0; i < layer.layer_size; i++)
-    {
-        double weightIntput = layer.neural_list[i].bias;
-
-        for (int j = 0; j < layer.layer_size; j++)
-        {
-            weightIntput += layer.neural_list[i].weights[j] * inputs[i];
-        }
-
-        output[i] = weightIntput;
-    }
-
-    double activations[layer.layer_size];
-    for (int i = 0; i < layer.layer_size; i++)
-    {
-        activations[i] = Activate(output, i);
-    }
-    
-
-    return activations;
-}
 
 //---------------
 // Neural Network
 //---------------
-double* CalculateOutputs_NN(double inputs[], neural_network NN)
+Matrix(double)* CalculateOutputs_NN(Matrix(double) input, neural_network NN)
 {
-    for (int i = 0; i < NN.layers_number; i++)
+    Matrix(double) new_m = NULL;
+
+    for (size_t i = 0; i < NN.layers_number; i++)
     {
-        inputs = CalculateOutputs_layer(inputs, NN.layers_[i]);
+        new_m = m_new(double, m_height(input), m_width(NN.layers_[i].m_weight));
+        m_mul(NN.layers_[i].m_weight, input, new_m);
+
+        m_add(NN.layers_[i].m_bias, new_m);
+
+        Relu_Activate(&new_m);
+
+        m_destroy(input);
+        m_copy(&input, new_m);
+        m_destroy(new_m);
     }
     
-
-    return inputs;
+    return &new_m;
 }
 
 
 // Run the inputs through the network and return the index of the highest input
-int Classify(neural_network NN, double inputs[])
+size_t Classify(neural_network NN, double inputs[])
 {
-    double * output = CalculateOutputs_NN(inputs, NN);
+    /*
+    double * output;
     double max = output[0];
 
 
-    int ind = 0;
-    for (int i = 1; i < NN.layers_sizes[NN.layers_number-1]; i++)
+    size_t ind = 0;
+    for (size_t i = 1; i < NN.layers_sizes[NN.layers_number-1]; i++)
     {
         if (max < output[i])
          {
@@ -70,7 +52,7 @@ int Classify(neural_network NN, double inputs[])
          }
     }
 
-    return ind;
+    return ind;*/
 }
 
 
@@ -110,4 +92,4 @@ double Average_Cost(double** outputs, double** expects, int size)
     return cost / size;
 } 
 
-*/
+

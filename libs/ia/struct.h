@@ -1,8 +1,6 @@
 #pragma once
 #include <stdlib.h>
 #include "matrices.h"
- #define MAX_LAYERS 10
- #define MAX_SIZE_LAYER 10
 
 typedef struct {
     size_t layer_size;

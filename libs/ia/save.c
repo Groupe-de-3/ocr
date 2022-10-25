@@ -53,72 +53,68 @@ void ia_save(neural_network *NN) // save the neural network in the file "neural_
     fclose(fichier);
 }
 
-/*
+
 neural_network * ia_load(char* file_name) // initialisation of the neural network from a file
 {
-    neural_network NN;
+    neural_network * NN = NULL;
 
     FILE *fichier = NULL;
     fichier       = fopen(file_name, "r");
 
     // ini base
     char chaine[10] = "";
+
     fgets(chaine, 10, fichier);
-    NN.layers_number = atoi(chaine);
+    NN->layers_number = (size_t) atoi(chaine);
 
-    NN.layers_ = malloc((uint) NN.layers_number * sizeof(Layer));
+    NN->layers_ = malloc((uint) NN->layers_number * sizeof(Layer));
 
 
-    NN.layers_sizes = malloc(sizeof(int) * NN.layers_number);
-    for (int i = 0; i < NN.layers_number; i++)
+    NN->layers_sizes = malloc(sizeof(int) * NN->layers_number);
+    for (size_t i = 0; i < NN->layers_number; i++)
     {
         fgets(chaine, 10, fichier);
-        NN.layers_sizes[i] = atoi(chaine);
+        NN->layers_sizes[i] = (size_t) atoi(chaine);
     }
 
-    
 
-    for (int layer_ind = 0; layer_ind < NN.layers_number; layer_ind++) {
+    Layer *array_layer = malloc((uint) NN->layers_number * sizeof(Layer));
+    
+    for (size_t layer_ind = 1; layer_ind < NN->layers_number; layer_ind++) {
         
         Layer Layer_;
+        
+        Layer_.layer_size = NN->layers_sizes[layer_ind]; // ini size of the layer
 
-        //NN.layers_[layer_ind].neural_list = malloc((uint) layers_sizes[layer_ind] * sizeof(Neurone));
+        Layer_.m_bias = m_new(double, Layer_.layer_size, 1);
+        Layer_.m_weight = m_new(double, Layer_.layer_size, NN->layers_sizes[layer_ind-1]);
+        
+        for (size_t i = 0; i < Layer_.layer_size; i++) {
 
-        Layer_.layer_size = NN.layers_sizes[layer_ind]; // ini size of the layer
-
-        for (int i = 0; i < NN.layers_sizes[layer_ind]; i++) {
-            //create neural && read neural
-
-            Neurone new_neurone;
-            char chaine2[10] = "";
-
-            fgets(chaine2, 10, fichier); // biais
-            new_neurone.bias = atof(chaine2);
-
-            
-           // new_neurone.weights = malloc(sizeof(double) * (uint) layers_sizes[layer_ind]); // a modif
-
-            for (int j = 0; j < NN.layers_sizes[layer_ind]; j++) // weights
-            {
-                fgets(chaine2, 10, fichier);
-                double res             = atof(chaine2);
-                new_neurone.weights[j] = res;
-            }
-
-            //add neurone
-            Layer_.neural_list[i] = new_neurone;
+            fgets(chaine, 10, fichier); // biais
+            m_get2(Layer_.m_bias, i, 0) = (double) atof(chaine); // ini biais
         }
 
-        //add layer
-        NN.layers_[layer_ind] = Layer_;
+        for (size_t i = 0; i < Layer_.layer_size; i++) {
+
+            for (size_t j = 0; j < NN->layers_sizes[layer_ind-1]; j++)
+            {
+                fgets(chaine, 10, fichier);
+                m_get2(Layer_.m_weight, i, j) = (double) atof(chaine); // ini weights
+            }
+        }
+        
+        array_layer[layer_ind] = Layer_; //add layer
     }
+
+    NN->layers_ = array_layer;
 
     fclose(fichier);
 
-    return &NN;
+    return NN;
 }
 
-*/
+
 
 void ia_memory_free(neural_network *NN)
 {
@@ -154,7 +150,7 @@ neural_network ia_init(size_t layers_number, size_t* layers_sizes)// initialisat
 
         Layer_.m_bias = m_new(double, Layer_.layer_size, 1);
         Layer_.m_weight = m_new(double, Layer_.layer_size, layers_sizes[layer_ind-1]);
-        
+
         for (size_t i = 0; i < Layer_.layer_size; i++) {
 
             m_get2(Layer_.m_bias, i, 0) = (double) (rand() / ((double)RAND_MAX));; // ini biais

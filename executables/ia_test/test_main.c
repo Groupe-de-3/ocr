@@ -7,8 +7,8 @@ int main() {
     
      printf("%s", "test\n");
      size_t layers_number = 3;
-     size_t layers_sizes[] = {2,3,2};
-     double inputs[] = {0,1};
+     size_t layers_sizes[] = {3,4,2};
+     double inputs[] = {0,1, 0};
 
      neural_network NN = ia_init(layers_number, layers_sizes);
      ia_save(&NN);

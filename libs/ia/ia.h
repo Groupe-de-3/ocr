@@ -1,8 +1,12 @@
 #pragma once
 #include "struct.h"
 
-double* CalculateOutputs_layer(double inputs[], Layer layer);
+Matrix(double)* CalculateOutputs_NN(Matrix(double) input, neural_network NN);
 
-double* CalculateOutputs_NN(double inputs[], neural_network NN);
+size_t Classify(neural_network NN, double inputs[]);
 
-int Classify(neural_network NN, double inputs[]);
+double NodeCost(double output, double expected);
+
+double Cost(double* outputs, double* expects, int size);
+
+double Average_Cost(double** outputs, double** expects, int size);
