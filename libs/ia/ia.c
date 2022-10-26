@@ -53,7 +53,7 @@ void Print_array(Matrix(double) m) // print matrix
 size_t array_max(Matrix(double) m) // search index of max element in Matrix
 {
     size_t ind = 0;
-    double max = m[0];
+    double max = 0;
     for (size_t i = 1; i < m_length(m); i++)
     {
         if (max < m[i])
@@ -73,6 +73,8 @@ size_t Classify(neural_network NN, double input[])
     Matrix(double) input_ = m_new(double, NN.layers_sizes[0], 1); // to Matrix
     for (size_t i = 0; i < NN.layers_sizes[0]; i++)
         input_[i] = input[i];
+    
+        
     
 
     printf("inputs :\n"); //print input

@@ -10,30 +10,28 @@
 
 // TRAITEMENT FICHIER / neural network
 
-void ia_clear() {
-    if (remove("neural_network.txt") != 0)
+void ia_clear(char *filename) {
+    if (remove(filename) != 0)
         errx(1, "Could not delete file neural_network.txt");
 }
 
-
-void ia_save(neural_network *NN) // save the neural network in the file "neural_network"
+void ia_save(neural_network *NN, char * filename) // save the neural network in the file "neural_network"
 {
     FILE *f = NULL;
-    if ((f = fopen("neural_network.txt", "r")))
+    if ((f = fopen(filename, "r")))
     {
         fclose(f);
-        ia_clear();
+        ia_clear(filename);
     }
     
     FILE *fichier  = NULL;
-    fichier = fopen("neural_network.txt", "w");
+    fichier = fopen(filename, "w");
 
 
     
     fprintf(fichier, "%zu\n", NN->layers_number);
 
-    
-    for (size_t i = 0; i < NN->layers_number; i++) 
+    for (size_t i = 0; i < NN->layers_number +1; i++) 
         fprintf(fichier, "%zu\n", NN->layers_sizes[i]);
 
     
@@ -53,10 +51,10 @@ void ia_save(neural_network *NN) // save the neural network in the file "neural_
     fclose(fichier);
 }
 
-
-neural_network * ia_load(char* file_name) // initialisation of the neural network from a file
+neural_network ia_load(char* file_name) // initialisation of the neural network from a file
 {
-    neural_network * NN = NULL;
+    
+    neural_network NN;
 
     FILE *fichier = NULL;
     fichier       = fopen(file_name, "r");
@@ -65,60 +63,59 @@ neural_network * ia_load(char* file_name) // initialisation of the neural networ
     char chaine[10] = "";
 
     fgets(chaine, 10, fichier);
-    NN->layers_number = (size_t) atoi(chaine);
+    NN.layers_number = (size_t) atoi(chaine);
 
-    NN->layers_ = malloc((uint) NN->layers_number * sizeof(Layer));
+    
 
 
-    NN->layers_sizes = malloc(sizeof(int) * NN->layers_number);
-    for (size_t i = 0; i < NN->layers_number; i++)
+    NN.layers_sizes = malloc(sizeof(size_t) * (NN.layers_number+1));
+
+    for (size_t i = 0; i < NN.layers_number+1; i++)
     {
         fgets(chaine, 10, fichier);
-        NN->layers_sizes[i] = (size_t) atoi(chaine);
+        NN.layers_sizes[i] = (size_t) atoi(chaine);
     }
 
-
-    Layer *array_layer = malloc((uint) NN->layers_number * sizeof(Layer));
+    NN.layers_ = malloc(NN.layers_number * sizeof(Layer));
     
-    for (size_t layer_ind = 1; layer_ind < NN->layers_number; layer_ind++) {
+    for (size_t layer_ind = 0; layer_ind < NN.layers_number; layer_ind++) {
         
         Layer Layer_;
         
-        Layer_.layer_size = NN->layers_sizes[layer_ind]; // ini size of the layer
+        Layer_.layer_size = NN.layers_sizes[layer_ind+1]; // ini size of the layer
 
         Layer_.m_bias = m_new(double, Layer_.layer_size, 1);
-        Layer_.m_weight = m_new(double, Layer_.layer_size, NN->layers_sizes[layer_ind-1]);
+        Layer_.m_weight = m_new(double, Layer_.layer_size, NN.layers_sizes[layer_ind]);
         
+        for (size_t i = 0; i < NN.layers_sizes[layer_ind]; i++) {
+
+            for (size_t j = 0; j < Layer_.layer_size; j++)
+            {
+                fgets(chaine, 10, fichier);
+                m_get2(Layer_.m_weight, j, i) = (double) atof(chaine); // ini weights
+            }
+        }
+
         for (size_t i = 0; i < Layer_.layer_size; i++) {
 
             fgets(chaine, 10, fichier); // biais
             m_get2(Layer_.m_bias, i, 0) = (double) atof(chaine); // ini biais
         }
 
-        for (size_t i = 0; i < Layer_.layer_size; i++) {
-
-            for (size_t j = 0; j < NN->layers_sizes[layer_ind-1]; j++)
-            {
-                fgets(chaine, 10, fichier);
-                m_get2(Layer_.m_weight, i, j) = (double) atof(chaine); // ini weights
-            }
-        }
         
-        array_layer[layer_ind] = Layer_; //add layer
+        NN.layers_[layer_ind] = Layer_; //add layer
     }
 
-    NN->layers_ = array_layer;
+    NN.layers_ = NN.layers_;
 
     fclose(fichier);
 
     return NN;
 }
 
-
-
-void ia_memory_free(neural_network *NN)
+void ia_memory_free(neural_network *NN) // free the memory
 {
-    //free(NN->layers_sizes);
+    free(NN->layers_sizes);
     
     for (size_t i = 0; i < NN->layers_number ; i++)
     {   
