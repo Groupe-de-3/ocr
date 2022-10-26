@@ -13,3 +13,14 @@ typedef struct {
     size_t layers_number; // number of layers in the neural network
     size_t *layers_sizes; // array of each layer size
 } neural_network;
+
+
+typedef struct {
+    Matrix(double) input;
+    Matrix(double) expect;
+} DataPoint;
+
+typedef struct {
+    DataPoint *data;
+    size_t size;
+} Data;

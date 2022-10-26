@@ -1,6 +1,7 @@
 #include "struct.h"
 #include "ia.h"
 #include "activation.h"
+#include "cost.h"
 
 #include <err.h>
 #include <math.h>
@@ -66,36 +67,114 @@ size_t array_max(Matrix(double) m) // search index of max element in Matrix
     return ind;
 }
 
-// Run the inputs through the network and return the index of the highest input
-size_t Classify(neural_network NN, double input[])
+// Run the inputs through the network and return the output
+Matrix(double) Classify(neural_network NN, double input[])
 {
     
     Matrix(double) input_ = m_new(double, NN.layers_sizes[0], 1); // to Matrix
     for (size_t i = 0; i < NN.layers_sizes[0]; i++)
         input_[i] = input[i];
     
-        
-    
 
     printf("inputs :\n"); //print input
     Print_array(input_);
     
 
-    Matrix(double) output = CalculateOutputs_NN(input_, NN); // launch forward
-    
+    return CalculateOutputs_NN(input_, NN); // launch forward
+}
+
+size_t Get_result(Matrix(double) output)
+{
     size_t ind = array_max(output); 
 
-    printf("result :\n"); // print result
+    printf("result : %zu\n", ind); // print result
     Print_array(output);
+
     m_destroy(output);
 
     return ind;
 }
 
+void Launch(neural_network NN, double input[])
+{
+    Matrix(double) output = Classify(NN, input);
+
+    Get_result(output);
+}
+
+
+//---------------
+// Gradient
+//---------------
+
+void ApplyGradients(Layer layer, Matrix(double) costB, Matrix(double) costW, double learnRate)
+{
+    for (size_t i = 0; i < m_height(costW); i++)
+    {
+        m_get2(layer.m_bias, i, 0) -= m_get2(costB, i, 0) * learnRate;
+        for (size_t j = 0; j < m_width(costW); j++)
+        {
+            m_get2(layer.m_weight, i, j) -= m_get2(costW, i, j) * learnRate;;
+        }     
+    }
+    
+}
+/*
+void Learn(neural_network *NN, DataPoint datapoint, double learnRate)
+{
+    double h = 0.01;
+    //double OriginalCost = Cost();
+
+    for (size_t layer_ind = 0; layer_ind < NN->layers_number; layer_ind++)
+    {
+        Matrix(double) costW = m_new(double, NN->layers_[layer_ind].layer_size, NN->layers_sizes[layer_ind]);
+
+        for (size_t i = 0; i < m_height(costW); i++)
+        {
+            for (size_t j = 0; j < m_width(costW); j++)
+            {
+                m_get2(NN->layers_[layer_ind].m_weight, i, j) += h;
+                double deltaCost = Aply_cost(NN, input_, expected);
+                m_get2(NN->layers_[layer_ind].m_weight, i, j) -= h;
+                //m_get2(costW, i, j) = deltaCost / h;
+            }     
+        }
+
+        Matrix(double) costB = m_new(double, NN->layers_[layer_ind].layer_size, 0);
+
+        for (size_t i = 0; i < m_height(costW); i++)
+        {
+            m_get2(NN->layers_[layer_ind].m_weight, i, 0) += h;
+            double deltaCost = Aply_cost()
+            m_get2(NN->layers_[layer_ind].m_weight, i, 0) -= h;
+            //m_get2(costW, i, 0) = deltaCost / h;
+              
+        }
+
+        ApplyGradients(NN->layers_[layer_ind], costB, costW, 0.1);
+
+        m_destroy(costW);
+        m_destroy(costB);   
+    }
+
+}
+
+double Aply_cost(neural_network NN, Matrix(double) inputs, Matrix(double) expects)
+{
+    Matrix(double) outputs = CalculateOutputs_NN(inputs, NN);
+    return Cost(outputs, expects);
+}
+*/
+
 
 //---------------
 // Cost
 //---------------
+
+double NodeCost_derivate(double output, double expected)
+{
+    return 2 * (output - expected);
+}
 
 double NodeCost(double output, double expected)
 {
@@ -103,30 +182,16 @@ double NodeCost(double output, double expected)
     return error * error;
 }
 
-double Cost(double* outputs, double* expects, int size)
+double Cost(Matrix(double) outputs, Matrix(double) expects)
 {
     double cost = 0;
     
-    for (int i = 0; i < size; i++)
+    for (size_t i = 0; i < m_length(outputs); i++)
     {
         cost += NodeCost(outputs[i], expects[i]);
     }
     
-    
     return cost;
 }
-
-double Average_Cost(double** outputs, double** expects, int size)
-{
-    double cost = 0;
-    
-    for (int i = 0; i < size; i++)
-    {
-        cost += Cost(outputs[i], expects[i], size);
-    }
-    
-    
-    return cost / size;
-} 
 
 

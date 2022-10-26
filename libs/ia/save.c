@@ -150,11 +150,11 @@ neural_network ia_init(size_t layers_number, size_t* layers_sizes)// initialisat
 
         for (size_t i = 0; i < Layer_.layer_size; i++) {
 
-            m_get2(Layer_.m_bias, i, 0) = (double) (rand() / ((double)RAND_MAX));; // ini biais
+            m_get2(Layer_.m_bias, i, 0) = (double) (rand() / ((double)RAND_MAX)) *2 -1;; // ini biais
             
             for (size_t j = 0; j < layers_sizes[layer_ind]; j++)
             {
-                m_get2(Layer_.m_weight, i, j) = (double) (rand() / ((double)RAND_MAX)); // ini weights
+                m_get2(Layer_.m_weight, i, j) = (double) (rand() / ((double)RAND_MAX)) *2 -1; // ini weights
             }
         }
         
