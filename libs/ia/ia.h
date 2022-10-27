@@ -11,5 +11,5 @@ double Average_Cost(double** outputs, double** expects, int size);
 
 void Launch(neural_network NN, Data d);
 
-void Learn(neural_network *NN, DataPoint datapoint, double learnRate);
+void Learn(neural_network *NN, Data data, double learnRate);
 

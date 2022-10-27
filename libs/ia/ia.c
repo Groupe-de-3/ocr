@@ -27,7 +27,7 @@ Matrix(double) CalculateOutputs_NN(Matrix(double) input, neural_network NN)
         if (i < NN.layers_number-1)
             Relu_Activate(new_m);
         else
-            Softmax_Activate(new_m);
+            Softmax_Activate(new_m); // last layer
 
         m_destroy(input);
         input = m_new(double, m_width(new_m), m_height(new_m));
@@ -55,7 +55,7 @@ size_t array_max(Matrix(double) m) // search index of max element in Matrix
 {
     size_t ind = 0;
     double max = 0;
-    for (size_t i = 1; i < m_length(m); i++)
+    for (size_t i = 0; i < m_length(m); i++)
     {
         if (max < m[i])
          {
@@ -69,7 +69,7 @@ size_t array_max(Matrix(double) m) // search index of max element in Matrix
 
 size_t Get_result(Matrix(double) output)
 {
-    size_t ind = array_max(output); 
+    size_t ind = array_max(output);
 
     printf("result : %zu\n", ind); // print result
     Print_array(output);
@@ -78,7 +78,6 @@ size_t Get_result(Matrix(double) output)
 
     return ind;
 }
-
 
 // Run the inputs through the network and return the output
 Matrix(double) Classify(neural_network NN, DataPoint datapoint)
@@ -94,15 +93,10 @@ void Launch(neural_network NN, Data d)
     for (size_t i = 0; i < d.size; i++)
     {
         Matrix(double) output = Classify(NN, d.data[i]);
-        size_t res = Get_result(output);
+        Get_result(output);
         printf("\n\n");
     }
 }
-
-
-
-
-
 
 //---------------
 // Gradient
@@ -110,62 +104,76 @@ void Launch(neural_network NN, Data d)
 
 void ApplyGradients(Layer layer, Matrix(double) costB, Matrix(double) costW, double learnRate)
 {
-    for (size_t i = 0; i < m_height(costW); i++)
+
+    for (size_t i = 0; i < m_width(costW); i++)
     {
-        m_get2(layer.m_bias, i, 0) -= m_get2(costB, i, 0) * learnRate;
-        for (size_t j = 0; j < m_width(costW); j++)
+        for (size_t j = 0; j < m_height(costW); j++)
         {
             m_get2(layer.m_weight, i, j) -= m_get2(costW, i, j) * learnRate;;
         }     
     }
-    
-}
-/*
-void Learn(neural_network *NN, DataPoint datapoint, double learnRate)
-{
-    double h = 0.01;
-    //double OriginalCost = Cost();
 
-    for (size_t layer_ind = 0; layer_ind < NN->layers_number; layer_ind++)
+    for (size_t i = 0; i < m_width(costB); i++)
     {
-        Matrix(double) costW = m_new(double, NN->layers_[layer_ind].layer_size, NN->layers_sizes[layer_ind]);
-
-        for (size_t i = 0; i < m_height(costW); i++)
-        {
-            for (size_t j = 0; j < m_width(costW); j++)
-            {
-                m_get2(NN->layers_[layer_ind].m_weight, i, j) += h;
-                double deltaCost = Aply_cost(NN, input_, expected);
-                m_get2(NN->layers_[layer_ind].m_weight, i, j) -= h;
-                //m_get2(costW, i, j) = deltaCost / h;
-            }     
-        }
-
-        Matrix(double) costB = m_new(double, NN->layers_[layer_ind].layer_size, 0);
-
-        for (size_t i = 0; i < m_height(costW); i++)
-        {
-            m_get2(NN->layers_[layer_ind].m_weight, i, 0) += h;
-            double deltaCost = Aply_cost()
-            m_get2(NN->layers_[layer_ind].m_weight, i, 0) -= h;
-            //m_get2(costW, i, 0) = deltaCost / h;
-              
-        }
-
-        ApplyGradients(NN->layers_[layer_ind], costB, costW, 0.1);
-
-        m_destroy(costW);
-        m_destroy(costB);   
+        double a = m_get2(costB, i, 0) * learnRate;
+        m_get2(layer.m_bias, i, 0) -= a;
     }
-
 }
 
-double Aply_cost(neural_network NN, Matrix(double) inputs, Matrix(double) expects)
+
+double Aply_cost(neural_network *NN, DataPoint d)
 {
-    Matrix(double) outputs = CalculateOutputs_NN(inputs, NN);
-    return Cost(outputs, expects);
+    Matrix(double) inputs2 = m_new(double, m_width(d.input), m_height(d.input)); 
+    for (size_t i = 0; i < m_length(d.input); i++)
+        inputs2[i] = d.input[i];
+    
+    
+    Matrix(double) outputs = CalculateOutputs_NN(inputs2, *NN);
+    return Cost(outputs, d.expect);
 }
-*/
+
+
+void Learn(neural_network *NN, Data data, double learnRate)
+{
+    for (size_t data_ind = 0; data_ind < data.size; data_ind++)
+    {
+        DataPoint datapoint = data.data[data_ind];
+        double OriginalCost = Aply_cost(NN, datapoint);
+
+        for (size_t layer_ind = 0; layer_ind < NN->layers_number; layer_ind++)
+        {
+            Matrix(double) costW = m_new(double, NN->layers_[layer_ind].layer_size, NN->layers_sizes[layer_ind]);
+
+            for (size_t i = 0; i < m_width(costW); i++)
+            {
+                for (size_t j = 0; j < m_height(costW); j++)
+                {
+                    m_get2(NN->layers_[layer_ind].m_weight, i, j) += learnRate;
+                    double deltaCost = Aply_cost(NN, datapoint) - OriginalCost;
+                    m_get2(NN->layers_[layer_ind].m_weight, i, j) -= learnRate;
+                    m_get2(costW, i, j) = deltaCost / learnRate;
+                }     
+            }
+
+            Matrix(double) costB = m_new(double, NN->layers_[layer_ind].layer_size, 1);
+
+            for (size_t i = 0; i < m_width(costB); i++)
+            {
+                m_get2(NN->layers_[layer_ind].m_weight, i, 0) += learnRate;
+                double deltaCost = Aply_cost(NN, datapoint) - OriginalCost;
+                m_get2(NN->layers_[layer_ind].m_weight, i, 0) -= learnRate;
+                m_get2(costW, i, 0) = deltaCost / learnRate;
+                
+            }
+
+            ApplyGradients(NN->layers_[layer_ind], costB, costW, 0.1);
+
+            m_destroy(costW);
+            m_destroy(costB);   
+        }
+    }
+}
+
 
 
 //---------------
@@ -191,6 +199,8 @@ double Cost(Matrix(double) outputs, Matrix(double) expects)
     {
         cost += NodeCost(outputs[i], expects[i]);
     }
+
+    m_destroy(outputs);
     
     return cost;
 }

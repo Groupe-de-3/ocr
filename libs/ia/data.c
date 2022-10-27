@@ -33,9 +33,8 @@ DataPoint To_dataPoint(double *input, double *expect, size_t size)
 void To_dataPoints(Data d, double **input, double **expect, size_t size)
 {
     for (size_t i = 0; i < d.size; i++)
-    {
         d.data[i] = To_dataPoint(input[i], expect[i], size);
-    }
+    
 }
 
 void datapoint_Destroy(DataPoint d)
