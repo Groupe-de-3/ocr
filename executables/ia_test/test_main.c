@@ -6,7 +6,7 @@
 
 int main() {
     
-    printf("%s", "test\n");    
+    printf("%s", "Launch\n\n");    
     size_t layers_number = 2;
     size_t layers_sizes[] = {2,8,2};
 
@@ -14,19 +14,32 @@ int main() {
     for (size_t i = 0; i < layers_number+1; i++)
         layers_sizes_[i] = layers_sizes[i];
 
-    double inputs[] = {0,0};
-    double expected_output[] = {0,1};
-    //DataPoint datapoint = To_dataPoint(inputs, expected_output, layers_sizes[0]);
+    // data
+    double inputs[4][2] = {{0,0}, {1,0}, {0,1}, {1,1}};
+    double expects[4][2] = {{0,0}, {0,1}, {0,1}, {0,0}};
+    Data d = data_init(4);
+    for (size_t i = 0; i < d.size; i++)
+        d.data[i] = To_dataPoint(inputs[i], expects[i], layers_sizes[0]);
+    
 
+
+    //init neural network
     neural_network NN = ia_init(layers_number, layers_sizes_);
     //neural_network NN = ia_load("neural_network.txt");    
 
-    Launch(NN, inputs);
+    // start forward
+    Launch(NN, d);
 
+    // start learning
     //Learn(NN, datapoint);
 
     ia_save(&NN, "neural_network.txt");
-    ia_memory_free(&NN); // free the memory
+
+
+    // free the memory
+    ia_memory_free(&NN); 
+    data_Destroy(d);
+
 
     return 0;
 }

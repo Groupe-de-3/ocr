@@ -2,6 +2,10 @@
 #include "struct.h"
 #include "matrices.h"
 
-DataPoint To_dataPoint(double * input, double * expect, size_t size);
+Data data_init(size_t size);
 
-void datapoint_Destroy(DataPoint d);
+DataPoint To_dataPoint(double *input, double *expect, size_t size);
+
+void To_dataPoints(Data d, double **input, double **expect, size_t size);
+
+void data_Destroy(Data data);

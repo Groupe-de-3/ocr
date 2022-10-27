@@ -67,22 +67,6 @@ size_t array_max(Matrix(double) m) // search index of max element in Matrix
     return ind;
 }
 
-// Run the inputs through the network and return the output
-Matrix(double) Classify(neural_network NN, double input[])
-{
-    
-    Matrix(double) input_ = m_new(double, NN.layers_sizes[0], 1); // to Matrix
-    for (size_t i = 0; i < NN.layers_sizes[0]; i++)
-        input_[i] = input[i];
-    
-
-    printf("inputs :\n"); //print input
-    Print_array(input_);
-    
-
-    return CalculateOutputs_NN(input_, NN); // launch forward
-}
-
 size_t Get_result(Matrix(double) output)
 {
     size_t ind = array_max(output); 
@@ -95,12 +79,29 @@ size_t Get_result(Matrix(double) output)
     return ind;
 }
 
-void Launch(neural_network NN, double input[])
-{
-    Matrix(double) output = Classify(NN, input);
 
-    Get_result(output);
+// Run the inputs through the network and return the output
+Matrix(double) Classify(neural_network NN, DataPoint datapoint)
+{
+    printf("inputs :\n"); //print input
+    Print_array(datapoint.input);
+
+    return CalculateOutputs_NN(datapoint.input, NN); // launch forward
 }
+
+void Launch(neural_network NN, Data d)
+{
+    for (size_t i = 0; i < d.size; i++)
+    {
+        Matrix(double) output = Classify(NN, d.data[i]);
+        size_t res = Get_result(output);
+        printf("\n\n");
+    }
+}
+
+
+
+
 
 
 //---------------
