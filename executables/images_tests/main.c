@@ -162,7 +162,7 @@ int main(int argc, char **argv) {
     Image     hough_lines      = img_new(resized.width, resized.height, PixelFormat_GrayScale);
     ImageView hough_lines_view = imgv_default(&hough_lines);
 
-    hough_acc_space_draw_lines(&hough_view, &hough_lines_view);
+    hough_acc_space_draw_all_lines(&hough_view, &hough_lines_view);
     printf("    Saving edges to hough-lines.bmp\n");
     bmp_save_to_path("hough-lines.bmp", &hough_lines);
     printf("    Done (%ldms)\n", timediff(start));

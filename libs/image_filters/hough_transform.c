@@ -5,8 +5,11 @@
 #include <stdlib.h>
 #include <time.h>
 #include <stdio.h>
+#include <stdbool.h>
+#include <float.h>
 
 #include "vec.h"
+#include "images.h"
 
 void hough_acc_space_run_at(
     ImageView *in, ImageView *gradient_dir, ImageView *out, int x, int y
@@ -94,45 +97,122 @@ void hough_acc_space_probabilistic_run(
             );
 }
 
-void hough_acc_space_draw_lines(ImageView *acc_space, ImageView *out) {
+
+static void hough_get_image_max(ImageView *space, int *max_x, int *max_y, float *max_value) {
+    *max_x = -1;
+    *max_y = -1;
+    *max_value = FLT_MIN;
+    
+    for (int y = 0; y < space->height; y++) {
+        for (int x = 0; x < space->width; x++) {
+            float v = (float)imgv_get_pixel_grayscale(space, x, y);
+            if (v > *max_value) {
+                *max_value = v;
+                *max_x = x;
+                *max_y = y;
+            }
+        }
+    }
+}
+
+static void hough_clear_pixel(ImageView *space, int x, int y) {
+    for (int dy = -3; dy <= 3; dy++) {
+        for (int dx = -3; dx <= 3; dx++) {
+            if (imgv_in_bound(space, x + dx, y + dy))
+                continue;
+            imgv_set_pixel_grayscale(space, x + dx, y + dy, 0.);
+        }
+    }
+}
+
+static HoughLine hough_pixel_as_line(ImageView *space, int x, int y) {
+    float image_max_dist = sqrtf((float)(space->width*space->width + space->height*space->height)) / 2.f;
+    float dist = ((float)y / (float)(space->height - 1)) * image_max_dist*2 - image_max_dist;
+    float theta = ((float)x / (float)(space->width - 1)) * (float)M_PI;
+
+    return (HoughLine){
+        .r = dist,
+        .theta = theta,
+    };
+}
+
+HoughLine *hough_extract_lines(ImageView *space) {
+    // Percentage of the maximum value that the minimum line should have
+    const float stop_dip = 0.6f;
+    
+    HoughLine *lines = vec_new(HoughLine);
+
+    int max_x, max_y;
+    float max_value;
+    hough_get_image_max(space, &max_x, &max_y, &max_value);
+    hough_clear_pixel(space, max_x, max_y);
+    *vec_push(&lines, HoughLine) = hough_pixel_as_line(space, max_x, max_y);
+    
+    int current_mx, current_my;
+    float cm = max_value;
+    while (cm >= stop_dip * max_value) {
+        hough_get_image_max(space, &current_mx, &current_my, &cm);
+        hough_clear_pixel(space, current_mx, current_my);
+        *vec_push(&lines, HoughLine) = hough_pixel_as_line(space, max_x, max_y);
+    }
+    
+    return lines;
+}
+
+
+void hough_acc_space_draw_line(HoughLine line, ImageView *out, some_pixel_t color, bool additive) {
+    float theta = line.theta;
+    float dist = line.r;
+
+    float stheta = sinf(theta);
+    float ctheta = cosf(theta);
+
+    if (theta < M_PI_4*3 && theta > M_PI_4) {
+        for (int oy = 0; oy < (int)out->height; oy++) {
+            float cy = (float)oy - (float)out->height/2.f;
+            float cx = (dist - cy * ctheta) / stheta;
+            cx += (float)out->width / 2.f;
+            int ox = (int)floor(cx);
+            if (ox >= 0 && ox < (int)out->width) {
+                some_pixel_t a = SOME_BLACK(color.format);
+                if (additive)
+                    a = imgv_get_pixel_some(out, ox, oy);
+                imgv_set_pixel_some(out, ox, oy, img_color_sum(a, color));
+            }
+        }
+    }
+    else {
+        for (int ox = 0; ox < (int)out->width; ox++) {
+            float cx = (float)ox - (float)out->width/2.f;
+            float cy = (dist - cx * stheta) / ctheta;
+            cy += (float)out->height / 2.f;
+            int oy = (int)floor(cy);
+            if (oy >= 0 && oy < (int)out->height) {
+                some_pixel_t a = SOME_BLACK(color.format);
+                if (additive)
+                    a = imgv_get_pixel_some(out, ox, oy);
+                imgv_set_pixel_some(out, ox, oy, img_color_sum(a, color));
+            }
+        }
+    }
+}
+void hough_acc_space_draw_all_lines(ImageView *acc_space, ImageView *out) {
     double high_threshold = 0.1;
 
     float image_max_dist = sqrtf((float)(out->width*out->width + out->height*out->height)) / 2.f;
     for (int y = 0; y < (int)acc_space->height; y++) {
         for (int x = 0; x < (int)acc_space->width; x++) {
-            float value = imgv_get_pixel_grayscale(acc_space, x, y);
-            if (value < high_threshold)
+            some_pixel_t value = imgv_get_pixel_some(acc_space, x, y);
+            if (img_some_to_grayscale(value) < high_threshold)
                 continue;
 
             float theta = ((float)x / (float)(acc_space->width - 1)) * (float)M_PI;
             float dist = ((float)y / (float)(acc_space->height - 1)) * image_max_dist*2 - image_max_dist;
-            float stheta = sinf(theta);
-            float ctheta = cosf(theta);
-
-            if (theta < M_PI_4*3 && theta > M_PI_4) {
-                for (int oy = 0; oy < (int)out->height; oy++) {
-                    float cy = (float)oy - (float)out->height/2.f;
-                    float cx = (dist - cy * ctheta) / stheta;
-                    cx += (float)out->width / 2.f;
-                    int ox = (int)floor(cx);
-                    if (ox >= 0 && ox < (int)out->width) {
-                        float a = imgv_get_pixel_grayscale(out, ox, oy);
-                        imgv_set_pixel_grayscale(out, ox, oy, value + a);
-                    }
-                }
-            }
-            else {
-                for (int ox = 0; ox < (int)out->width; ox++) {
-                    float cx = (float)ox - (float)out->width/2.f;
-                    float cy = (dist - cx * stheta) / ctheta;
-                    cy += (float)out->height / 2.f;
-                    int oy = (int)floor(cy);
-                    if (oy >= 0 && oy < (int)out->height) {
-                        float a = imgv_get_pixel_grayscale(out, ox, oy);
-                        imgv_set_pixel_grayscale(out, ox, oy, value + a);
-                    }
-                }
-            }
+            
+            hough_acc_space_draw_line((HoughLine) {
+                .r = dist,
+                .theta = theta,
+            }, out, value, true);
         }
     }
 
