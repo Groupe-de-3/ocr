@@ -93,6 +93,24 @@ enum PixelFormat img_equivalent_float_channels_format(enum PixelFormat from) {
     }
 }
 
+some_pixel_t     img_color_sum(some_pixel_t a, some_pixel_t b) {
+    enum PixelFormat fa = img_equivalent_float_channels_format(a.format);
+    enum PixelFormat fb = img_equivalent_float_channels_format(b.format);
+    size_t ia = img_float_channels_length(fa);
+    size_t ib = img_float_channels_length(fb);
+    
+    enum PixelFormat target_format = ia > ib ? fa : fb;
+    size_t float_length = img_float_channels_length(target_format);
+
+    any_pixel_t ca = img_some_to_any(a, target_format);
+    any_pixel_t cb = img_some_to_any(b, target_format);
+    
+    some_pixel_t out = (some_pixel_t) { .format = target_format };
+    for (size_t i = 0; i < float_length; i++)
+        out.value.float_channels[i] = ca.float_channels[i] + cb.float_channels[i];
+    return out;
+}
+
 // Inline function definitions
 grayscale_pixel_t img_some_to_grayscale(some_pixel_t value);
 rgb8_pixel_t      img_some_to_rgb8(some_pixel_t value);

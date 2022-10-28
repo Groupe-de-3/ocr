@@ -74,6 +74,9 @@ typedef struct {
       [PixelFormat_Rgbf]      = (any_pixel_t){.rgbf = RGBF_WHITE},           \
       [PixelFormat_Rgb8]      = (any_pixel_t){.rgb8 = RGB8_WHITE}})[FORMAT])
 
+#define SOME_BLACK(FORMAT) ((some_pixel_t){ .format = (FORMAT), .value = ANY_BLACK(FORMAT) })
+#define SOME_WHITE(FORMAT) ((some_pixel_t){ .format = (FORMAT), .value = ANY_WHITE(FORMAT) })
+
 Image img_new(size_t width, size_t height, enum PixelFormat format);
 void  img_destroy(Image image);
 
@@ -89,6 +92,8 @@ ImageLoadResult img_load_file(
 
 size_t           img_float_channels_length(enum PixelFormat format);
 enum PixelFormat img_equivalent_float_channels_format(enum PixelFormat from);
+
+some_pixel_t     img_color_sum(some_pixel_t a, some_pixel_t b);
 
 inline grayscale_pixel_t img_some_to_grayscale(some_pixel_t value) {
     switch (value.format) {
