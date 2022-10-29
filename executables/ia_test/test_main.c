@@ -5,7 +5,6 @@
 #include "data.h"
 
 int main() {
-    
     printf("%s", "Launch\n\n");    
     size_t layers_number = 2;
     size_t layers_sizes[] = {2,8,2};

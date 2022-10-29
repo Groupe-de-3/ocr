@@ -23,6 +23,17 @@ ImageView imgv_default(Image *image) {
     };
 }
 
+void imgv_copy(ImageView *from, ImageView *to) {
+    assert(from->width == to->width);
+    assert(from->height == to->height);
+
+    for (int y = 0; y < from->height; y++) {
+        for (int x = 0; x < from->width; x++) {
+            imgv_set_pixel_some(to, x, y, imgv_get_pixel_some(from, x, y));
+        }
+    }
+}
+
 static void wrap_coords(ImageView *imagev, int *x, int *y) {
     switch (imagev->wraping_mode) {
     case WrappingMode_Clamp:

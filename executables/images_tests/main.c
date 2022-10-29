@@ -14,6 +14,7 @@
 #include "kernel_convolution.h"
 #include "matrices.h"
 #include "sobel_operator.h"
+#include "vec.h"
 
 static void print_m(float *m) {
     for (size_t y = 0; y < m_height(m); y++) {
@@ -97,10 +98,11 @@ int main(int argc, char **argv) {
     }
 
     gettimeofday(&start, NULL);
-    printf("Bluring image\n");
+    printf("Bluring and grayscaling image\n");
 
     // Bluring image
-    Image blured = img_new(resized.width, resized.height, resized.format);
+    Image blured =
+        img_new(resized.width, resized.height, PixelFormat_GrayScale);
     imgv_default(&blured);
 
     ImageView blur_view    = imgv_default(&blured);
@@ -148,10 +150,14 @@ int main(int argc, char **argv) {
     gettimeofday(&start, NULL);
     printf("Runnig Hough Transform\n");
     // Computing image's gradient
-    Image     hough      = img_new(2000, 2000, PixelFormat_GrayScale);
-    ImageView hough_view = imgv_default(&hough);
+    Image     hough         = img_new(2000, 2000, PixelFormat_GrayScale);
+    ImageView hough_view    = imgv_default(&hough);
+    hough_view.wraping_mode = WrappingMode_Clamp;
 
-    hough_acc_space_probabilistic_run(&edges_view, &gradient_dir_view, &hough_view, (resized.width * resized.height) / 5);
+    hough_acc_space_probabilistic_run(
+        &edges_view, &gradient_dir_view, &hough_view,
+        (resized.width * resized.height) / 5
+    );
     printf("    Saving edges to hough.bmp\n");
     bmp_save_to_path("hough.bmp", &hough);
     printf("    Done (%ldms)\n", timediff(start));
@@ -159,14 +165,39 @@ int main(int argc, char **argv) {
     gettimeofday(&start, NULL);
     printf("Drawing hough lines\n");
     // Computing image's gradient
-    Image     hough_lines      = img_new(resized.width, resized.height, PixelFormat_GrayScale);
-    ImageView hough_lines_view = imgv_default(&hough_lines);
+    Image hough_lines_img =
+        img_new(resized.width, resized.height, resized.format);
+    ImageView hough_lines_img_view = imgv_default(&hough_lines_img);
 
-    hough_acc_space_draw_all_lines(&hough_view, &hough_lines_view);
+    imgv_copy(&resized_view, &hough_lines_img_view);
+
+    HoughLine *hough_lines = hough_extract_lines(
+        &hough_view, (int)resized.width, (int)resized.height
+    );
+    printf("    Extracted %zu lines\n", vec_size(hough_lines));
+
+    some_pixel_t line_colors = (some_pixel_t){
+        .format = PixelFormat_Rgb8,
+        .value  = {
+                   .rgb8 =
+                 (rgb8_pixel_t){
+                     .r = 255,
+                     .g = 0,
+                     .b = 0,
+                }, }
+    };
+    for (size_t i = 0; i < vec_size(hough_lines); i++) {
+        hough_acc_space_draw_line(
+            hough_lines[i], &hough_lines_img_view, line_colors, false
+        );
+    }
     printf("    Saving edges to hough-lines.bmp\n");
-    bmp_save_to_path("hough-lines.bmp", &hough_lines);
+    bmp_save_to_path("hough-lines.bmp", &hough_lines_img);
     printf("    Done (%ldms)\n", timediff(start));
 
+    vec_destroy(hough_lines);
+
+    img_destroy(hough_lines_img);
     img_destroy(image);
     img_destroy(resized);
     img_destroy(blured);

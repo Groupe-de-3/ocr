@@ -74,8 +74,10 @@ typedef struct {
       [PixelFormat_Rgbf]      = (any_pixel_t){.rgbf = RGBF_WHITE},           \
       [PixelFormat_Rgb8]      = (any_pixel_t){.rgb8 = RGB8_WHITE}})[FORMAT])
 
-#define SOME_BLACK(FORMAT) ((some_pixel_t){ .format = (FORMAT), .value = ANY_BLACK(FORMAT) })
-#define SOME_WHITE(FORMAT) ((some_pixel_t){ .format = (FORMAT), .value = ANY_WHITE(FORMAT) })
+#define SOME_BLACK(FORMAT) \
+    ((some_pixel_t){.format = (FORMAT), .value = ANY_BLACK(FORMAT)})
+#define SOME_WHITE(FORMAT) \
+    ((some_pixel_t){.format = (FORMAT), .value = ANY_WHITE(FORMAT)})
 
 Image img_new(size_t width, size_t height, enum PixelFormat format);
 void  img_destroy(Image image);
@@ -93,7 +95,7 @@ ImageLoadResult img_load_file(
 size_t           img_float_channels_length(enum PixelFormat format);
 enum PixelFormat img_equivalent_float_channels_format(enum PixelFormat from);
 
-some_pixel_t     img_color_sum(some_pixel_t a, some_pixel_t b);
+some_pixel_t img_color_sum(some_pixel_t a, some_pixel_t b);
 
 inline grayscale_pixel_t img_some_to_grayscale(some_pixel_t value) {
     switch (value.format) {
@@ -116,8 +118,8 @@ inline rgb8_pixel_t img_some_to_rgb8(some_pixel_t value) {
         return value.value.rgb8;
     case PixelFormat_GrayScale:
         {
-            uint8_t v =
-                (uint8_t)(clamp(value.value.grayscale, 0., 1.) * (grayscale_pixel_t)255);
+            uint8_t v = (uint8_t
+            )(clamp(value.value.grayscale, 0., 1.) * (grayscale_pixel_t)255);
             return (rgb8_pixel_t){v, v, v};
         }
     case PixelFormat_Rgbf:

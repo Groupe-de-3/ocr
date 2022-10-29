@@ -21,6 +21,8 @@ _Bool imgv_in_bound(ImageView *imagev, int x, int y);
 
 ImageView imgv_default(Image *image);
 
+void imgv_copy(ImageView *from, ImageView *to);
+
 any_pixel_t imgv_get_pixel_any(ImageView *imagev, int x, int y);
 void imgv_set_pixel_any(ImageView *image, int x, int y, any_pixel_t new_value);
 
