@@ -25,3 +25,5 @@ void hough_acc_space_draw_line(
     HoughLine line, ImageView *out, some_pixel_t color, _Bool additive
 );
 void hough_acc_space_draw_all_lines(ImageView *acc_space, ImageView *out);
+
+HoughLine *hough_extract_extermum_lines(HoughLine *lines);

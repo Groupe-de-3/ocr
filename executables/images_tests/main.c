@@ -199,6 +199,9 @@ int main(int argc, char **argv) {
         &hough_view, (int)resized.width, (int)resized.height
     );
     printf("    Extracted %zu lines\n", vec_size(hough_lines));
+    
+    HoughLine *extrem_lines = hough_extract_extermum_lines(hough_lines);
+    printf("    Extracted %zu extrem lines\n", vec_size(extrem_lines));
 
     some_pixel_t line_colors = (some_pixel_t){
         .format = PixelFormat_Rgb8,
@@ -210,15 +213,16 @@ int main(int argc, char **argv) {
                      .b = 0,
                 }, }
     };
-    for (size_t i = 0; i < vec_size(hough_lines); i++) {
+    for (size_t i = 0; i < vec_size(extrem_lines); i++) {
         hough_acc_space_draw_line(
-            hough_lines[i], &hough_lines_img_view, line_colors, false
+            extrem_lines[i], &hough_lines_img_view, line_colors, false
         );
     }
     printf("    Saving edges to hough-lines.bmp\n");
     bmp_save_to_path("hough-lines.bmp", &hough_lines_img);
     printf("    Done (%ldms)\n", timediff(start));
 
+    vec_destroy(extrem_lines);
     vec_destroy(hough_lines);
 
     img_destroy(edges_mask);
