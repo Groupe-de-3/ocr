@@ -4,6 +4,7 @@
 #include <sys/time.h>
 #include <time.h>
 
+#include "sudoku_parser.h"
 #include "gaussian_adaptive_threshold.h"
 #include "image_mask.h"
 #include "blood_filling.h"
@@ -221,6 +222,28 @@ int main(int argc, char **argv) {
     printf("    Saving edges to hough-lines.bmp\n");
     bmp_save_to_path("hough-lines.bmp", &hough_lines_img);
     printf("    Done (%ldms)\n", timediff(start));
+    
+    if (true) {
+        Image sudoku_corners_img =
+            img_new(resized.width, resized.height, resized.format);
+        ImageView sudoku_corners_img_view = imgv_default(&sudoku_corners_img);
+
+        imgv_copy(&resized_view, &sudoku_corners_img_view);
+
+        ParsedSudokuResult parse_rslt = sudoku_parse_from_lines(extrem_lines, sudoku_corners_img_view.width, sudoku_corners_img_view.height);
+        for (int d = -5; d <= 5; d++) {
+            for (int i = 0; i < 4; i++) {
+                sudoku_parse_pixel_pos_t corner = parse_rslt.corners[i];
+                if (imgv_in_bound(&sudoku_corners_img_view, corner.x + d, corner.y))
+                    imgv_set_pixel_some(&sudoku_corners_img_view, corner.x + d, corner.y, line_colors);
+                if (imgv_in_bound(&sudoku_corners_img_view, corner.x, corner.y + d))
+                    imgv_set_pixel_some(&sudoku_corners_img_view, corner.x, corner.y + d, line_colors);
+            }
+        }
+        
+        bmp_save_to_path("sudoku-corners.bmp", &sudoku_corners_img);
+        img_destroy(sudoku_corners_img);
+    }
 
     vec_destroy(extrem_lines);
     vec_destroy(hough_lines);
