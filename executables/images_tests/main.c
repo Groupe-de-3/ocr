@@ -179,9 +179,8 @@ int main(int argc, char **argv) {
     ImageView hough_view    = imgv_default(&hough);
     hough_view.wraping_mode = WrappingMode_Clamp;
 
-    hough_acc_space_probabilistic_run(
-        &edges_view, &gradient_dir_view, &hough_view,
-        (resized.width * resized.height) / 4
+    hough_acc_space_run(
+        &edges_view, &gradient_dir_view, &hough_view
     );
     printf("    Saving edges to hough.bmp\n");
     bmp_save_to_path("hough.bmp", &hough);
