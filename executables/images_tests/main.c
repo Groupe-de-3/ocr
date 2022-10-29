@@ -4,7 +4,9 @@
 #include <sys/time.h>
 #include <time.h>
 
+#include "blood_filling.h"
 #include "bilinear_sampling.h"
+#include "global_threshold.h"
 #include "box_blur.h"
 #include "canny_edge_detector.h"
 #include "gaussian_blur.h"
@@ -143,6 +145,20 @@ int main(int argc, char **argv) {
     canny_run(
         &gradient_view, &gradient_dir_view, &edges_view, canny_parameters
     );
+    
+    {
+        Image edges_b = img_new(resized.width, resized.height, PixelFormat_GrayScale);
+        ImageView edges_b_view    = imgv_default(&edges_b);
+        edges_b_view.wraping_mode = WrappingMode_Clamp;
+        box_blur_run(&edges_view, &edges_b_view, 9);
+        bmp_save_to_path("edges-b1.bmp", &edges_b);
+        global_threshold_run(&edges_b_view, 0.1f);
+        bmp_save_to_path("edges-b2.bmp", &edges_b);
+        blood_fill_largest_blob(&edges_b_view);
+        bmp_save_to_path("edges-b3.bmp", &edges_b);
+        img_destroy(edges_b);
+    }
+    
     printf("    Saving edges to edges.bmp\n");
     bmp_save_to_path("edges.bmp", &edges);
     printf("    Done (%ldms)\n", timediff(start));
