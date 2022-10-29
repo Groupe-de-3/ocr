@@ -123,7 +123,7 @@ static void hough_get_image_max(
 }
 
 static void hough_clear_pixel(ImageView *space, int x, int y) {
-    for (int dy = -20; dy <= 20; dy++) {
+    for (int dy = -50; dy <= 50; dy++) {
         for (int dx = -20; dx <= 20; dx++) {
             if (!imgv_in_bound(space, x + dx, y + dy))
                 continue;
