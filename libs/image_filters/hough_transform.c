@@ -264,21 +264,26 @@ void hough_acc_space_draw_all_lines(ImageView *acc_space, ImageView *out) {
     }
 }
 
+static float hough_get_accurate_position_from_origin(HoughLine line) {
+    if (line.theta < M_PI_4 || line.theta > 3.f*M_PI_4) {
+        return line.r * copysignf(1.f, cosf(line.theta));
+    }
+    return line.r;
+}
+
 HoughLine *hough_extract_extermum_lines(HoughLine *lines) {
     const float angle_max_d = (float)M_PI_4;
 
-    float *counts = vec_new(float);
     float *angles = vec_new(float);
     // Always twice a long as angles
     HoughLine *extremes = vec_new(HoughLine);
     
     for (size_t i = 0; i < vec_size(lines); i++) {
-        float wrapped_theta = lines[i].theta;
-        float wrapped_dist = lines[i].r;
+        float pos_orig = hough_get_accurate_position_from_origin(lines[i]);
 
         size_t angle_i = 0;
         for (; angle_i < vec_size(angles); angle_i++) {
-            float angle_dist = fabsf(wrapped_theta - (angles[angle_i] / counts[angle_i]));
+            float angle_dist = fabsf(lines[i].theta - angles[angle_i]);
             if (angle_dist > (float)M_PI_2)
                 angle_dist = (float)M_PI - angle_dist;
 
@@ -286,9 +291,9 @@ HoughLine *hough_extract_extermum_lines(HoughLine *lines) {
                 //angles[angle_i] += wrapped_theta;
                 //counts[angle_i] += 1;
 
-                if (wrapped_dist < extremes[angle_i*2].r)
+                if (pos_orig < hough_get_accurate_position_from_origin(extremes[angle_i*2]))
                     extremes[angle_i*2] = lines[i];
-                else if (wrapped_dist > extremes[angle_i*2+1].r)
+                else if (pos_orig > hough_get_accurate_position_from_origin(extremes[angle_i*2+1]))
                     extremes[angle_i*2+1] = lines[i];
                 break;
             }
@@ -296,14 +301,12 @@ HoughLine *hough_extract_extermum_lines(HoughLine *lines) {
 
         // No matching angle was found
         if (angle_i == vec_size(angles)) {
-            *vec_push(&counts, float) = 1;
-            *vec_push(&angles, float) = wrapped_theta;
+            *vec_push(&angles, float) = lines[i].theta;
             *vec_push(&extremes, HoughLine) = lines[i];
             *vec_push(&extremes, HoughLine) = lines[i];
         }
     }
-    
-    vec_destroy(counts);
+
     vec_destroy(angles);
     return extremes;
 }
