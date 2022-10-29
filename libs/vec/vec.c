@@ -33,7 +33,8 @@ void *vec_create(size_t elem_size, size_t capacity) {
     return (void *)(ptr + 1);
 }
 void vec_destroy(void *vec) {
-    free((VecMetaData *)vec - 1);
+    if (vec != NULL)
+        free((VecMetaData *)vec - 1);
 }
 
 static VecMetaData *vec_get_metadata(void *vec) {
