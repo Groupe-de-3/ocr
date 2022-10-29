@@ -4,6 +4,7 @@
 #include <sys/time.h>
 #include <time.h>
 
+#include "gaussian_adaptive_threshold.h"
 #include "image_mask.h"
 #include "blood_filling.h"
 #include "bilinear_sampling.h"
@@ -106,8 +107,6 @@ int main(int argc, char **argv) {
     // Bluring image
     Image blured =
         img_new(resized.width, resized.height, PixelFormat_GrayScale);
-    imgv_default(&blured);
-
     ImageView blur_view    = imgv_default(&blured);
     blur_view.wraping_mode = WrappingMode_Clamp;
 
@@ -118,7 +117,7 @@ int main(int argc, char **argv) {
     // Saving blur
     bmp_save_to_path("blured.bmp", &blured);
     printf("    Done (%ldms)\n", timediff(start));
-
+    
     gettimeofday(&start, NULL);
     printf("Computing gradient\n");
 
@@ -157,7 +156,7 @@ int main(int argc, char **argv) {
     ImageView edges_mask_view    = imgv_default(&edges_mask);
     edges_mask_view.wraping_mode = WrappingMode_Clamp;
     box_blur_run(&edges_view, &edges_mask_view, 9);
-    printf("    Saving step one to edges-mask2.bmp\n");
+    printf("    Saving step one to edges-mask1.bmp\n");
     bmp_save_to_path("edges-mask1.bmp", &edges_mask);
     global_threshold_run(&edges_mask_view, 0.1f);
     printf("    Saving step two to edges-mask2.bmp\n");
