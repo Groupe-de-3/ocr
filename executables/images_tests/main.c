@@ -4,12 +4,13 @@
 #include <sys/time.h>
 #include <time.h>
 
-#include "bilinear_sampling.h"
+#include "image_mask.h"
 #include "blood_filling.h"
+#include "bilinear_sampling.h"
+#include "global_threshold.h"
 #include "box_blur.h"
 #include "canny_edge_detector.h"
 #include "gaussian_blur.h"
-#include "global_threshold.h"
 #include "hough_transform.h"
 #include "images.h"
 #include "img_formats/bmp.h"
@@ -145,25 +146,33 @@ int main(int argc, char **argv) {
     canny_run(
         &gradient_view, &gradient_dir_view, &edges_view, canny_parameters
     );
-
-    {
-        Image edges_b =
-            img_new(resized.width, resized.height, PixelFormat_GrayScale);
-        ImageView edges_b_view    = imgv_default(&edges_b);
-        edges_b_view.wraping_mode = WrappingMode_Clamp;
-        box_blur_run(&edges_view, &edges_b_view, 9);
-        bmp_save_to_path("edges-b1.bmp", &edges_b);
-        global_threshold_run(&edges_b_view, 0.1f);
-        bmp_save_to_path("edges-b2.bmp", &edges_b);
-        blood_fill_largest_blob(&edges_b_view);
-        bmp_save_to_path("edges-b3.bmp", &edges_b);
-        img_destroy(edges_b);
-    }
-
+    
     printf("    Saving edges to edges.bmp\n");
     bmp_save_to_path("edges.bmp", &edges);
     printf("    Done (%ldms)\n", timediff(start));
 
+    gettimeofday(&start, NULL);
+    printf("Computing a mask for the edges\n");
+    Image edges_mask = img_new(resized.width, resized.height, PixelFormat_GrayScale);
+    ImageView edges_mask_view    = imgv_default(&edges_mask);
+    edges_mask_view.wraping_mode = WrappingMode_Clamp;
+    box_blur_run(&edges_view, &edges_mask_view, 9);
+    printf("    Saving step one to edges-mask2.bmp\n");
+    bmp_save_to_path("edges-mask1.bmp", &edges_mask);
+    global_threshold_run(&edges_mask_view, 0.1f);
+    printf("    Saving step two to edges-mask2.bmp\n");
+    bmp_save_to_path("edges-mask2.bmp", &edges_mask);
+    blood_fill_largest_blob(&edges_mask_view);
+    printf("    Saving step three to edges-mask3.bmp\n");
+    bmp_save_to_path("edges-mask3.bmp", &edges_mask);
+    
+    printf("    Applying the mask to the edges");
+    image_mask_run(&edges_view, &edges_mask_view);
+    printf("    Saving masked edges to masked-edges.bmp\n");
+    bmp_save_to_path("masked-edges.bmp", &edges);
+
+    printf("    Done (%ldms)\n", timediff(start));
+    
     gettimeofday(&start, NULL);
     printf("Runnig Hough Transform\n");
     // Computing image's gradient
@@ -214,6 +223,7 @@ int main(int argc, char **argv) {
 
     vec_destroy(hough_lines);
 
+    img_destroy(edges_mask);
     img_destroy(hough_lines_img);
     img_destroy(image);
     img_destroy(resized);
