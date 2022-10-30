@@ -3,12 +3,13 @@
 #include <stdio.h>
 #include <math.h>
 
+#include "point2d.h"
 #include "vec.h"
 
 ParsedSudokuResult sudoku_parse_from_lines(HoughLine *lines_vec, int w, int h) {
     assert(vec_size(lines_vec) == 4);
 
-    sudoku_parse_pixel_pos_t points[4];
+    ipoint2d_t points[4];
 
     float mw = (float)w / 2.f;
     float mh = (float)h / 2.f;
@@ -30,11 +31,21 @@ ParsedSudokuResult sudoku_parse_from_lines(HoughLine *lines_vec, int w, int h) {
             px += mw;
             py += mh;
             
-            points[i*2 + j] = (sudoku_parse_pixel_pos_t){ .x = (int)roundf(px), .y = (int)roundf(py) };
+            points[i*2 + j] = ipoint2d((int)floorf(px), (int)floorf(py));
         }
     }
     
-    return (ParsedSudokuResult) {
-        .corners = { points[0], points[1], points[2], points[3] },
+    iquadrilateral_t shape = {
+        .a = points[0],
+        .b = points[2],
+        .c = points[3],
+        .d = points[1],
     };
+    
+    ParsedSudokuResult result = {
+        .shape = shape,
+    };
+    la_subdivide_concave_iquadrilateral(shape, 9, 9, result.cells);
+    
+    return result;
 }

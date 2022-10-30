@@ -1,0 +1,12 @@
+#pragma once
+
+#include "point2d.h"
+
+typedef struct {
+    ipoint2d_t a;
+    ipoint2d_t b;
+    ipoint2d_t c;
+    ipoint2d_t d;
+} iquadrilateral_t;
+
+void la_subdivide_concave_iquadrilateral(iquadrilateral_t from, int width, int height, iquadrilateral_t *out);

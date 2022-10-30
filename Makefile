@@ -90,8 +90,10 @@ $(guile (define-target "images" \
 ))
 
 $(guile (define-target "image_filters" \
-	`(deps "images" "matrices" "vec")\
+	`(deps "images" "matrices" "vec" "linear_algebra")\
 ))
+
+$(guile (define-target "linear_algebra"))
 
 $(guile (define-target "test_lib" \
 	`(source-dirs "tests/lib")\
