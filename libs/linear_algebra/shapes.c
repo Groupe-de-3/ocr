@@ -2,6 +2,23 @@
 
 #include <assert.h>
 
+iquadrilateral_t f2iquadrilateral(fquadrilateral_t from) {
+    return (iquadrilateral_t) {
+        .a = f2ipoint2d(from.a),
+        .b = f2ipoint2d(from.b),
+        .c = f2ipoint2d(from.c),
+        .d = f2ipoint2d(from.d),
+    };
+}
+fquadrilateral_t i2fquadrilateral(iquadrilateral_t from) {
+    return (fquadrilateral_t) {
+        .a = i2fpoint2d(from.a),
+        .b = i2fpoint2d(from.b),
+        .c = i2fpoint2d(from.c),
+        .d = i2fpoint2d(from.d),
+    };
+}
+
 void la_subdivide_concave_iquadrilateral(iquadrilateral_t from, int width, int height, iquadrilateral_t *out) {
     assert(width >= 0);
     assert(height >= 0);

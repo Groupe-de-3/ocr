@@ -260,7 +260,23 @@ int main(int argc, char **argv) {
     printf("    Saving edges to sudoku-corners.bmp\n");
     bmp_save_to_path("sudoku-corners.bmp", &sudoku_corners_img);
     printf("    Done (%ldms)\n", timediff(start));
+
+    gettimeofday(&start, NULL);
+    printf("Isolating the suodku\n");
+    Image sudoku =
+        img_new(800, 800, resized.format);
+    ImageView sudoku_view = imgv_default(&sudoku);
     
+    bilinear_perspective_transmute(&resized_view, i2fquadrilateral(parse_rslt.shape), &sudoku_view, (iquadrilateral_t) {
+        .a = ipoint2d(0, 0),
+        .b = ipoint2d(sudoku_view.width-1, 0),
+        .c = ipoint2d(sudoku_view.width-1, sudoku_view.height-1),
+        .d = ipoint2d(0, sudoku_view.height-1),
+    });
+
+    printf("    Saving edges to sudoku.bmp\n");
+    bmp_save_to_path("sudoku.bmp", &sudoku);
+    printf("    Done (%ldms)\n", timediff(start));
 
     vec_destroy(extrem_lines);
     vec_destroy(hough_lines);
@@ -275,5 +291,6 @@ int main(int argc, char **argv) {
     img_destroy(edges);
     img_destroy(hough);
     img_destroy(sudoku_corners_img);
+    img_destroy(sudoku);
     return 0;
 }

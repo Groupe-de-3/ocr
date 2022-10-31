@@ -19,6 +19,9 @@ ipoint2d_t ipoint2d(int x, int y) {
 ipoint2d_t f2ipoint2d(fpoint2d_t p) {
     return ipoint2d((int)floor(p.x), (int)floor(p.y));
 }
+fpoint2d_t i2fpoint2d(ipoint2d_t p) {
+    return fpoint2d((float)p.x, (float)p.y);
+}
 
 fpoint2d_t fpoint2d_interpolate(fpoint2d_t from, fpoint2d_t to, float d) {
     return fpoint2d(
