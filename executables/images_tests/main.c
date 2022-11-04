@@ -4,21 +4,21 @@
 #include <sys/time.h>
 #include <time.h>
 
-#include "sudoku_parser.h"
-#include "gaussian_adaptive_threshold.h"
-#include "image_mask.h"
-#include "blood_filling.h"
 #include "bilinear_sampling.h"
-#include "global_threshold.h"
+#include "blood_filling.h"
 #include "box_blur.h"
 #include "canny_edge_detector.h"
+#include "gaussian_adaptive_threshold.h"
 #include "gaussian_blur.h"
+#include "global_threshold.h"
 #include "hough_transform.h"
+#include "image_mask.h"
 #include "images.h"
 #include "img_formats/bmp.h"
 #include "kernel_convolution.h"
 #include "matrices.h"
 #include "sobel_operator.h"
+#include "sudoku_parser.h"
 #include "vec.h"
 
 static void print_m(float *m) {
@@ -118,7 +118,7 @@ int main(int argc, char **argv) {
     // Saving blur
     bmp_save_to_path("blured.bmp", &blured);
     printf("    Done (%ldms)\n", timediff(start));
-    
+
     gettimeofday(&start, NULL);
     printf("Computing gradient\n");
 
@@ -146,14 +146,15 @@ int main(int argc, char **argv) {
     canny_run(
         &gradient_view, &gradient_dir_view, &edges_view, canny_parameters
     );
-    
+
     printf("    Saving edges to edges.bmp\n");
     bmp_save_to_path("edges.bmp", &edges);
     printf("    Done (%ldms)\n", timediff(start));
 
     gettimeofday(&start, NULL);
     printf("Computing a mask for the edges\n");
-    Image edges_mask = img_new(resized.width, resized.height, PixelFormat_GrayScale);
+    Image edges_mask =
+        img_new(resized.width, resized.height, PixelFormat_GrayScale);
     ImageView edges_mask_view    = imgv_default(&edges_mask);
     edges_mask_view.wraping_mode = WrappingMode_Clamp;
     box_blur_run(&edges_view, &edges_mask_view, 9);
@@ -165,14 +166,14 @@ int main(int argc, char **argv) {
     blood_fill_largest_blob(&edges_mask_view);
     printf("    Saving step three to edges-mask3.bmp\n");
     bmp_save_to_path("edges-mask3.bmp", &edges_mask);
-    
+
     printf("    Applying the mask to the edges");
     image_mask_run(&edges_view, &edges_mask_view);
     printf("    Saving masked edges to masked-edges.bmp\n");
     bmp_save_to_path("masked-edges.bmp", &edges);
 
     printf("    Done (%ldms)\n", timediff(start));
-    
+
     gettimeofday(&start, NULL);
     printf("Runnig Hough Transform\n");
     // Computing image's gradient
@@ -180,9 +181,7 @@ int main(int argc, char **argv) {
     ImageView hough_view    = imgv_default(&hough);
     hough_view.wraping_mode = WrappingMode_Clamp;
 
-    hough_acc_space_run(
-        &edges_view, &gradient_dir_view, &hough_view
-    );
+    hough_acc_space_run(&edges_view, &gradient_dir_view, &hough_view);
     printf("    Saving edges to hough.bmp\n");
     bmp_save_to_path("hough.bmp", &hough);
     printf("    Done (%ldms)\n", timediff(start));
@@ -200,7 +199,7 @@ int main(int argc, char **argv) {
         &hough_view, (int)resized.width, (int)resized.height
     );
     printf("    Extracted %zu lines\n", vec_size(hough_lines));
-    
+
     HoughLine *extrem_lines = hough_extract_extermum_lines(hough_lines);
     printf("    Extracted %zu extrem lines\n", vec_size(extrem_lines));
 
@@ -222,7 +221,7 @@ int main(int argc, char **argv) {
     printf("    Saving edges to hough-lines.bmp\n");
     bmp_save_to_path("hough-lines.bmp", &hough_lines_img);
     printf("    Done (%ldms)\n", timediff(start));
-    
+
     gettimeofday(&start, NULL);
     printf("Extracting the individuel sudoku cells\n");
     Image sudoku_corners_img =
@@ -231,28 +230,53 @@ int main(int argc, char **argv) {
 
     imgv_copy(&resized_view, &sudoku_corners_img_view);
 
-    ParsedSudokuResult parse_rslt = sudoku_parse_from_lines(extrem_lines, sudoku_corners_img_view.width, sudoku_corners_img_view.height);
+    ParsedSudokuResult parse_rslt = sudoku_parse_from_lines(
+        extrem_lines, sudoku_corners_img_view.width,
+        sudoku_corners_img_view.height
+    );
     for (int d = -5; d <= 5; d++) {
         {
-            ipoint2d_t corners[4] = { parse_rslt.shape.a, parse_rslt.shape.b, parse_rslt.shape.c, parse_rslt.shape.d };
+            ipoint2d_t corners[4] = {
+                parse_rslt.shape.a, parse_rslt.shape.b, parse_rslt.shape.c,
+                parse_rslt.shape.d};
             for (int i = 0; i < 4; i++) {
                 ipoint2d_t corner = corners[i];
-                if (imgv_in_bound(&sudoku_corners_img_view, corner.x + d, corner.y))
-                    imgv_set_pixel_some(&sudoku_corners_img_view, corner.x + d, corner.y, line_colors);
-                if (imgv_in_bound(&sudoku_corners_img_view, corner.x, corner.y + d))
-                    imgv_set_pixel_some(&sudoku_corners_img_view, corner.x, corner.y + d, line_colors);
+                if (imgv_in_bound(
+                        &sudoku_corners_img_view, corner.x + d, corner.y
+                    ))
+                    imgv_set_pixel_some(
+                        &sudoku_corners_img_view, corner.x + d, corner.y,
+                        line_colors
+                    );
+                if (imgv_in_bound(
+                        &sudoku_corners_img_view, corner.x, corner.y + d
+                    ))
+                    imgv_set_pixel_some(
+                        &sudoku_corners_img_view, corner.x, corner.y + d,
+                        line_colors
+                    );
             }
         }
-        
-        for (int j = 0; j < 9*9; j++) {
-            iquadrilateral_t cell = parse_rslt.cells[j];
-            ipoint2d_t corners[4] = { cell.a, cell.b, cell.c, cell.d };
+
+        for (int j = 0; j < 9 * 9; j++) {
+            iquadrilateral_t cell       = parse_rslt.cells[j];
+            ipoint2d_t       corners[4] = {cell.a, cell.b, cell.c, cell.d};
             for (int i = 0; i < 4; i++) {
                 ipoint2d_t corner = corners[i];
-                if (imgv_in_bound(&sudoku_corners_img_view, corner.x + d, corner.y))
-                    imgv_set_pixel_some(&sudoku_corners_img_view, corner.x + d, corner.y, line_colors);
-                if (imgv_in_bound(&sudoku_corners_img_view, corner.x, corner.y + d))
-                    imgv_set_pixel_some(&sudoku_corners_img_view, corner.x, corner.y + d, line_colors);
+                if (imgv_in_bound(
+                        &sudoku_corners_img_view, corner.x + d, corner.y
+                    ))
+                    imgv_set_pixel_some(
+                        &sudoku_corners_img_view, corner.x + d, corner.y,
+                        line_colors
+                    );
+                if (imgv_in_bound(
+                        &sudoku_corners_img_view, corner.x, corner.y + d
+                    ))
+                    imgv_set_pixel_some(
+                        &sudoku_corners_img_view, corner.x, corner.y + d,
+                        line_colors
+                    );
             }
         }
     }
@@ -263,16 +287,18 @@ int main(int argc, char **argv) {
 
     gettimeofday(&start, NULL);
     printf("Isolating the suodku\n");
-    Image sudoku =
-        img_new(800, 800, resized.format);
+    Image     sudoku      = img_new(800, 800, resized.format);
     ImageView sudoku_view = imgv_default(&sudoku);
-    
-    bilinear_perspective_transmute(&resized_view, i2fquadrilateral(parse_rslt.shape), &sudoku_view, (iquadrilateral_t) {
-        .a = ipoint2d(0, 0),
-        .b = ipoint2d(sudoku_view.width-1, 0),
-        .c = ipoint2d(sudoku_view.width-1, sudoku_view.height-1),
-        .d = ipoint2d(0, sudoku_view.height-1),
-    });
+
+    bilinear_perspective_transmute(
+        &resized_view, i2fquadrilateral(parse_rslt.shape), &sudoku_view,
+        (iquadrilateral_t){
+            .a = ipoint2d(0, 0),
+            .b = ipoint2d(sudoku_view.width - 1, 0),
+            .c = ipoint2d(sudoku_view.width - 1, sudoku_view.height - 1),
+            .d = ipoint2d(0, sudoku_view.height - 1),
+        }
+    );
 
     printf("    Saving edges to sudoku.bmp\n");
     bmp_save_to_path("sudoku.bmp", &sudoku);

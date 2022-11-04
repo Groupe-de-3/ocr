@@ -2,8 +2,8 @@
 
 #include "hough_transform.h"
 #include "image_view.h"
-#include "shapes.h"
 #include "point2d.h"
+#include "shapes.h"
 
 typedef struct {
     iquadrilateral_t shape;

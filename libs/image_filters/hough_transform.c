@@ -265,7 +265,7 @@ void hough_acc_space_draw_all_lines(ImageView *acc_space, ImageView *out) {
 }
 
 static float hough_get_accurate_position_from_origin(HoughLine line) {
-    if (line.theta < M_PI_4 || line.theta > 3.f*M_PI_4) {
+    if (line.theta < M_PI_4 || line.theta > 3.f * M_PI_4) {
         return line.r * copysignf(1.f, cosf(line.theta));
     }
     return line.r;
@@ -277,7 +277,7 @@ HoughLine *hough_extract_extermum_lines(HoughLine *lines) {
     float *angles = vec_new(float);
     // Always twice a long as angles
     HoughLine *extremes = vec_new(HoughLine);
-    
+
     for (size_t i = 0; i < vec_size(lines); i++) {
         float pos_orig = hough_get_accurate_position_from_origin(lines[i]);
 
@@ -291,17 +291,19 @@ HoughLine *hough_extract_extermum_lines(HoughLine *lines) {
                 //angles[angle_i] += wrapped_theta;
                 //counts[angle_i] += 1;
 
-                if (pos_orig < hough_get_accurate_position_from_origin(extremes[angle_i*2]))
-                    extremes[angle_i*2] = lines[i];
-                else if (pos_orig > hough_get_accurate_position_from_origin(extremes[angle_i*2+1]))
-                    extremes[angle_i*2+1] = lines[i];
+                if (pos_orig < hough_get_accurate_position_from_origin(
+                                   extremes[angle_i * 2]
+                               ))
+                    extremes[angle_i * 2] = lines[i];
+                else if (pos_orig > hough_get_accurate_position_from_origin(extremes[angle_i * 2 + 1]))
+                    extremes[angle_i * 2 + 1] = lines[i];
                 break;
             }
         }
 
         // No matching angle was found
         if (angle_i == vec_size(angles)) {
-            *vec_push(&angles, float) = lines[i].theta;
+            *vec_push(&angles, float)       = lines[i].theta;
             *vec_push(&extremes, HoughLine) = lines[i];
             *vec_push(&extremes, HoughLine) = lines[i];
         }

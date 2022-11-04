@@ -65,27 +65,37 @@ void bilinear_resize(ImageView *from, ImageView *to) {
     }
 }
 
-void bilinear_perspective_transmute(ImageView *from_img, fquadrilateral_t from_shape, ImageView *to, iquadrilateral_t to_shape) {
+void bilinear_perspective_transmute(
+    ImageView *from_img, fquadrilateral_t from_shape, ImageView *to,
+    iquadrilateral_t to_shape
+) {
     int height_left = to_shape.d.y - to_shape.a.y;
     assert(height_left > 0);
 
     for (int dy = 0; dy < height_left; dy++) {
         float fdy = (float)dy / (float)(height_left - 1);
 
-        ipoint2d_t to_left  = ipoint2d_interpolate(to_shape.a, to_shape.d, dy, height_left - 1);
-        ipoint2d_t to_right = ipoint2d_interpolate(to_shape.b, to_shape.c, dy, height_left - 1);
+        ipoint2d_t to_left =
+            ipoint2d_interpolate(to_shape.a, to_shape.d, dy, height_left - 1);
+        ipoint2d_t to_right =
+            ipoint2d_interpolate(to_shape.b, to_shape.c, dy, height_left - 1);
 
-        fpoint2d_t from_left  = fpoint2d_interpolate(from_shape.a, from_shape.d, fdy);
-        fpoint2d_t from_right = fpoint2d_interpolate(from_shape.b, from_shape.c, fdy);
+        fpoint2d_t from_left =
+            fpoint2d_interpolate(from_shape.a, from_shape.d, fdy);
+        fpoint2d_t from_right =
+            fpoint2d_interpolate(from_shape.b, from_shape.c, fdy);
 
         int width = to_right.x - to_left.x;
         for (int dx = 0; dx < width; dx++) {
             float fdx = (float)dx / (float)(width - 1);
 
-            ipoint2d_t target_pixel = ipoint2d_interpolate(to_left, to_right, dx, width - 1);
-            fpoint2d_t source_pixel = fpoint2d_interpolate(from_left, from_right, fdx);
-            
-            some_pixel_t new_value = bilinear_sample(from_img, source_pixel.x, source_pixel.y);
+            ipoint2d_t target_pixel =
+                ipoint2d_interpolate(to_left, to_right, dx, width - 1);
+            fpoint2d_t source_pixel =
+                fpoint2d_interpolate(from_left, from_right, fdx);
+
+            some_pixel_t new_value =
+                bilinear_sample(from_img, source_pixel.x, source_pixel.y);
             imgv_set_pixel_some(to, target_pixel.x, target_pixel.y, new_value);
         }
     }
