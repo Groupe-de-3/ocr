@@ -4,6 +4,7 @@
 
 double single_relu_Activate(double val)
 {
+    return 1.0 / (1 + exp(-val));
     if (0 > val)
         return 0;
     return val;

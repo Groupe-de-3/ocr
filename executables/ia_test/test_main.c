@@ -5,17 +5,18 @@
 #include "data.h"
 
 int main() {
+
     printf("%s", "Launch\n\n");    
     size_t layers_number = 2;
-    size_t layers_sizes[] = {2,8,2};
+    size_t layers_sizes[] = {2,5,2};
 
     size_t *layers_sizes_ = malloc(sizeof(size_t) * (layers_number+1));
     for (size_t i = 0; i < layers_number+1; i++)
         layers_sizes_[i] = layers_sizes[i];
 
     //data
-    double inputs[4][2] = {{0,0}, {1,0}, {0,1}, {1,1}};
-    double expects[4][2] = {{0,0}, {0,1}, {0,1}, {0,0}};
+    double inputs[4][2] = {{0, 0},  {0,1}, {1,0}, {1,1}};
+    double expects[4][2] = {{1,0}, {0,1}, {0,1}, {1,0}};
     Data d = data_init(4);
     
     for (size_t i = 0; i < d.size; i++)
@@ -26,19 +27,16 @@ int main() {
     //neural_network NN = ia_load("neural_network.txt");    
 
 
-    for (size_t i = 0; i < 10000; i++)
+    for (size_t i = 0; i < 20000; i++)
     {
-        Learn(&NN, d, 1);
+        Learn(&NN, d, 0.3);
     }
     
     
     // start forward
     Launch(NN, d);
 
-    // start learning
-    //Learn(NN, datapoint);
-
-    //ia_save(&NN, "neural_network.txt");
+    ia_save(&NN, "neural_network.txt");
 
 
     // free the memory

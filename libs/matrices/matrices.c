@@ -104,6 +104,7 @@ bool m_eq(Matrix(void) a, Matrix(void) b) {
                                                                               \
         size_t c1 = m_height(a);                                              \
         size_t c2 = m_width(b);                                               \
+        size_t c3 = m_height(b);                                               \
                                                                               \
         assert(m_width(a) == m_height(b));                                    \
         assert(c1 == m_height(out));                                          \
@@ -112,7 +113,7 @@ bool m_eq(Matrix(void) a, Matrix(void) b) {
         for (size_t row_i = 0; row_i < c1; row_i++) {                         \
             for (size_t col_i = 0; col_i < c2; col_i++) {                     \
                 type sum = 0.;                                                \
-                for (size_t row_and_col = 0; row_and_col < c1; row_and_col++) \
+                for (size_t row_and_col = 0; row_and_col < c3; row_and_col++) \
                     sum += m_get2(a, row_and_col, row_i) *                    \
                            m_get2(b, col_i, row_and_col);                     \
                 m_get2(out, col_i, row_i) = sum;                              \

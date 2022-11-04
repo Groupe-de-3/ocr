@@ -129,6 +129,8 @@ void ia_memory_free(neural_network *NN) // free the memory
 
 neural_network ia_init(size_t layers_number, size_t* layers_sizes)// initialisation of a new neural network
 {
+    //set seed
+    srand(170);
     
     neural_network NN;
     

@@ -13,29 +13,39 @@
 //---------------
 // Neural Network Forward
 //---------------
-Matrix(double) CalculateOutputs_NN(Matrix(double) input, neural_network NN)
+
+Matrix(double) CalculateOutputs_Layer(Layer layer, Matrix(double) input, int last)
 {
     Matrix(double) new_m = NULL;
 
+    new_m = m_new(double, m_width(layer.m_weight), 1);
+    m_mul(input, layer.m_weight, new_m);
+
+    m_add(new_m, layer.m_bias);
+
+    if (last)
+        Softmax_Activate(new_m); // last layer
+    else
+        Relu_Activate(new_m);
+
+    m_destroy(input);
+    input = m_new(double, m_width(new_m), m_height(new_m));
+    for (size_t j = 0; j < m_length(new_m); j++)
+    {
+        input[j] = new_m[j];
+    }
+    m_destroy(new_m);
+    
+    return input;
+}
+
+
+
+Matrix(double) CalculateOutputs_NN(Matrix(double) input, neural_network NN)
+{
     for (size_t i = 0; i < NN.layers_number; i++)
     {
-        new_m = m_new(double, m_width(NN.layers_[i].m_weight), m_height(input));
-        m_mul(input, NN.layers_[i].m_weight, new_m);
-
-        m_add(new_m, NN.layers_[i].m_bias);
-
-        if (i < NN.layers_number-1)
-            Relu_Activate(new_m);
-        else
-            Softmax_Activate(new_m); // last layer
-
-        m_destroy(input);
-        input = m_new(double, m_width(new_m), m_height(new_m));
-        for (size_t j = 0; j < m_length(new_m); j++)
-        {
-            input[j] = new_m[j];
-        }
-        m_destroy(new_m);
+        input = CalculateOutputs_Layer(NN.layers_[i], input, (i == NN.layers_number-1));
     }
     
     return input;
@@ -119,6 +129,9 @@ void ApplyGradients(Layer layer, Matrix(double) costB, Matrix(double) costW, dou
         m_get2(layer.m_bias, i, 0) -= a;
     }
 }
+
+
+//void CalculOutputLayerNodeValue()
 
 
 double Aply_cost(neural_network *NN, DataPoint d)
