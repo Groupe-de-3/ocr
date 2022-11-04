@@ -9,7 +9,7 @@
 ParsedSudokuResult sudoku_parse_from_lines(HoughLine *lines_vec, int w, int h) {
     assert(vec_size(lines_vec) == 4);
 
-    ipoint2d_t points[4];
+    fpoint2d_t points[4];
 
     float mw = (float)w / 2.f;
     float mh = (float)h / 2.f;
@@ -21,6 +21,7 @@ ParsedSudokuResult sudoku_parse_from_lines(HoughLine *lines_vec, int w, int h) {
             float da = la.r;
             float ca = cosf(la.theta);
             float sa = sinf(la.theta);
+
             HoughLine lb = lines_vec[2+j];
             float db = lb.r;
             float cb = cosf(lb.theta);
@@ -31,21 +32,24 @@ ParsedSudokuResult sudoku_parse_from_lines(HoughLine *lines_vec, int w, int h) {
             px += mw;
             py += mh;
             
-            points[i*2 + j] = ipoint2d((int)floorf(px), (int)floorf(py));
+            points[i*2 + j] = fpoint2d(px, py);
         }
     }
     
-    iquadrilateral_t shape = {
+    fquadrilateral_t shape = {
         .a = points[0],
         .b = points[2],
         .c = points[3],
         .d = points[1],
     };
     
-    ParsedSudokuResult result = {
-        .shape = shape,
-    };
-    la_subdivide_concave_iquadrilateral(shape, 9, 9, result.cells);
+    fquadrilateral_t cells[9*9];
+    la_perspective_subdivide_concave_fquadrilateral(shape, 9, 9, cells);
     
+    ParsedSudokuResult result;
+    for (size_t i = 0; i < 9*9; i++)
+        result.cells[i] = f2iquadrilateral(cells[i]);
+    result.shape = f2iquadrilateral(shape);
+
     return result;
 }
