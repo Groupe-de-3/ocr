@@ -60,7 +60,7 @@ neural_network ia_load(char* file_name) // initialisation of the neural network 
     fichier       = fopen(file_name, "r");
 
     // ini base
-    char chaine[10] = "";
+    char chaine[15] = "";
 
     fgets(chaine, 10, fichier);
     NN.layers_number = (size_t) atoi(chaine);
@@ -72,7 +72,7 @@ neural_network ia_load(char* file_name) // initialisation of the neural network 
 
     for (size_t i = 0; i < NN.layers_number+1; i++)
     {
-        fgets(chaine, 10, fichier);
+        fgets(chaine, 5, fichier);
         NN.layers_sizes[i] = (size_t) atoi(chaine);
     }
 
@@ -91,14 +91,14 @@ neural_network ia_load(char* file_name) // initialisation of the neural network 
 
             for (size_t j = 0; j < Layer_.layer_size; j++)
             {
-                fgets(chaine, 10, fichier);
+                fgets(chaine, 15, fichier);
                 m_get2(Layer_.m_weight, j, i) = (double) atof(chaine); // ini weights
             }
         }
 
         for (size_t i = 0; i < Layer_.layer_size; i++) {
 
-            fgets(chaine, 10, fichier); // biais
+            fgets(chaine, 15, fichier); // biais
             m_get2(Layer_.m_bias, i, 0) = (double) atof(chaine); // ini biais
         }
 
@@ -130,7 +130,7 @@ void ia_memory_free(neural_network *NN) // free the memory
 neural_network ia_init(size_t layers_number, size_t* layers_sizes)// initialisation of a new neural network
 {
     //set seed
-    srand(170);
+    //srand(170);
     
     neural_network NN;
     
@@ -152,11 +152,11 @@ neural_network ia_init(size_t layers_number, size_t* layers_sizes)// initialisat
 
         for (size_t i = 0; i < Layer_.layer_size; i++) {
 
-            m_get2(Layer_.m_bias, i, 0) = (double) (rand() / ((double)RAND_MAX)) *2 -1;; // ini biais
+            m_get2(Layer_.m_bias, i, 0) = (double) (rand() / ((double)RAND_MAX)); // ini biais
             
             for (size_t j = 0; j < layers_sizes[layer_ind]; j++)
             {
-                m_get2(Layer_.m_weight, i, j) = (double) (rand() / ((double)RAND_MAX)) *2 -1; // ini weights
+                m_get2(Layer_.m_weight, i, j) = (double) (rand() / ((double)RAND_MAX)); // ini weights
             }
         }
         
