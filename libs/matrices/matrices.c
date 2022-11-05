@@ -96,7 +96,7 @@ bool m_eq(Matrix(void) a, Matrix(void) b) {
     return true;
 }
 
-void m_transpose(Matrix(float) in, Matrix(float) out) {
+void m_transpose(Matrix(double) in, Matrix(double) out) {
     assert(m_dimc(in) == 2);
     assert(m_dimc(out) == 2);
     assert(m_height(in) == m_width(out));
