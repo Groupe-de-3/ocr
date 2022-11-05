@@ -103,8 +103,8 @@ void m_transpose(Matrix(double) in, Matrix(double) out) {
     assert(m_width(in) == m_height(out));
 
     for (size_t x = 0; x < m_width(in); x++)
-        for (size_t y = 0; y < m_height(out); y++)
-            m_get2(out, x, y) = m_get2(in, y, x);
+        for (size_t y = 0; y < m_height(in); y++)
+            m_get2(out, y, x) = m_get2(in, x, y);
 }
 
 #define matrix_mul(name, type)                                                \
