@@ -54,7 +54,7 @@ bool check_lines(char *board)
                 vec_destroy(list);
                 return false;
             }
-            *vec_push(&list, char) =  board[i*9 + j];
+            *vec_push(&list, char) =  board[i * 9 + j];
         }
         vec_destroy(list);
     }
@@ -77,7 +77,7 @@ bool check_columns(char *board)
                 vec_destroy(list);
                 return false;
             }
-            *vec_push(&list, char) =  board[j*9 + i];
+            *vec_push(&list, char) =  board[j * 9 + i];
         }
         vec_destroy(list);
     }
@@ -91,7 +91,7 @@ bool check_squares(char *board, int x, int y)
     {
         for (int j = 0; j < 3; ++j)
         {
-            if (board[(i +x)* 9 + j + y] == EMPTY_CELL)
+            if (board[(i + x)* 9 + j + y] == EMPTY_CELL)
             {
                 continue;
             }
@@ -152,6 +152,7 @@ bool __sudoku_solve(char *board, int i, int j)
     }
     for (char k = 1; k <= 9 ; ++k)
     {
+
         board[i * 9 + j] = k;
         if(is_board_valid(board))
         {

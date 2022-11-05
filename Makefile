@@ -75,6 +75,7 @@ $(guile (define-target "matrices" \
 
 $(guile (define-target "sudoku" \
 	`(deps "vec")\
+	`(enable-tests)\
 ))
 
 $(guile (define-target "ia" \
