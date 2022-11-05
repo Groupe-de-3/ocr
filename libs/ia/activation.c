@@ -4,7 +4,6 @@
 
 double single_relu_Activate(double val)
 {
-    return 1.0 / (1 + exp(-val));
     if (0 > val)
         return 0;
     return val;
@@ -30,6 +29,36 @@ void Relu_Derivative(Matrix(double) m)
         m[i] = single_relu_Derivative(m[i]);
     }
 }
+
+
+double single_sigmoid_Activate(double val)
+{
+    return 1.0 / (1 + exp(-val));
+}
+
+
+void Sigmoid_Activate(Matrix(double) m)
+{
+    for (size_t i = 0; i < m_length(m); i++)
+    {
+        m[i] = single_sigmoid_Activate(m[i]);
+    }
+}
+
+double single_sigmoid_Derivative(double val)
+{
+    double a = single_sigmoid_Activate(val);
+	return a * (1 - a);
+}
+
+void Sigmoid_Derivative(Matrix(double) m)
+{
+    for (size_t i = 0; i < m_length(m); i++)
+    {
+        m[i] = single_sigmoid_Derivative(m[i]);
+    }
+}
+
 
 void Softmax_Activate(Matrix(double) inputs)
 {

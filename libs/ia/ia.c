@@ -26,7 +26,7 @@ Matrix(double) CalculateOutputs_Layer(Layer layer, Matrix(double) input, int las
     if (last)
         Softmax_Activate(new_m); // last layer
     else
-        Relu_Activate(new_m);
+        Sigmoid_Activate(new_m); // orther layer
 
     m_destroy(input);
     input = m_new(double, m_width(new_m), m_height(new_m));
