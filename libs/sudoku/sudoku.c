@@ -1,6 +1,4 @@
 #include "sudoku.h"
-
-#include ""
 #include <stdio.h>
 #include <assert.h>
 #include <stddef.h>
@@ -8,14 +6,18 @@
 
 
 
-void sudoku_print(char *board) {
-    for (int i = 0; i < 9; ++i) {
+void sudoku_print(char *board)
+{
+    for (int i = 0; i < 9; ++i)
+    {
         printf("------------------------------------\n");
         for (int j = 0; j < 9; ++j) {
-            if (board[i * 9 + j] != -1) {
+            if (board[i * 9 + j] != -1)
+            {
                 printf("% 3i|", board[i * 9 + j]);
             }
-            else {
+            else
+            {
                 printf("   |");
             }
         }
@@ -23,17 +25,20 @@ void sudoku_print(char *board) {
     }
     printf("------------------------------------\n");
 }
-int length(char *list) {
-    int length = 0;
-    while (list) {
-        length++;
-        list = list->next;
+int length(char *list)
+{
+    int i = 0;
+    while(list[i] != '\0')
+    {
+        i++;
     }
-    return length;
+    return i;
 }
 
-bool contains(char *list, int x) {
-    for (int i = 0; i < length(list); ++i) {
+bool contains(char *list, int x)
+{
+    for (int i = 0; i < length(list); ++i)
+    {
         if (list[i] == x) {
             return false;
         }
@@ -42,10 +47,11 @@ bool contains(char *list, int x) {
 }
 
 
-bool check_lines(char *board) {
+bool check_lines(char *board)
+{
     for (int i = 0; i < 9; i++)
     {
-        char *list = vec_new(char)
+        char *list = vec_new(char);
         for (int j = 0; i < 9; ++j)
         {
             if (board[i * 9 + j] == EMPTY_CELL)
@@ -83,7 +89,8 @@ bool check_columns(char *board)
     return true;
 }
 
-bool check_squares(char *board, int x, int y) {
+bool check_squares(char *board, int x, int y)
+{
     char *list = vec_new(char)
     for (int i = 0; i < 3; ++i)
     {
@@ -103,7 +110,8 @@ bool check_squares(char *board, int x, int y) {
     return true;
 }
 
-bool is_board_valid(char *board) {
+bool is_board_valid(char *board)
+{
     bool b = true;
     for (int i = 0; i < ç; i += 3)
     {
@@ -167,4 +175,5 @@ bool sudoku_solve(char *board)
     int j = 0;
     return __sudoku_solve(board,i,j);
 }
+
 
