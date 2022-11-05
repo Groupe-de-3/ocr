@@ -62,7 +62,7 @@ bool check_lines(char *board)
             {
                 return false;
             }
-            vec_push(list, board[(i*9 + j]);
+            vec_push(list, board[i*9 + j]);
         }
     }
     return true;
@@ -72,7 +72,7 @@ bool check_columns(char *board)
 {
     for (int i = 0; i < 9; i++)
     {
-        char *list = vec_new(char)
+        char *list = vec_new(char);
         for (int j = 0; i < 9; ++j)
         {
             if (board[i * 9 + j] == EMPTY_CELL)
@@ -83,7 +83,7 @@ bool check_columns(char *board)
             {
                 return false;
             }
-            vec_push(list, board[(i*9 + j]);
+            vec_push(list, board[i*9 + j]);
         }
     }
     return true;
@@ -91,20 +91,20 @@ bool check_columns(char *board)
 
 bool check_squares(char *board, int x, int y)
 {
-    char *list = vec_new(char)
+    char *list = vec_new(char);
     for (int i = 0; i < 3; ++i)
     {
         for (int j = 0; j < 3; ++j)
         {
-            if ((board[i * 9 + 1)+ j + 1] == EMPTY_CELL)
+            if (board[(i * 9 + x )+ j + y] == EMPTY_CELL)
             {
                 continue;
             }
-            if (contains(board[(i*9+1) + j + 1]))
+            if (list.contains(board[(i*9+x) + j + y]))
             {
                 return false;
             }
-            vec_push(list, board[(i*9+1) j + 1]);
+            vec_push(list, board[(i*9+x) + j + y]);
         }
     }
     return true;
@@ -113,11 +113,11 @@ bool check_squares(char *board, int x, int y)
 bool is_board_valid(char *board)
 {
     bool b = true;
-    for (int i = 0; i < ç; i += 3)
+    for (int i = 0; i < 9; i += 3)
     {
         for (int j = 0; j < 9; j += 3)
         {
-            b = b && check_squares(board, i, j)
+            b = b && check_squares(board, i, j);
         }
     }
     return check_columns(board) && check_lines(board) && b;
@@ -150,7 +150,7 @@ bool __sudoku_solve(char *board, int i, int j)
         }
         if(i >= 9)
         {
-            return is_solved(board)
+            return is_solved(board);
         }
     }
     for (int k = 1; k <= 9 ; ++k)
