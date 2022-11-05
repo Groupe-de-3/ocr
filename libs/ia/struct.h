@@ -6,6 +6,8 @@ typedef struct {
     size_t layer_size;
     Matrix(double) m_bias;
     Matrix(double) m_weight;
+    Matrix(double) last_output;
+    Matrix(double) last_output_activated;
 } Layer;
 
 typedef struct {
@@ -26,9 +28,7 @@ typedef struct {
 } Data;
 
 
-typedef struct {
-	LayerLearnData[] layerData;
-} NetworkLearnData;
+
 
 
 typedef struct {
@@ -37,3 +37,6 @@ typedef struct {
 	Matrix(double) activations;
 	Matrix(double) nodeValues;
 } LayerLearnData;
+typedef struct {
+	LayerLearnData *layerData;
+} NetworkLearnData;

@@ -2,6 +2,7 @@
 #include "ia.h"
 #include "activation.h"
 #include "cost.h"
+#include "layer.h"
 
 #include <err.h>
 #include <math.h>
@@ -14,39 +15,11 @@
 // Neural Network Forward
 //---------------
 
-Matrix(double) CalculateOutputs_Layer(Layer layer, Matrix(double) input, int last)
-{
-    Matrix(double) new_m = NULL;
-
-    new_m = m_new(double, m_width(layer.m_weight), 1);
-    m_mul(input, layer.m_weight, new_m);
-
-    m_add(new_m, layer.m_bias);
-
-    if (last)
-        Softmax_Activate(new_m); // last layer
-    else
-        Sigmoid_Activate(new_m); // orther layer
-
-    m_destroy(input);
-    input = m_new(double, m_width(new_m), m_height(new_m));
-    for (size_t j = 0; j < m_length(new_m); j++)
-    {
-        input[j] = new_m[j];
-    }
-    m_destroy(new_m);
-    
-    return input;
-}
-
-
 
 Matrix(double) CalculateOutputs_NN(Matrix(double) input, neural_network NN)
 {
     for (size_t i = 0; i < NN.layers_number; i++)
-    {
         input = CalculateOutputs_Layer(NN.layers_[i], input, (i == NN.layers_number-1));
-    }
     
     return input;
 }
@@ -108,28 +81,6 @@ void Launch(neural_network NN, Data d)
     }
 }
 
-//---------------
-// Gradient
-//---------------
-
-void ApplyGradients(Layer layer, Matrix(double) costB, Matrix(double) costW, double learnRate)
-{
-
-    for (size_t i = 0; i < m_width(costW); i++)
-    {
-        for (size_t j = 0; j < m_height(costW); j++)
-        {
-            m_get2(layer.m_weight, i, j) -= m_get2(costW, i, j) * learnRate;;
-        }     
-    }
-
-    for (size_t i = 0; i < m_width(costB); i++)
-    {
-        double a = m_get2(costB, i, 0) * learnRate;
-        m_get2(layer.m_bias, i, 0) -= a;
-    }
-}
-
 
 //void CalculOutputLayerNodeValue()
 
@@ -179,43 +130,11 @@ void Learn(neural_network *NN, Data data, double learnRate)
                 
             }
 
-            ApplyGradients(NN->layers_[layer_ind], costB, costW, 0.1);
+            ApplyGradients_layer(NN->layers_[layer_ind], costB, costW, 0.1);
 
             m_destroy(costW);
             m_destroy(costB);   
         }
     }
 }
-
-
-
-//---------------
-// Cost
-//---------------
-
-double NodeCost_derivate(double output, double expected)
-{
-    return 2 * (output - expected);
-}
-
-double NodeCost(double output, double expected)
-{
-    double error = output - expected;
-    return error * error;
-}
-
-double Cost(Matrix(double) outputs, Matrix(double) expects)
-{
-    double cost = 0;
-    
-    for (size_t i = 0; i < m_length(outputs); i++)
-    {
-        cost += NodeCost(outputs[i], expects[i]);
-    }
-
-    m_destroy(outputs);
-    
-    return cost;
-}
-
 

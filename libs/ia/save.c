@@ -85,6 +85,8 @@ neural_network ia_load(char* file_name) // initialisation of the neural network 
         Layer_.layer_size = NN.layers_sizes[layer_ind+1]; // ini size of the layer
 
         Layer_.m_bias = m_new(double, Layer_.layer_size, 1);
+        Layer_.last_output = m_new(double, Layer_.layer_size, 1);
+        Layer_.last_output_activated = m_new(double, Layer_.layer_size, 1);
         Layer_.m_weight = m_new(double, Layer_.layer_size, NN.layers_sizes[layer_ind]);
         
         for (size_t i = 0; i < NN.layers_sizes[layer_ind]; i++) {
@@ -121,6 +123,8 @@ void ia_memory_free(neural_network *NN) // free the memory
     {   
         m_destroy(NN->layers_[i].m_bias);
         m_destroy(NN->layers_[i].m_weight);
+        m_destroy(NN->layers_[i].last_output);
+        m_destroy(NN->layers_[i].last_output_activated);
     }
 
     free(NN->layers_);
@@ -148,6 +152,8 @@ neural_network ia_init(size_t layers_number, size_t* layers_sizes)// initialisat
         Layer_.layer_size = layers_sizes[layer_ind + 1]; // ini size of the layer
 
         Layer_.m_bias = m_new(double, Layer_.layer_size, 1);
+        Layer_.last_output = m_new(double, Layer_.layer_size, 1);
+        Layer_.last_output_activated = m_new(double, Layer_.layer_size, 1);
         Layer_.m_weight = m_new(double, Layer_.layer_size, layers_sizes[layer_ind]);
 
         for (size_t i = 0; i < Layer_.layer_size; i++) {
