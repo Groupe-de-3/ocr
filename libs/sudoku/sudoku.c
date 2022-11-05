@@ -12,7 +12,7 @@ void sudoku_print(char *board)
     {
         printf("------------------------------------\n");
         for (int j = 0; j < 9; ++j) {
-            if (board[i * 9 + j] != -1)
+            if (board[i * 9 + j] != 0)
             {
                 printf("% 3i|", board[i * 9 + j]);
             }
@@ -25,25 +25,16 @@ void sudoku_print(char *board)
     }
     printf("------------------------------------\n");
 }
-int length(char *list)
-{
-    int i = 0;
-    while(list[i] != '\0')
-    {
-        i++;
-    }
-    return i;
-}
 
 bool contains(char *list, int x)
 {
-    for (int i = 0; i < length(list); ++i)
+    for (size_t i = 0; i < vec_size(list); ++i)
     {
         if (list[i] == x) {
-            return false;
+            return true;
         }
     }
-    return true;
+    return false;
 }
 
 
@@ -52,7 +43,7 @@ bool check_lines(char *board)
     for (int i = 0; i < 9; i++)
     {
         char *list = vec_new(char);
-        for (int j = 0; i < 9; ++j)
+        for (int j = 0; j < 9; ++j)
         {
             if (board[i * 9 + j] == EMPTY_CELL)
             {
@@ -60,10 +51,12 @@ bool check_lines(char *board)
             }
             if (contains(list, board[i * 9 + j]))
             {
+                vec_destroy(list);
                 return false;
             }
-            vec_push(list, board[i*9 + j]);
+            *vec_push(&list, char) =  board[i*9 + j];
         }
+        vec_destroy(list);
     }
     return true;
 }
@@ -73,18 +66,20 @@ bool check_columns(char *board)
     for (int i = 0; i < 9; i++)
     {
         char *list = vec_new(char);
-        for (int j = 0; i < 9; ++j)
+        for (int j = 0; j < 9; ++j)
         {
-            if (board[i * 9 + j] == EMPTY_CELL)
+            if (board[j * 9 + i] == EMPTY_CELL)
             {
                 continue;
             }
             if (contains(list, board[j * 9 + i]))
             {
+                vec_destroy(list);
                 return false;
             }
-            vec_push(list, board[i*9 + j]);
+            *vec_push(&list, char) =  board[j*9 + i];
         }
+        vec_destroy(list);
     }
     return true;
 }
@@ -96,17 +91,19 @@ bool check_squares(char *board, int x, int y)
     {
         for (int j = 0; j < 3; ++j)
         {
-            if (board[(i * 9 + x )+ j + y] == EMPTY_CELL)
+            if (board[(i +x)* 9 + j + y] == EMPTY_CELL)
             {
                 continue;
             }
-            if (list.contains(board[(i*9+x) + j + y]))
+            if (contains(list, board[(i + x)*9 + j + y]))
             {
+                vec_destroy(list);
                 return false;
             }
-            vec_push(list, board[(i*9+x) + j + y]);
+            *vec_push(&list, char) =  board[(i+x)*9 + j + y];
         }
     }
+    vec_destroy(list);
     return true;
 }
 
@@ -140,7 +137,7 @@ bool is_solved(char *board)
 
 bool __sudoku_solve(char *board, int i, int j)
 {
-    while (board[i*9+j] != 0)
+    while (board[i*9+j] != EMPTY_CELL)
     {
         j+=1;
         if(j >= 9)
@@ -153,7 +150,7 @@ bool __sudoku_solve(char *board, int i, int j)
             return is_solved(board);
         }
     }
-    for (int k = 1; k <= 9 ; ++k)
+    for (char k = 1; k <= 9 ; ++k)
     {
         board[i * 9 + j] = k;
         if(is_board_valid(board))
