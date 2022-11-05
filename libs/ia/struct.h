@@ -24,3 +24,16 @@ typedef struct {
     DataPoint *data;
     size_t size;
 } Data;
+
+
+typedef struct {
+	LayerLearnData[] layerData;
+} NetworkLearnData;
+
+
+typedef struct {
+	Matrix(double) inputs;
+	Matrix(double) weightedInputs;
+	Matrix(double) activations;
+	Matrix(double) nodeValues;
+} LayerLearnData;
