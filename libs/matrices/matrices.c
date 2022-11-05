@@ -96,6 +96,17 @@ bool m_eq(Matrix(void) a, Matrix(void) b) {
     return true;
 }
 
+void m_transpose(Matrix(float) in, Matrix(float) out) {
+    assert(m_dimc(in) == 2);
+    assert(m_dimc(out) == 2);
+    assert(m_height(in) == m_width(out));
+    assert(m_width(in) == m_height(out));
+
+    for (size_t x = 0; x < m_width(in); x++)
+        for (size_t y = 0; y < m_height(out); y++)
+            m_get2(out, x, y) = m_get2(in, y, x);
+}
+
 #define matrix_mul(name, type)                                                \
     void name(Matrix(type) a, Matrix(type) b, Matrix(type) out) {             \
         assert(m_dimc(a) >= 2);                                               \

@@ -131,6 +131,8 @@ void m_copy(Matrix(void) destination, void *data);
 bool m_dim_eq(Matrix(void) a, Matrix(void) b);
 bool m_eq(Matrix(void) a, Matrix(void) b);
 
+void m_transpose(Matrix(float) in, Matrix(float) out);
+
 /*! \brief Convinient macro for accessing elements of a 2d matrix.
  *
  *  \par Example
@@ -154,6 +156,13 @@ bool m_eq(Matrix(void) a, Matrix(void) b);
  *  \return The value of the element at the given position.
  */
 #define m_get2(m, x, y) m[m_width(m) * y + x]
+
+/*! \brief Transposes the in matrix into the out matrix.
+ *  
+ *  \param in The 2D matrix to transpose.
+ *  \param out The output of the transpose operation, its height and width must be equal respectively to the width and height of the in matrix.
+ */
+void m_transpose(Matrix(float) in, Matrix(float) out);
 
 /*! \brief Convinient macro for using functions in the form m_xmul.
  *
