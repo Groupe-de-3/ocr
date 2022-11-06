@@ -162,6 +162,11 @@ bool m_eq(Matrix(void) a, Matrix(void) b);
  */
 void m_transpose(Matrix(double) in, Matrix(double) out);
 
+/*! \brief Computes the hadamard product of two matrices.
+ *
+ *  \param[in] a The First Matrix.
+ *  \param[in,out] out The second Matrix, also the destination of the computation.
+ */
 void m_hadamard_product(Matrix(double) a, Matrix(double) out);
 
 /*! \brief Convinient macro for using functions in the form m_xmul.
