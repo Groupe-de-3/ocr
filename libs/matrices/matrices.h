@@ -162,6 +162,8 @@ bool m_eq(Matrix(void) a, Matrix(void) b);
  */
 void m_transpose(Matrix(double) in, Matrix(double) out);
 
+void m_hadamard_product(Matrix(double) a, Matrix(double) out);
+
 /*! \brief Convinient macro for using functions in the form m_xmul.
  *
  *  All matrices must be of the same type and respect the following:

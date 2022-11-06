@@ -107,6 +107,13 @@ void m_transpose(Matrix(double) in, Matrix(double) out) {
             m_get2(out, y, x) = m_get2(in, x, y);
 }
 
+void m_hadamard_product(Matrix(double) a, Matrix(double) out) {
+    assert(m_length(a) == m_length(out));
+
+    for (size_t i = 0; i < m_length(a); i++)
+        out[i] *= a[i];
+}
+
 #define matrix_mul(name, type)                                                \
     void name(Matrix(type) a, Matrix(type) b, Matrix(type) out) {             \
         assert(m_dimc(a) >= 2);                                               \
