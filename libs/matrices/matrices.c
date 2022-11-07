@@ -4,6 +4,7 @@
 #include <stdalign.h>
 #include <stdbool.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
 
 typedef struct {
@@ -46,6 +47,15 @@ size_t m_dimc(Matrix(void) m) {
 }
 size_t *m_dimv(Matrix(void) m) {
     return m_metadata(m)->dimv;
+}
+
+void m_fprint(Matrix(double) m) {
+    for (size_t y = 0; y < m_width(m); y++) {
+        for (size_t x = 0; x < m_width(m); x++) {
+            printf("%f ", m_get2(m, x, y));
+        }
+        printf("\n");
+    }
 }
 
 size_t m_length(Matrix(void) m) {

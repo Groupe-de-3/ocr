@@ -69,6 +69,8 @@ size_t  m_elem_size(Matrix(void) m);
 size_t  m_dimc(Matrix(void) m);
 size_t *m_dimv(Matrix(void) m);
 
+void m_fprint(Matrix(double) m);
+
 /*! \brief Get the length of a matrix.
  *
  *  Instead of returning the size of a single dimension, this computes the
