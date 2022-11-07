@@ -94,7 +94,10 @@ $(guile (define-target "image_filters" \
 	`(deps "images" "matrices" "vec" "linear_algebra")\
 ))
 
-$(guile (define-target "linear_algebra"))
+$(guile (define-target "linear_algebra" \
+	`(deps "matrices") \
+	`(enable-tests) \
+))
 
 $(guile (define-target "test_lib" \
 	`(source-dirs "tests/lib")\
@@ -132,6 +135,11 @@ $(guile (define-target "images_tests"\
 $(guile (define-target "ia_test"\
 	`(target-type "executable")\
 	`(deps "ia" "matrices")\
+))
+
+$(guile (define-target "least_squares_tests"\
+	`(target-type "executable")\
+	`(deps "linear_algebra")\
 ))
 # -------------------
 # (Build) PROFILES
