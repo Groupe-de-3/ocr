@@ -25,7 +25,6 @@ Matrix(double) CalculateOutputs_NN(Matrix(double) input, neural_network NN)
 }
 
 
-
 void Print_array(Matrix(double) m) // print matrix
 {
     printf("-------------\n");
@@ -96,6 +95,19 @@ double Aply_cost(neural_network *NN, DataPoint d)
     return Cost(outputs, d.expect);
 }
 
+Matrix(double) Learn_layer(neural_network NN, DataPoint datapoint)
+{
+
+    Matrix(double) output = get_last_layer_gradient(NN.layers_[NN.layers_number-1], datapoint.expect, datapoint.input);
+
+    for (size_t layer_ind = NN.layers_number - 2; layer_ind > 0; layer_ind++)
+    {
+        get_hidden_layer_gradient(NN.layers_[layer_ind], datapoint.expect, output);
+    }
+    
+
+}
+
 
 void Learn(neural_network *NN, Data data, double learnRate)
 {
@@ -104,37 +116,7 @@ void Learn(neural_network *NN, Data data, double learnRate)
         DataPoint datapoint = data.data[data_ind];
         double OriginalCost = Aply_cost(NN, datapoint);
 
-        for (size_t layer_ind = 0; layer_ind < NN->layers_number; layer_ind++)
-        {
-            Matrix(double) costW = m_new(double, NN->layers_[layer_ind].layer_size, NN->layers_sizes[layer_ind]);
-
-            for (size_t i = 0; i < m_width(costW); i++)
-            {
-                for (size_t j = 0; j < m_height(costW); j++)
-                {
-                    m_get2(NN->layers_[layer_ind].m_weight, i, j) += learnRate;
-                    double deltaCost = Aply_cost(NN, datapoint) - OriginalCost;
-                    m_get2(NN->layers_[layer_ind].m_weight, i, j) -= learnRate;
-                    m_get2(costW, i, j) = deltaCost / learnRate;
-                }     
-            }
-
-            Matrix(double) costB = m_new(double, NN->layers_[layer_ind].layer_size, 1);
-
-            for (size_t i = 0; i < m_width(costB); i++)
-            {
-                m_get2(NN->layers_[layer_ind].m_weight, i, 0) += learnRate;
-                double deltaCost = Aply_cost(NN, datapoint) - OriginalCost;
-                m_get2(NN->layers_[layer_ind].m_weight, i, 0) -= learnRate;
-                m_get2(costW, i, 0) = deltaCost / learnRate;
-                
-            }
-
-            ApplyGradients_layer(NN->layers_[layer_ind], costB, costW, 0.1);
-
-            m_destroy(costW);
-            m_destroy(costB);   
-        }
+        Learn_layer(*NN, datapoint);
     }
 }
 

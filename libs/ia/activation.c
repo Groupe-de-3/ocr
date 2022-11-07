@@ -53,6 +53,7 @@ double single_sigmoid_Derivative(double val)
 
 void Sigmoid_Derivative(Matrix(double) m)
 {
+    // TODO: Should return a rectangular matrix
     for (size_t i = 0; i < m_length(m); i++)
     {
         m[i] = single_sigmoid_Derivative(m[i]);

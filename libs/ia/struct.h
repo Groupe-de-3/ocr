@@ -11,7 +11,7 @@ typedef struct {
 } Layer;
 
 typedef struct {
-    Layer *layers_; // array of layers
+    Layer *layers_;       // array of layers
     size_t layers_number; // number of layers in the neural network
     size_t *layers_sizes; // array of each layer size
 } neural_network;

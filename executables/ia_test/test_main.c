@@ -15,7 +15,7 @@ int main() {
         layers_sizes_[i] = layers_sizes[i];
 
     //data
-    double inputs[4][2] = {{0, 0},  {0,1}, {1,0}, {1,1}};
+    double inputs[4][2] = {{0,0},  {0,1}, {1,0}, {1,1}};
     double expects[4][2] = {{1,0}, {0,1}, {0,1}, {1,0}};
     Data d = data_init(4);
 
