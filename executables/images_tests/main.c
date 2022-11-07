@@ -38,6 +38,24 @@ static long timediff(struct timeval start) {
            start.tv_usec / 1000;
 }
 
+static void draw_all_lines_on(ImageView *in, HoughLine *lines) {
+    some_pixel_t line_colors = (some_pixel_t){
+        .format = PixelFormat_Rgb8,
+        .value  = {
+                   .rgb8 =
+                 (rgb8_pixel_t){
+                     .r = 255,
+                     .g = 0,
+                     .b = 0,
+                }, }
+    };
+    for (size_t i = 0; i < vec_size(lines); i++) {
+        hough_acc_space_draw_line(
+            lines[i], in, line_colors, false
+        );
+    }
+}
+
 int main(int argc, char **argv) {
     if (argc < 2) {
         errx(
@@ -167,7 +185,7 @@ int main(int argc, char **argv) {
     printf("    Saving step three to edges-mask3.bmp\n");
     bmp_save_to_path("edges-mask3.bmp", &edges_mask);
 
-    printf("    Applying the mask to the edges");
+    printf("    Applying the mask to the edges\n");
     image_mask_run(&edges_view, &edges_mask_view);
     printf("    Saving masked edges to masked-edges.bmp\n");
     bmp_save_to_path("masked-edges.bmp", &edges);
@@ -184,11 +202,25 @@ int main(int argc, char **argv) {
     hough_acc_space_run(&edges_view, &gradient_dir_view, &hough_view);
     printf("    Saving edges to hough.bmp\n");
     bmp_save_to_path("hough.bmp", &hough);
-    printf("    Done (%ldms)\n", timediff(start));
 
+    Image hough_all_lines_img =
+        img_new(resized.width, resized.height, resized.format);
+    ImageView hough_all_lines_img_view = imgv_default(&hough_all_lines_img);
+    
+    hough_acc_space_draw_all_lines(&hough_view, &hough_all_lines_img_view);
+    printf("    Saving all lines to hough-all-lines.bmp\n");
+    bmp_save_to_path("hough-all-lines.bmp", &hough_all_lines_img);
+
+    printf("    Done (%ldms)\n", timediff(start));
+    
     gettimeofday(&start, NULL);
-    printf("Drawing hough lines\n");
-    // Computing image's gradient
+    printf("Extracting hough lines\n");
+    Image hough_peak_lines_img =
+        img_new(resized.width, resized.height, resized.format);
+    ImageView hough_peak_lines_img_view = imgv_default(&hough_peak_lines_img);
+
+    imgv_copy(&resized_view, &hough_peak_lines_img_view);
+
     Image hough_lines_img =
         img_new(resized.width, resized.height, resized.format);
     ImageView hough_lines_img_view = imgv_default(&hough_lines_img);
@@ -200,25 +232,15 @@ int main(int argc, char **argv) {
     );
     printf("    Extracted %zu lines\n", vec_size(hough_lines));
 
+    draw_all_lines_on(&hough_peak_lines_img_view, hough_lines);
+    printf("    Saving peak lines to hough-peak-lines.bmp\n");
+    bmp_save_to_path("hough-peak-lines.bmp", &hough_peak_lines_img);
+
     HoughLine *extrem_lines = hough_extract_extermum_lines(hough_lines);
     printf("    Extracted %zu extrem lines\n", vec_size(extrem_lines));
 
-    some_pixel_t line_colors = (some_pixel_t){
-        .format = PixelFormat_Rgb8,
-        .value  = {
-                   .rgb8 =
-                 (rgb8_pixel_t){
-                     .r = 255,
-                     .g = 0,
-                     .b = 0,
-                }, }
-    };
-    for (size_t i = 0; i < vec_size(extrem_lines); i++) {
-        hough_acc_space_draw_line(
-            extrem_lines[i], &hough_lines_img_view, line_colors, false
-        );
-    }
-    printf("    Saving edges to hough-lines.bmp\n");
+    draw_all_lines_on(&hough_lines_img_view, extrem_lines);
+    printf("    Saving lines to hough-lines.bmp\n");
     bmp_save_to_path("hough-lines.bmp", &hough_lines_img);
     printf("    Done (%ldms)\n", timediff(start));
 
@@ -234,6 +256,16 @@ int main(int argc, char **argv) {
         extrem_lines, sudoku_corners_img_view.width,
         sudoku_corners_img_view.height
     );
+    some_pixel_t line_colors = (some_pixel_t){
+        .format = PixelFormat_Rgb8,
+        .value  = {
+                   .rgb8 =
+                 (rgb8_pixel_t){
+                     .r = 255,
+                     .g = 0,
+                     .b = 0,
+                }, }
+    };
     for (int d = -5; d <= 5; d++) {
         {
             ipoint2d_t corners[4] = {
@@ -290,15 +322,15 @@ int main(int argc, char **argv) {
     Image     sudoku      = img_new(800, 800, resized.format);
     ImageView sudoku_view = imgv_default(&sudoku);
 
-    bilinear_perspective_transmute(
+    /*bilinear_perspective_transmute(
         &resized_view, i2fquadrilateral(parse_rslt.shape), &sudoku_view,
-        (iquadrilateral_t){
-            .a = ipoint2d(0, 0),
-            .b = ipoint2d(sudoku_view.width - 1, 0),
-            .c = ipoint2d(sudoku_view.width - 1, sudoku_view.height - 1),
-            .d = ipoint2d(0, sudoku_view.height - 1),
+        (fquadrilateral_t){
+            .a = fpoint2d(0, 0),
+            .b = fpoint2d((float)(sudoku_view.width - 1), 0),
+            .c = fpoint2d((float)(sudoku_view.width - 1), (float)(sudoku_view.height - 1)),
+            .d = fpoint2d(0, (float)(sudoku_view.height - 1)),
         }
-    );
+    );*/
 
     printf("    Saving edges to sudoku.bmp\n");
     bmp_save_to_path("sudoku.bmp", &sudoku);
@@ -308,6 +340,8 @@ int main(int argc, char **argv) {
     vec_destroy(hough_lines);
 
     img_destroy(edges_mask);
+    img_destroy(hough_all_lines_img);
+    img_destroy(hough_peak_lines_img);
     img_destroy(hough_lines_img);
     img_destroy(image);
     img_destroy(resized);

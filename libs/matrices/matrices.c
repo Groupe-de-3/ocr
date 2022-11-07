@@ -50,7 +50,7 @@ size_t *m_dimv(Matrix(void) m) {
 }
 
 void m_fprint(Matrix(double) m) {
-    for (size_t y = 0; y < m_width(m); y++) {
+    for (size_t y = 0; y < m_height(m); y++) {
         for (size_t x = 0; x < m_width(m); x++) {
             printf("%f ", m_get2(m, x, y));
         }
