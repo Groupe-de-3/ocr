@@ -10,17 +10,17 @@ void test_least_squares(void) {
         0, 1, 0,
         0, 0, 1,
     });
-    Matrix(double) b = m_new(double, 3, 3);
+    Matrix(double) b = m_new(double, 1, 3);
     m_copy(b, (double[]) {
-         32.0,   78.,  -30.,
-        -120.0,  0.,    23.,
-         9999.0, 1002., 99,
+         32.0,
+        -120.0,
+         9999.0,
     });
 
-    Matrix(double) x = m_new(double, 3, 3);
+    Matrix(double) x = m_new(double, 1, 3);
     la_solve_least_squares(a, b, x);
     
-    Matrix(double) rslt = m_new(double, 3, 3);
+    Matrix(double) rslt = m_new(double, 1, 3);
     m_mul(a, x, rslt);
     
     for (size_t y = 0; y < m_height(x); y++) {

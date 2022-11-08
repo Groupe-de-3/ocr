@@ -155,7 +155,7 @@ bool m_eq(Matrix(void) a, Matrix(void) b);
  *  \param y The position in the second dimension.
  *  \return The value of the element at the given position.
  */
-#define m_get2(m, x, y) m[m_width(m) * y + x]
+#define m_get2(m, x, y) (m)[m_width((m)) * (y) + (x)]
 
 /*! \brief Transposes the in matrix into the out matrix.
  *  

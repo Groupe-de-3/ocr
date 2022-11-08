@@ -166,7 +166,7 @@ profiles = valgrind-debug debug release
 # PROFILE_NAME_cflags - List of flags to give to $CC
 
 debug_cflags = $(default_cflags) -fsanitize=address -static-libsan -g -Og
-valgrind-debug_cflags = $(default_cflags) -gdwarf-4 -g -Og $(disable_asserts_cflags)
+valgrind-debug_cflags = $(default_cflags) -gdwarf-4 -g -Og
 release_cflags = $(default_cflags) -Ofast -flto $(disable_asserts_cflags)
 
 # -------------------

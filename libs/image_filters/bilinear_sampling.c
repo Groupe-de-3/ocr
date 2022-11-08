@@ -6,6 +6,7 @@
 
 #include "point2d.h"
 #include "utils_math.h"
+#include "least_squares.h"
 
 some_pixel_t bilinear_sample(ImageView *img, float x, float y) {
     // Image must be in a "float channel" format
@@ -65,38 +66,102 @@ void bilinear_resize(ImageView *from, ImageView *to) {
     }
 }
 
-void bilinear_perspective_transmute(
-    ImageView *from_img, fquadrilateral_t from_shape, ImageView *to,
-    iquadrilateral_t to_shape
-) {
-    int height_left = to_shape.d.y - to_shape.a.y;
-    assert(height_left > 0);
+void bilinear_apply_matrix(ImageView *from, ImageView *to, Matrix(double) m) {
+    Matrix(double) mat_a = m_new(double, 3, 1);
+    Matrix(double) mat_b = m_new(double, 3, 1);
+    
+    Matrix(double) inv = m_new(double, 3, 3);
+    Matrix(double) id  = m_new(double, 3, 3);
+    memset(id, 0, sizeof(double) * 9);
+    m_get2(id, 0, 0) = 1.;
+    m_get2(id, 1, 1) = 1.;
+    m_get2(id, 2, 2) = 1.;
+    la_solve_least_squares(m, id, inv);
 
-    for (int dy = 0; dy < height_left; dy++) {
-        float fdy = (float)dy / (float)(height_left - 1);
+    printf("Inv:\n");
+    m_fprint(inv);
+    
+    for (int y = 0; y < to->height; y++) {
+        for (int x = 0; x < to->width; x++) {
+            m_copy(mat_a, (double[]) { (double) x, (double) y, 1. });
+            m_mul(mat_a, inv, mat_b);
+            double fx = mat_b[0] / mat_b[2];
+            double fy = mat_b[1] / mat_b[2];
 
-        ipoint2d_t to_left =
-            ipoint2d_interpolate(to_shape.a, to_shape.d, dy, height_left - 1);
-        ipoint2d_t to_right =
-            ipoint2d_interpolate(to_shape.b, to_shape.c, dy, height_left - 1);
-
-        fpoint2d_t from_left =
-            fpoint2d_interpolate(from_shape.a, from_shape.d, fdy);
-        fpoint2d_t from_right =
-            fpoint2d_interpolate(from_shape.b, from_shape.c, fdy);
-
-        int width = to_right.x - to_left.x;
-        for (int dx = 0; dx < width; dx++) {
-            float fdx = (float)dx / (float)(width - 1);
-
-            ipoint2d_t target_pixel =
-                ipoint2d_interpolate(to_left, to_right, dx, width - 1);
-            fpoint2d_t source_pixel =
-                fpoint2d_interpolate(from_left, from_right, fdx);
-
-            some_pixel_t new_value =
-                bilinear_sample(from_img, source_pixel.x, source_pixel.y);
-            imgv_set_pixel_some(to, target_pixel.x, target_pixel.y, new_value);
+            imgv_set_pixel_some(to, x, y, bilinear_sample(from, (float)fx, (float)fy));
         }
     }
+    
+    m_destroy(mat_a);
+    m_destroy(mat_b);
+}
+
+void bilinear_perspective_transmute(
+    ImageView *from_img, fquadrilateral_t from_shape, ImageView *to,
+    fquadrilateral_t to_shape
+) {
+    printf("[(%f, %f), (%f, %f), (%f, %f), (%f, %f)]\n", 
+        from_shape.a.x,
+        from_shape.a.y,
+        from_shape.b.x,
+        from_shape.b.y,
+        from_shape.c.x,
+        from_shape.c.y,
+        from_shape.d.x,
+        from_shape.d.y
+    );
+    printf("[(%f, %f), (%f, %f), (%f, %f), (%f, %f)]\n", 
+        to_shape.a.x,
+        to_shape.a.y,
+        to_shape.b.x,
+        to_shape.b.y,
+        to_shape.c.x,
+        to_shape.c.y,
+        to_shape.d.x,
+        to_shape.d.y
+    );
+
+    Matrix(double) a = m_new(double, 8, 8);
+    Matrix(double) b = m_new(double, 1, 8);
+
+    fpoint2d_t src[4] = { from_shape.a, from_shape.b, from_shape.c, from_shape.d };
+    fpoint2d_t dst[4] = { to_shape.a, to_shape.b, to_shape.c, to_shape.d };
+    for (size_t i = 0; i < 4; ++i) {
+        m_get2(a, 0, i) = src[i].x;
+        m_get2(a, 3, i+4) = src[i].x;
+
+        m_get2(a, 1, i) = src[i].y;
+        m_get2(a, 4, i+4) = src[i].y;
+
+        m_get2(a, 2, i) = 1;
+        m_get2(a, 5, i+4) = 1;
+
+        m_get2(a, 3, i) = 0;
+        m_get2(a, 4, i) = 0;
+        m_get2(a, 5, i) = 0;
+        m_get2(a, 0, i+4) = 0;
+        m_get2(a, 1, i+4) = 0;
+        m_get2(a, 2, i+4) = 0;
+
+        m_get2(a, 6, i) = -src[i].x*dst[i].x;
+        m_get2(a, 7, i) = -src[i].y*dst[i].x;
+
+        m_get2(a, 6, i+4) = -src[i].x*dst[i].y;
+        m_get2(a, 7, i+4) = -src[i].y*dst[i].y;
+
+        m_get2(b, 0, i) = dst[i].x;
+        m_get2(b, 0, i+4) = dst[i].y;
+    }
+
+    Matrix(double) x = m_new(double, 1, 8);
+    la_solve_least_squares(a, b, x);
+
+    Matrix(double) m = m_new(double, 3, 3);
+    /*memset(m, 0, sizeof(double) * 9);
+    m_get2(m, 0, 0) = 1.;
+    m_get2(m, 1, 1) = 1.;*/
+    memcpy(m, x, sizeof(double) * 8);
+    m_get2(m, 2, 2) = 1.;
+
+    bilinear_apply_matrix(from_img, to, m);
 }

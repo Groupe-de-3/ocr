@@ -322,7 +322,7 @@ int main(int argc, char **argv) {
     Image     sudoku      = img_new(800, 800, resized.format);
     ImageView sudoku_view = imgv_default(&sudoku);
 
-    /*bilinear_perspective_transmute(
+    bilinear_perspective_transmute(
         &resized_view, i2fquadrilateral(parse_rslt.shape), &sudoku_view,
         (fquadrilateral_t){
             .a = fpoint2d(0, 0),
@@ -330,7 +330,7 @@ int main(int argc, char **argv) {
             .c = fpoint2d((float)(sudoku_view.width - 1), (float)(sudoku_view.height - 1)),
             .d = fpoint2d(0, (float)(sudoku_view.height - 1)),
         }
-    );*/
+    );
 
     printf("    Saving edges to sudoku.bmp\n");
     bmp_save_to_path("sudoku.bmp", &sudoku);
