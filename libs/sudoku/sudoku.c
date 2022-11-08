@@ -1,23 +1,18 @@
 #include "sudoku.h"
-#include <stdio.h>
+
 #include <assert.h>
 #include <stddef.h>
+#include <stdio.h>
 #include <vec.h>
 
-
-
-void sudoku_print(char *board)
-{
-    for (int i = 0; i < 9; ++i)
-    {
+void sudoku_print(char *board) {
+    for (int i = 0; i < 9; ++i) {
         printf("------------------------------------\n");
         for (int j = 0; j < 9; ++j) {
-            if (board[i * 9 + j] != 0)
-            {
+            if (board[i * 9 + j] != 0) {
                 printf("% 3i|", board[i * 9 + j]);
             }
-            else
-            {
+            else {
                 printf("   |");
             }
         }
@@ -26,17 +21,14 @@ void sudoku_print(char *board)
     printf("------------------------------------\n");
 }
 
-bool contains(char *list, int x)
-{
-    for (size_t i = 0; i < vec_size(list); ++i)
-    {
+bool contains(char *list, int x) {
+    for (size_t i = 0; i < vec_size(list); ++i) {
         if (list[i] == x) {
             return true;
         }
     }
     return false;
 }
-
 
 /*bool check_lines(char *board)
 {
@@ -117,9 +109,8 @@ bool is_solved(char *board)
             {
                 return false;
             }
-            if (check_squares(board) && check_lines(board) && check_columns(board))
-                continue;
-            return false;
+            if (check_squares(board) && check_lines(board) &&
+check_columns(board)) continue; return false;
         }
     }
     return true;
@@ -152,15 +143,12 @@ bool sudoku_solve(char *board)
 
 */
 
-bool checkBoardInterity (bool mustBeValid, char* board)
-{
+bool checkBoardInterity(bool mustBeValid, char *board) {
     for (int blockI = 0; blockI < 3; ++blockI) {
-        for (int blockJ = 0; blockJ < 3; ++blockJ)
-        {
-            for (int i = 0; i < 3; ++i)
-            {unsigned int foundBitMap = 0;
-                for (int j = 0; j < 3; ++j)
-                {
+        for (int blockJ = 0; blockJ < 3; ++blockJ) {
+            for (int i = 0; i < 3; ++i) {
+                unsigned int foundBitMap = 0;
+                for (int j = 0; j < 3; ++j) {
                     unsigned int bit =
                         1u << board[(blockI + i) * 3 + (blockJ + j) * 3];
                     if ((foundBitMap & bit) != 0 && bit != 1)
@@ -170,13 +158,12 @@ bool checkBoardInterity (bool mustBeValid, char* board)
                 if (mustBeValid && foundBitMap != 0x3FE)
                     return false;
             }
-        }}
+        }
+    }
 
-    for (int i = 0; i < 9; i++)
-    {
+    for (int i = 0; i < 9; i++) {
         unsigned int foundBitMap = 0;
-        for (int j = 0; j < 9; j++)
-        {
+        for (int j = 0; j < 9; j++) {
             unsigned int bit = 1u << board[i * 9 + j];
             if ((foundBitMap & bit) != 0 && bit != 1)
                 return false;
@@ -185,11 +172,9 @@ bool checkBoardInterity (bool mustBeValid, char* board)
         if (mustBeValid && foundBitMap != 0x3FE)
             return false;
     }
-    for (int j = 0; j < 9; j++)
-    {
+    for (int j = 0; j < 9; j++) {
         unsigned int foundBitMap = 0;
-        for (int i = 0; i < 9; i++)
-        {
+        for (int i = 0; i < 9; i++) {
             unsigned int bit = 1u << board[j * 9 + i];
             if ((foundBitMap & bit) != 0 && bit != 1)
                 return false;
@@ -202,45 +187,36 @@ bool checkBoardInterity (bool mustBeValid, char* board)
     return true;
 }
 
-bool IsBoardValid(char* board)
-{
-    return checkBoardInterity(false,board);
+bool IsBoardValid(char *board) {
+    return checkBoardInterity(false, board);
 }
 
-bool IsSolved(char *board)
-{
-    return checkBoardInterity(true,board);
+bool IsSolved(char *board) {
+    return checkBoardInterity(true, board);
 }
 
-bool Solve(int i, int j,char* board)
-{
-    while (j < 9 && board[i*9+j] != 0)
-    {
+bool Solve(int i, int j, char *board) {
+    while (j < 9 && board[i * 9 + j] != 0) {
         i++;
-        if(i >= 9)
-        {
+        if (i >= 9) {
             i = 0;
-            j+=1;
+            j += 1;
         }
     }
 
-    if(j >= 9)
-    {
+    if (j >= 9) {
         return IsSolved(board);
     }
-    for (char k = 1; k <= 9; ++k)
-    {
-        board[i*9+j] = k;
-        if(!IsBoardValid(board))
-        {
-            continue ;
+    for (char k = 1; k <= 9; ++k) {
+        board[i * 9 + j] = k;
+        if (!IsBoardValid(board)) {
+            continue;
         }
         sudoku_print(board);
-        if(Solve(i,j,board))
-        {
+        if (Solve(i, j, board)) {
             return true;
         }
     }
-    board[i*9+j] = 0;
+    board[i * 9 + j] = 0;
     return false;
 }
