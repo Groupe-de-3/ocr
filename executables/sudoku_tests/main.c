@@ -20,6 +20,6 @@ int main() {
     //printf("%i \n" , check_squares(sudoku,0,0));
     //printf("%i \n" , is_solved(sudoku));
     //printf("%i \n" ,  __sudoku_solve(sudoku,0,0));
-    printf("%i \n" , Solve(0,0,sudoku));
+    printf("%i \n" , solve(0,0,sudoku));
     sudoku_print(sudoku);
 }

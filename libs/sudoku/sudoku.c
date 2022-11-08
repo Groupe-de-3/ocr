@@ -30,7 +30,7 @@ bool contains(char *list, int x) {
     return false;
 }
 
-bool checkBoardInterity(bool mustBeValid, char *board) {
+bool check_board_interity(bool mustBeValid, char *board) {
     for (int blockI = 0; blockI < 3; ++blockI) {
         for (int blockJ = 0; blockJ < 3; ++blockJ) {
             unsigned int foundBitMap = 0;
@@ -74,15 +74,15 @@ bool checkBoardInterity(bool mustBeValid, char *board) {
     return true;
 }
 
-bool IsBoardValid(char *board) {
-    return checkBoardInterity(false, board);
+bool is_board_valid(char *board) {
+    return check_board_interity(false, board);
 }
 
-bool IsSolved(char *board) {
-    return checkBoardInterity(true, board);
+bool is_solved(char *board) {
+    return check_board_interity(true, board);
 }
 
-bool Solve(int i, int j, char *board) {
+bool solve(int i, int j, char *board) {
     while (j < 9 && board[i * 9 + j] != 0) {
         i++;
         if (i >= 9) {
@@ -92,14 +92,14 @@ bool Solve(int i, int j, char *board) {
     }
 
     if (j >= 9) {
-        return IsSolved(board);
+        return is_solved(board);
     }
     for (char k = 1; k <= 9; ++k) {
         board[i * 9 + j] = k;
-        if (!IsBoardValid(board)) {
+        if (!is_board_valid(board)) {
             continue;
         }
-        if (Solve(i, j, board)) {
+        if (solve(i, j, board)) {
             return true;
         }
     }
