@@ -1,8 +1,8 @@
 #pragma once
 
 #include "image_view.h"
-#include "shapes.h"
 #include "matrices.h"
+#include "shapes.h"
 
 some_pixel_t bilinear_sample(ImageView *img, float x, float y);
 

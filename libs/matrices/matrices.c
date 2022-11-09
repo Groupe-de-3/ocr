@@ -3,8 +3,8 @@
 #include <assert.h>
 #include <stdalign.h>
 #include <stdbool.h>
-#include <stdlib.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 typedef struct {
@@ -132,7 +132,7 @@ void m_hadamard_product(Matrix(double) a, Matrix(double) out) {
                                                                               \
         size_t c1 = m_height(a);                                              \
         size_t c2 = m_width(b);                                               \
-        size_t c3 = m_height(b);                                               \
+        size_t c3 = m_height(b);                                              \
                                                                               \
         assert(m_width(a) == m_height(b));                                    \
         assert(c1 == m_height(out));                                          \

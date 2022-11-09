@@ -50,9 +50,7 @@ static void draw_all_lines_on(ImageView *in, HoughLine *lines) {
                 }, }
     };
     for (size_t i = 0; i < vec_size(lines); i++) {
-        hough_acc_space_draw_line(
-            lines[i], in, line_colors, false
-        );
+        hough_acc_space_draw_line(lines[i], in, line_colors, false);
     }
 }
 
@@ -206,13 +204,13 @@ int main(int argc, char **argv) {
     Image hough_all_lines_img =
         img_new(resized.width, resized.height, resized.format);
     ImageView hough_all_lines_img_view = imgv_default(&hough_all_lines_img);
-    
+
     hough_acc_space_draw_all_lines(&hough_view, &hough_all_lines_img_view);
     printf("    Saving all lines to hough-all-lines.bmp\n");
     bmp_save_to_path("hough-all-lines.bmp", &hough_all_lines_img);
 
     printf("    Done (%ldms)\n", timediff(start));
-    
+
     gettimeofday(&start, NULL);
     printf("Extracting hough lines\n");
     Image hough_peak_lines_img =
@@ -327,7 +325,9 @@ int main(int argc, char **argv) {
         (fquadrilateral_t){
             .a = fpoint2d(0, 0),
             .b = fpoint2d((float)(sudoku_view.width - 1), 0),
-            .c = fpoint2d((float)(sudoku_view.width - 1), (float)(sudoku_view.height - 1)),
+            .c = fpoint2d(
+                (float)(sudoku_view.width - 1), (float)(sudoku_view.height - 1)
+            ),
             .d = fpoint2d(0, (float)(sudoku_view.height - 1)),
         }
     );

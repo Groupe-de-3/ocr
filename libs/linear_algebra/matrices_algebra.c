@@ -1,18 +1,19 @@
 #include "matrices_algebra.h"
 
 #include <assert.h>
-#include <stdio.h>
 #include <math.h>
+#include <stdio.h>
 #include <string.h>
+
 #include "utils_mem.h"
 
 void utils_memswap(void *from, void *to, size_t length) {
-    char *fromb = (char*)from;
-    char *tob   = (char*)to;
+    char *fromb = (char *)from;
+    char *tob   = (char *)to;
     for (size_t i = 0; i < length; i++) {
         char temp = *fromb;
-        *fromb = *tob;
-        *tob = temp;
+        *fromb    = *tob;
+        *tob      = temp;
         fromb++;
         tob++;
     }
@@ -35,17 +36,23 @@ void mal_gauss_reduction(Matrix(double) a, Matrix(double) b) {
             pivot_x++;
             continue;
         }
-        
+
         if (max_y != pivot_y) {
-            utils_memswap(&m_get2(a, 0, max_y), &m_get2(a, 0, pivot_y), sizeof(double) * m_width(a));
-            utils_memswap(&m_get2(b, 0, max_y), &m_get2(b, 0, pivot_y), sizeof(double) * m_width(b));
+            utils_memswap(
+                &m_get2(a, 0, max_y), &m_get2(a, 0, pivot_y),
+                sizeof(double) * m_width(a)
+            );
+            utils_memswap(
+                &m_get2(b, 0, max_y), &m_get2(b, 0, pivot_y),
+                sizeof(double) * m_width(b)
+            );
         }
 
         // For each row we try to make the pivot = 1
-        for (size_t y = pivot_y+1; y < m_height(a); y++) {
+        for (size_t y = pivot_y + 1; y < m_height(a); y++) {
             double factor = m_get2(a, pivot_x, y) / m_get2(a, pivot_x, pivot_y);
             m_get2(a, pivot_x, y) = 0.;
-            for (size_t nx = pivot_x+1; nx < m_width(a); nx++)
+            for (size_t nx = pivot_x + 1; nx < m_width(a); nx++)
                 m_get2(a, nx, y) -= m_get2(a, nx, pivot_y) * factor;
             for (size_t nx = 0; nx < m_width(b); nx++)
                 m_get2(b, nx, y) -= m_get2(b, nx, pivot_y) * factor;
@@ -62,15 +69,15 @@ void mal_backward_propagation(Matrix(double) a, Matrix(double) b) {
     assert(m_width(a) == m_height(b));
     size_t w = m_width(a);
     size_t h = m_height(a);
-    
+
     for (size_t npivot = 0; npivot < h; npivot++) {
         size_t pivot = h - npivot - 1;
-        
+
         // Normalize the row (0 and only one 1)
         for (size_t x = 0; x < w; x++)
             m_get2(b, x, pivot) /= m_get2(a, pivot, pivot);
         m_get2(a, pivot, pivot) = 1.;
-        
+
         // Set to zero the whole column
         for (size_t y = 0; y < pivot; y++) {
             for (size_t x = 0; x < w; x++)
@@ -85,12 +92,12 @@ static void mal_inverse_2by2(Matrix(double) m) {
     assert(m_width(m) == m_height(m));
     assert(m_width(m) == 2);
 
-    double determinent = m_get2(m, 0, 0) * m_get2(m, 1, 1) -
-         m_get2(m, 1, 0) * m_get2(m, 0, 1);
+    double determinent =
+        m_get2(m, 0, 0) * m_get2(m, 1, 1) - m_get2(m, 1, 0) * m_get2(m, 0, 1);
     assert(determinent != 0.);
     double det_1 = 1. / determinent;
 
-    double temp = m_get2(m, 0, 0);
+    double temp     = m_get2(m, 0, 0);
     m_get2(m, 0, 0) = m_get2(m, 1, 1);
     m_get2(m, 1, 1) = temp;
     m_get2(m, 0, 1) *= -1;
@@ -101,28 +108,31 @@ static void mal_inverse_2by2(Matrix(double) m) {
 }
 
 static void mal_inverse_3by3(Matrix(double) m) {
-    double a = m[0], b = m[1], c = m[2],
-           d = m[3], e = m[4], f = m[5],
-           g = m[6], h = m[7], i = m[8];
-    double a2 =  (e*i - f*g),
-           b2 = -(d*i - f*g),
-           c2 =  (d*h - e*g);
-    double d2 = -(b*i - c*h),
-           e2 =  (a*i - c*g),
-           f2 = -(a*h - b*g);
-    double g2 =  (b*f - c*e),
-           h2 = -(a*f - c*d),
-           i2 =  (a*e - b*d);
-    
-    double determinent = a*a2 + b*b2 + c*c2;
+    double a = m[0], b = m[1], c = m[2], d = m[3], e = m[4], f = m[5], g = m[6],
+           h = m[7], i = m[8];
+    double a2 = (e * i - f * g), b2 = -(d * i - f * g), c2 = (d * h - e * g);
+    double d2 = -(b * i - c * h), e2 = (a * i - c * g), f2 = -(a * h - b * g);
+    double g2 = (b * f - c * e), h2 = -(a * f - c * d), i2 = (a * e - b * d);
+
+    double determinent = a * a2 + b * b2 + c * c2;
     assert(determinent != 0.);
 
     double det_1 = 1. / determinent;
-    memcpy(m, (double[]) {
-        a2 * det_1, d2 * det_1, g2 * det_1,
-        b2 * det_1, e2 * det_1, h2 * det_1,
-        c2 * det_1, f2 * det_1, i2 * det_1,
-    }, sizeof(double) * 3*3);
+    memcpy(
+        m,
+        (double[]){
+            a2 * det_1,
+            d2 * det_1,
+            g2 * det_1,
+            b2 * det_1,
+            e2 * det_1,
+            h2 * det_1,
+            c2 * det_1,
+            f2 * det_1,
+            i2 * det_1,
+        },
+        sizeof(double) * 3 * 3
+    );
 }
 
 static void mal_inverse_NbyN(Matrix(double) m) {
@@ -162,11 +172,11 @@ static void mal_inverse_NbyN(Matrix(double) m) {
 
     Matrix(double) rslt_1a = m_new(double, m_width(m), m_height(m));
     Matrix(double) rslt_1b = m_new(double, m_width(m), m_height(m));
-    
+
     for (size_t n = 0; n < 10; n++) {
         m_mul(m, rslt, rslt_a);
         m_copy(rslt_1a, rslt_a);
-        
+
         printf("RSLT:\n");
         m_fprint(rslt);
         printf("RSLT A:\n");
@@ -179,7 +189,7 @@ static void mal_inverse_NbyN(Matrix(double) m) {
         for (size_t i = 0; i < m_width(m); i++)
             m_get2(rslt_1a, i, i) -= 15;
         m_mul(rslt_a, rslt_1a, rslt_1b);
-        
+
         for (size_t i = 0; i < m_width(m); i++)
             m_get2(rslt_1b, i, i) += 93;
         m_mul(rslt_a, rslt_1b, rslt_1a);
@@ -207,14 +217,14 @@ static void mal_inverse_NbyN(Matrix(double) m) {
         for (size_t i = 0; i < m_width(m); i++)
             m_get2(rslt_1b, i, i) += 120;
         m_mul(rslt_a, rslt_1b, rslt_1a);
-        
+
         m_mul(rslt, rslt_1a, rslt_1b);
         for (size_t i = 0; i < m_length(rslt); i++)
             rslt[i] = rslt_1b[i] / 16.;
     }
-    
+
     m_copy(m, rslt);
-    
+
     m_destroy(rslt);
     m_destroy(rslt_a);
     m_destroy(rslt_1a);
@@ -224,10 +234,10 @@ static void mal_inverse_NbyN(Matrix(double) m) {
 
 void mal_inverse(Matrix(double) m) {
     assert(m_dimc(m) == 2);
-    
+
     size_t w = m_width(m);
     assert(w == m_height(m));
-       
+
     if (w == 2 && false)
         mal_inverse_2by2(m);
     else if (w == 3 && false)

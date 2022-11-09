@@ -1,18 +1,18 @@
 #include "least_squares.h"
-#include "matrices.h"
 
+#include <assert.h>
 #include <math.h>
 #include <stdio.h>
-#include <assert.h>
+
+#include "matrices.h"
 
 #define LEARN_SPEED 0.00000000000001
-#define THRESHOLD   0.0000001
+#define THRESHOLD 0.0000001
 
 /*
-static Matrix(double) la_get_square_diff(Matrix(double) a, Matrix(double) b, Matrix(double) x) {
-    Matrix(double) rslt = m_new(double, m_width(b), m_height(b));
-    m_mul(a, x, rslt);
-    for (size_t i = 0; i < m_length(x); i++) {
+static Matrix(double) la_get_square_diff(Matrix(double) a, Matrix(double) b,
+Matrix(double) x) { Matrix(double) rslt = m_new(double, m_width(b),
+m_height(b)); m_mul(a, x, rslt); for (size_t i = 0; i < m_length(x); i++) {
         rslt[i] = (rslt[i] - b[i]);
         rslt[i] *= rslt[i];
     }
@@ -20,25 +20,26 @@ static Matrix(double) la_get_square_diff(Matrix(double) a, Matrix(double) b, Mat
 }
 */
 
-static Matrix(double) la_get_square_diff_grad(Matrix(double) a, Matrix(double) b, Matrix(double) x) {
+static Matrix(double) la_get_square_diff_grad(
+    Matrix(double) a, Matrix(double) b, Matrix(double) x
+) {
     Matrix(double) diff = m_new(double, m_width(b), m_height(b));
-    //printf("%zu %zu x %zu %zu = %zu %zu\n", m_width(a), m_height(a), m_width(x), m_height(x), m_width(diff), m_height(diff));
+    //printf("%zu %zu x %zu %zu = %zu %zu\n", m_width(a), m_height(a),
+    //m_width(x), m_height(x), m_width(diff), m_height(diff));
     m_mul(a, x, diff);
     for (size_t i = 0; i < m_length(diff); i++)
         diff[i] = (diff[i] - b[i]);
-      
+
     Matrix(double) grad = m_new(double, m_width(x), m_height(x));
     for (size_t j = 0; j < m_width(x); j++) {
         for (size_t i = 0; i < m_height(x); i++) {
             double sum = 0;
             for (size_t ai = 0; ai < m_height(a); ai++)
-                sum += 2. *
-                    m_get2(a, i, ai) *
-                    m_get2(diff, j, ai);
+                sum += 2. * m_get2(a, i, ai) * m_get2(diff, j, ai);
             m_get2(grad, j, i) = sum;
         }
     }
-    
+
     m_destroy(diff);
     return grad;
 }
@@ -49,7 +50,9 @@ static Matrix(double) la_get_square_diff_grad(Matrix(double) a, Matrix(double) b
  *  \param b The b Matrix.
  *  \param x The x Matrix which will be overwritten with the result.
  */
-void la_solve_least_squares(Matrix(double) const a, Matrix(double) const b, Matrix(double) const x) {
+void la_solve_least_squares(
+    Matrix(double) const a, Matrix(double) const b, Matrix(double) const x
+) {
     for (size_t i = 0; i < m_length(x); i++)
         x[i] = 0;
 
@@ -59,7 +62,7 @@ void la_solve_least_squares(Matrix(double) const a, Matrix(double) const b, Matr
     m_fprint(x);
     printf("B:\n");
     m_fprint(b);
-    
+
     double learn_speed = LEARN_SPEED;
 
     bool found = false;
@@ -76,10 +79,10 @@ void la_solve_least_squares(Matrix(double) const a, Matrix(double) const b, Matr
 
         printf("X:\n");
         m_fprint(x);
-        
+
         Matrix(double) rslt = m_new(double, m_width(b), m_height(b));
         m_mul(a, x, rslt);
-        
+
         printf("Rslt:\n");
         m_fprint(rslt);
 
@@ -88,7 +91,7 @@ void la_solve_least_squares(Matrix(double) const a, Matrix(double) const b, Matr
             if (fabs(rslt[i] - b[i]) >= THRESHOLD)
                 found = false;
         }
-        
+
         m_destroy(rslt);
     }
 }

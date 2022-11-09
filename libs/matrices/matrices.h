@@ -158,16 +158,18 @@ bool m_eq(Matrix(void) a, Matrix(void) b);
 #define m_get2(m, x, y) (m)[m_width((m)) * (y) + (x)]
 
 /*! \brief Transposes the in matrix into the out matrix.
- *  
+ *
  *  \param in The 2D matrix to transpose.
- *  \param out The output of the transpose operation, its height and width must be equal respectively to the width and height of the in matrix.
+ *  \param out The output of the transpose operation, its height and width must
+ * be equal respectively to the width and height of the in matrix.
  */
 void m_transpose(Matrix(double) in, Matrix(double) out);
 
 /*! \brief Computes the hadamard product of two matrices.
  *
  *  \param[in] a The First Matrix.
- *  \param[in,out] out The second Matrix, also the destination of the computation.
+ *  \param[in,out] out The second Matrix, also the destination of the
+ * computation.
  */
 void m_hadamard_product(Matrix(double) a, Matrix(double) out);
 
