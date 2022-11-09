@@ -12,10 +12,18 @@
 #include "images.h"
 #include "vec.h"
 
+/*! \brief Gets the max distance from the center of the image.
+ *
+ * \param out_width width of the given image.
+ * \param out_height hight of the given image.
+ * \return the max distance r between the center of the image and the furtherest point.
+ */
 static float get_image_max_dist(int out_width, int out_height) {
     return sqrtf((float)(out_width * out_width + out_height * out_height)) /
            2.f;
 }
+
+
 
 void hough_acc_space_run_at(
     ImageView *in, ImageView *gradient_dir, ImageView *out, int x, int y
@@ -53,6 +61,9 @@ void hough_acc_space_run_at(
         );
     }
 }
+
+
+
 void hough_acc_space_run(
     ImageView *in, ImageView *gradient_dir, ImageView *out
 ) {
@@ -76,6 +87,8 @@ void hough_acc_space_run(
                 out, x, y, imgv_get_pixel_grayscale(out, x, y) / max_val
             );
 }
+
+
 void hough_acc_space_probabilistic_run(
     ImageView *in, ImageView *gradient_dir, ImageView *out, size_t m
 ) {
@@ -103,6 +116,15 @@ void hough_acc_space_probabilistic_run(
             );
 }
 
+/*! \brief gets the max value of the hough space
+ *
+ * \param[in] space the hough space.
+ * \param[out] max_x the x coordinate where the max value is.
+ * \param[out] max_y the y coordinate where the max value is.
+ * \param[out] max_value the max value.
+
+*/
+
 static void hough_get_image_max(
     ImageView *space, int *max_x, int *max_y, float *max_value
 ) {
@@ -122,6 +144,13 @@ static void hough_get_image_max(
     }
 }
 
+/*! \brief clears the pixels around the given pixel.
+ *
+ * \param space the hough space.
+ * \param x the x coordinate.
+ * \param y the y coordinate.
+
+*/
 static void hough_clear_pixel(ImageView *space, int x, int y) {
     for (int dy = -50; dy <= 50; dy++) {
         for (int dx = -20; dx <= 20; dx++) {
@@ -133,7 +162,15 @@ static void hough_clear_pixel(ImageView *space, int x, int y) {
         }
     }
 }
+/*! \brief gives the coordinates in the hough space with theta and r.
+ *
+ * \param space the hough space.
+ * \param image_max_dist the max r.
+ * \param x the x coordinate
+ * \param y the y coordinate.
+ * \return the computed line.
 
+*/
 static HoughLine
 hough_pixel_as_line(ImageView *space, float image_max_dist, int x, int y) {
     float dist = ((float)y / (float)(space->height - 1)) * image_max_dist * 2 -
@@ -145,6 +182,14 @@ hough_pixel_as_line(ImageView *space, float image_max_dist, int x, int y) {
         .theta = theta,
     };
 }
+/*! \brief extracts all lines from the hough space.
+ *
+ * \param space the hough space.
+ * \param target_output_width the width of the given image.
+ * \param target_output_height the height of the given image.
+ * \return the vec of the extracted lines.
+
+*/
 
 HoughLine *hough_extract_lines(
     ImageView *space, int target_output_width, int target_output_height
@@ -264,6 +309,8 @@ void hough_acc_space_draw_all_lines(ImageView *acc_space, ImageView *out) {
     }
 }
 
+
+
 static float hough_get_accurate_position_from_origin(HoughLine line) {
     if (line.theta < M_PI_4 || line.theta > 3.f * M_PI_4) {
         return line.r * copysignf(1.f, cosf(line.theta));
@@ -271,6 +318,12 @@ static float hough_get_accurate_position_from_origin(HoughLine line) {
     return line.r;
 }
 
+/*! \brief gives the most external lines.
+ *
+ * \param lines a vec of all the lines.
+ * \return a new vec of all the external lines.
+
+*/
 HoughLine *hough_extract_extermum_lines(HoughLine *lines) {
     const float angle_max_d = (float)M_PI_4;
 
