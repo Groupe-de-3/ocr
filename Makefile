@@ -80,6 +80,7 @@ $(guile (define-target "sudoku" \
 
 $(guile (define-target "ia" \
 	`(deps "matrices")\
+	`(source-dirs "libs/ia2")\
 ))
 
 $(guile (define-target "utils"))
