@@ -6,6 +6,8 @@ typedef struct {
     size_t layer_size;
     Matrix(double) m_bias;
     Matrix(double) m_weight;
+    Matrix(double) m_gradW;
+    Matrix(double) m_gradB;
     Matrix(double) last_output;
     Matrix(double) last_output_activated;
 } Layer;
