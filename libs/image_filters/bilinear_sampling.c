@@ -148,21 +148,17 @@ void bilinear_perspective_transmute(
     la_solve_least_squares(a, b, x);
 
     Matrix(double) m = m_new(double, 3, 3);
-    m_copy(
-        m,
-        (double[]){
-            1,
-            0,
-            0,
-            0,
-            2,
-            0,
-            0,
-            0,
-            1,
-        }
-    );
+    m_copy(m, (double[]){
+        1, 0, 0,
+        0, 2, 0,
+        0, 0, 1,
+    });
     memcpy(m, x, sizeof(double) * 8);
 
     bilinear_apply_matrix(from_img, to, m);
+
+    m_destroy(a);
+    m_destroy(b);
+    m_destroy(x);
+    m_destroy(m);
 }

@@ -148,6 +148,8 @@ static void mal_inverse_NbyN(Matrix(double) m) {
 
     mal_gauss_reduction(normal, m);
     mal_backward_propagation(normal, m);
+    
+    m_destroy(normal);
 }
 
 /*
@@ -238,9 +240,9 @@ void mal_inverse(Matrix(double) m) {
     size_t w = m_width(m);
     assert(w == m_height(m));
 
-    if (w == 2 && false)
+    if (w == 2)
         mal_inverse_2by2(m);
-    else if (w == 3 && false)
+    else if (w == 3)
         mal_inverse_3by3(m);
     else
         mal_inverse_NbyN(m);
