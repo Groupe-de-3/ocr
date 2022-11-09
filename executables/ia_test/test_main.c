@@ -27,15 +27,15 @@ int main() {
     //neural_network NN = ia_load("xor.txt");    
 
 
-    for (size_t i = 0; i < 50000; i++)
+    for (size_t i = 0; i < 500; i++)
     {
-        Learn(&NN, d, 0.3);
+        Learn(&NN, d, 0.1);
     }
 
     // start forward
     Launch(NN, d);
 
-    //ia_save(&NN, "neurla_network.txt");
+    ia_save(&NN, "neural_network.txt");
 
 
     // free the memory

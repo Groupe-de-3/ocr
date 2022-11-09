@@ -23,6 +23,8 @@ Matrix(double) CostFunction_derivative(Matrix(double) predictedOutputs, Matrix(d
     {
         cost_derivate[i] = CostDerivative(predictedOutputs[i], expectedOutputs[i]);
     }
+
+    return cost_derivate;
 }
 
 

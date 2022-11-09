@@ -95,17 +95,20 @@ double Aply_cost(neural_network *NN, DataPoint d)
     return Cost(outputs, d.expect);
 }
 
-Matrix(double) Learn_layer(neural_network NN, DataPoint datapoint)
+void Learn_layer(neural_network NN, DataPoint datapoint, double learnRate)
 {
 
-    Matrix(double) output = get_last_layer_gradient(NN.layers_[NN.layers_number-1], datapoint.expect, datapoint.input);
+    Matrix(double) output = get_last_layer_gradient(NN.layers_[NN.layers_number-1], datapoint.expect);
+    Print_array(NN.layers_[NN.layers_number-1].m_gradW);
+    ApplyGradients_layer(NN.layers_[NN.layers_number-1], learnRate);
+    printf("%zu     %zu\n", m_width(output), m_height(output));
 
-    for (size_t layer_ind = NN.layers_number - 2; layer_ind > 0; layer_ind++)
+    for (int layer_ind = NN.layers_number - 2; layer_ind > 0; layer_ind--)
     {
-        get_hidden_layer_gradient(NN.layers_[layer_ind], datapoint.expect, output);
+        output = get_hidden_layer_gradient(NN.layers_[layer_ind], output, NN.layers_[layer_ind +1].m_weight);
+        ApplyGradients_layer(NN.layers_[layer_ind], learnRate);
+        printf("%zu     %zu\n", m_width(output), m_height(output));
     }
-    
-
 }
 
 
@@ -114,9 +117,7 @@ void Learn(neural_network *NN, Data data, double learnRate)
     for (size_t data_ind = 0; data_ind < data.size; data_ind++)
     {
         DataPoint datapoint = data.data[data_ind];
-        double OriginalCost = Aply_cost(NN, datapoint);
-
-        Learn_layer(*NN, datapoint);
+        Learn_layer(*NN, datapoint, learnRate);
     }
 }
 

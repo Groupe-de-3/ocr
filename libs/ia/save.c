@@ -83,11 +83,13 @@ neural_network ia_load(char* file_name) // initialisation of the neural network 
         Layer Layer_;
         
         Layer_.layer_size = NN.layers_sizes[layer_ind+1]; // ini size of the layer
-
+        Layer_.m_gradB = m_new(double, Layer_.layer_size, 1);
         Layer_.m_bias = m_new(double, Layer_.layer_size, 1);
         Layer_.last_output = m_new(double, Layer_.layer_size, 1);
         Layer_.last_output_activated = m_new(double, Layer_.layer_size, 1);
         Layer_.m_weight = m_new(double, Layer_.layer_size, NN.layers_sizes[layer_ind]);
+        Layer_.m_gradW  = m_new(double, Layer_.layer_size, 1);
+        
         
         for (size_t i = 0; i < NN.layers_sizes[layer_ind]; i++) {
 
@@ -125,6 +127,9 @@ void ia_memory_free(neural_network *NN) // free the memory
         m_destroy(NN->layers_[i].m_weight);
         m_destroy(NN->layers_[i].last_output);
         m_destroy(NN->layers_[i].last_output_activated);
+        m_destroy(NN->layers_[i].m_gradB);
+        m_destroy(NN->layers_[i].m_gradW);
+
     }
 
     free(NN->layers_);
@@ -150,19 +155,20 @@ neural_network ia_init(size_t layers_number, size_t* layers_sizes)// initialisat
         Layer Layer_;
         
         Layer_.layer_size = layers_sizes[layer_ind + 1]; // ini size of the layer
-
         Layer_.m_bias = m_new(double, Layer_.layer_size, 1);
+        Layer_.m_gradB = m_new(double, Layer_.layer_size, 1);
         Layer_.last_output = m_new(double, Layer_.layer_size, 1);
         Layer_.last_output_activated = m_new(double, Layer_.layer_size, 1);
         Layer_.m_weight = m_new(double, Layer_.layer_size, layers_sizes[layer_ind]);
-
+        Layer_.m_gradW  = m_new(double, Layer_.layer_size, 1);
+        
         for (size_t i = 0; i < Layer_.layer_size; i++) {
 
-            m_get2(Layer_.m_bias, i, 0) = (double) (rand() / ((double)RAND_MAX)); // ini biais
+            m_get2(Layer_.m_bias, i, 0) = (double) (rand() / ((double)RAND_MAX) * 2 +1); // ini biais
             
             for (size_t j = 0; j < layers_sizes[layer_ind]; j++)
             {
-                m_get2(Layer_.m_weight, i, j) = (double) (rand() / ((double)RAND_MAX)); // ini weights
+                m_get2(Layer_.m_weight, i, j) = (double) (rand() / ((double)RAND_MAX) * 2 +1); // ini weights
             }
         }
         
