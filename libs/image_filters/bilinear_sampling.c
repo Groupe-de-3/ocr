@@ -7,6 +7,7 @@
 #include "point2d.h"
 #include "utils_math.h"
 #include "least_squares.h"
+#include "matrices_algebra.h"
 
 some_pixel_t bilinear_sample(ImageView *img, float x, float y) {
     // Image must be in a "float channel" format
@@ -71,14 +72,10 @@ void bilinear_apply_matrix(ImageView *from, ImageView *to, Matrix(double) m) {
     Matrix(double) mat_b = m_new(double, 3, 1);
     
     Matrix(double) inv = m_new(double, 3, 3);
-    Matrix(double) id  = m_new(double, 3, 3);
-    memset(id, 0, sizeof(double) * 9);
-    m_get2(id, 0, 0) = 1.;
-    m_get2(id, 1, 1) = 1.;
-    m_get2(id, 2, 2) = 1.;
-    la_solve_least_squares(m, id, inv);
+    m_copy(inv, m);
+    mal_inverse(inv);
 
-    printf("Inv:\n");
+    printf("InvB:\n");
     m_fprint(inv);
     
     for (int y = 0; y < to->height; y++) {
@@ -94,6 +91,7 @@ void bilinear_apply_matrix(ImageView *from, ImageView *to, Matrix(double) m) {
     
     m_destroy(mat_a);
     m_destroy(mat_b);
+    m_destroy(inv);
 }
 
 void bilinear_perspective_transmute(
@@ -157,11 +155,12 @@ void bilinear_perspective_transmute(
     la_solve_least_squares(a, b, x);
 
     Matrix(double) m = m_new(double, 3, 3);
-    /*memset(m, 0, sizeof(double) * 9);
-    m_get2(m, 0, 0) = 1.;
-    m_get2(m, 1, 1) = 1.;*/
+    m_copy(m, (double[]) {
+        1, 0, 0,
+        0, 2, 0,
+        0, 0, 1,
+    });
     memcpy(m, x, sizeof(double) * 8);
-    m_get2(m, 2, 2) = 1.;
 
     bilinear_apply_matrix(from_img, to, m);
 }

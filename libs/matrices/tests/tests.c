@@ -13,6 +13,7 @@ const char *test_functions[] = {
     "test_int_add2_transposed",
     "test_double_add2",
     "test_double_mul2",
+    "test_double_mul3",
     NULL};
 
 void test_basics(void) {
@@ -226,6 +227,45 @@ void test_double_mul2(void) {
     h_assert_double_eq(m_get2(out, 1, 0), 25278.4092, 0.0001);
     h_assert_double_eq(m_get2(out, 0, 1), 44694.2035, 0.0001);
     h_assert_double_eq(m_get2(out, 1, 1), 28322.9512, 0.0001);
+
+    m_destroy(a);
+    m_destroy(b);
+    m_destroy(out);
+}
+
+void test_double_mul3(void) {
+    Matrix(double) a = m_new(double, 3, 3);
+    // clang-format off
+    m_copy(a, (double[]){
+        1, 3, 1,
+        -23, 2, 1,
+        0.34, -3, 1,
+    });
+    // clang-format on
+
+    Matrix(double) b = m_new(double, 3, 3);
+    // clang-format off
+    m_copy(b, (double[]){
+        1, 10, -123,
+        0, 0.5, 0.12,
+        35., 0, 1,
+    });
+    // clang-format on
+
+    Matrix(double) out = m_new(double, 3, 3);
+
+    m_mul(a, b, out);
+    h_assert_double_eq(m_get2(out, 0, 0), 36., 0.001);
+    h_assert_double_eq(m_get2(out, 0, 1), 12., 0.001);
+    h_assert_double_eq(m_get2(out, 0, 2), 35.34, 0.001);
+
+    h_assert_double_eq(m_get2(out, 1, 0), 11.5, 0.001);
+    h_assert_double_eq(m_get2(out, 1, 1), -229, 0.001);
+    h_assert_double_eq(m_get2(out, 1, 2), 1.9, 0.001);
+
+    h_assert_double_eq(m_get2(out, 2, 0), -121.64, 0.001);
+    h_assert_double_eq(m_get2(out, 2, 1), 2830.24, 0.001);
+    h_assert_double_eq(m_get2(out, 2, 2), -41.18, 0.001);
 
     m_destroy(a);
     m_destroy(b);

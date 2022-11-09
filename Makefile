@@ -96,7 +96,7 @@ $(guile (define-target "image_filters" \
 ))
 
 $(guile (define-target "linear_algebra" \
-	`(deps "matrices") \
+	`(deps "matrices" "utils") \
 	`(enable-tests) \
 ))
 

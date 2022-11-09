@@ -6,6 +6,18 @@
 #include <string.h>
 #include "utils_mem.h"
 
+void utils_memswap(void *from, void *to, size_t length) {
+    char *fromb = (char*)from;
+    char *tob   = (char*)to;
+    for (size_t i = 0; i < length; i++) {
+        char temp = *fromb;
+        *fromb = *tob;
+        *tob = temp;
+        fromb++;
+        tob++;
+    }
+}
+
 void mal_gauss_reduction(Matrix(double) a, Matrix(double) b) {
     assert(m_width(a) == m_width(b));
     assert(m_height(a) == m_height(b));
@@ -14,38 +26,57 @@ void mal_gauss_reduction(Matrix(double) a, Matrix(double) b) {
     size_t pivot_y = 0;
     while (pivot_x < m_width(a) && pivot_y < m_height(a)) {
         size_t max_y = 0;
-        for (size_t y = 1; y < m_height(a); y++)
+        for (size_t y = pivot_y; y < m_height(a); y++)
             if (fabs(m_get2(a, pivot_x, y)) > fabs(m_get2(a, pivot_x, max_y)))
                 max_y = y;
+
         // Swaping the first row with the max row
-        if (max_y != 0) {
-            utils_memswap(&m_get2(a, 0, max_y), &m_get2(a, 0, 0), sizeof(double) * m_width(a));
-            utils_memswap(&m_get2(b, 0, max_y), &m_get2(b, 0, 0), sizeof(double) * m_width(b));
+        if (m_get2(a, pivot_x, max_y) == 0) {
+            pivot_x++;
+            continue;
         }
-        // For each row we try to make the pivot 0
-        for (size_t y = max_y+1; y < m_height(a); y++) {
-            double factor = m_get2(a, pivot_x, y) / m_get2(a, pivot_x, max_y);
+        
+        if (max_y != pivot_y) {
+            utils_memswap(&m_get2(a, 0, max_y), &m_get2(a, 0, pivot_y), sizeof(double) * m_width(a));
+            utils_memswap(&m_get2(b, 0, max_y), &m_get2(b, 0, pivot_y), sizeof(double) * m_width(b));
+        }
+
+        // For each row we try to make the pivot = 1
+        for (size_t y = pivot_y+1; y < m_height(a); y++) {
+            double factor = m_get2(a, pivot_x, y) / m_get2(a, pivot_x, pivot_y);
             m_get2(a, pivot_x, y) = 0.;
             for (size_t nx = pivot_x+1; nx < m_width(a); nx++)
-                m_get2(a, nx, y) -= m_get2(a, nx, max_y) * factor;
+                m_get2(a, nx, y) -= m_get2(a, nx, pivot_y) * factor;
             for (size_t nx = 0; nx < m_width(b); nx++)
-                m_get2(b, nx, y) -= m_get2(b, nx, max_y) * factor;
+                m_get2(b, nx, y) -= m_get2(b, nx, pivot_y) * factor;
         }
+
+        pivot_x++;
+        pivot_y++;
     }
+}
+
+void mal_backward_propagation(Matrix(double) a, Matrix(double) b) {
+    assert(m_width(a) == m_width(b));
+    assert(m_height(a) == m_height(b));
+    assert(m_width(a) == m_height(b));
+    size_t w = m_width(a);
+    size_t h = m_height(a);
     
-    for (size_t x = 0; x < m_width(a); x++) {
-        double f = m_get2(a, x, 0);
+    for (size_t npivot = 0; npivot < h; npivot++) {
+        size_t pivot = h - npivot - 1;
         
-        for (size_t dx = x; dx < m_width(a); dx++) {
-            m_get2();
+        // Normalize the row (0 and only one 1)
+        for (size_t x = 0; x < w; x++)
+            m_get2(b, x, pivot) /= m_get2(a, pivot, pivot);
+        m_get2(a, pivot, pivot) = 1.;
+        
+        // Set to zero the whole column
+        for (size_t y = 0; y < pivot; y++) {
+            for (size_t x = 0; x < w; x++)
+                m_get2(b, x, y) -= m_get2(a, pivot, y);
+            m_get2(a, pivot, y) = 0.;
         }
-    	DO I = N-1, 1, -1
-    	    S = Y(I)
-    	    DO J = N, I+1, -1
-    	        S = S - DPROD(U(I,J), X(J))
-            END DO
-            X(I) = S / U(I,I)		
-    	END DO
     }
 }
 
@@ -92,6 +123,21 @@ static void mal_inverse_3by3(Matrix(double) m) {
         b2 * det_1, e2 * det_1, h2 * det_1,
         c2 * det_1, f2 * det_1, i2 * det_1,
     }, sizeof(double) * 3*3);
+}
+
+static void mal_inverse_NbyN(Matrix(double) m) {
+    assert(m_width(m) == m_height(m));
+
+    Matrix(double) normal = m_new(double, m_width(m), m_height(m));
+    m_copy(normal, m);
+
+    // Setting m to identity matrix
+    memset(m, 0, sizeof(double) * m_length(m));
+    for (size_t i = 0; i < m_width(m); i++)
+        m_get2(m, i, i) = 1.;
+
+    mal_gauss_reduction(normal, m);
+    mal_backward_propagation(normal, m);
 }
 
 /*
