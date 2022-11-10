@@ -242,78 +242,9 @@ int main(int argc, char **argv) {
     bmp_save_to_path("hough-lines.bmp", &hough_lines_img);
     printf("    Done (%ldms)\n", timediff(start));
 
-    gettimeofday(&start, NULL);
-    printf("Extracting the individuel sudoku cells\n");
-    Image sudoku_corners_img =
-        img_new(resized.width, resized.height, resized.format);
-    ImageView sudoku_corners_img_view = imgv_default(&sudoku_corners_img);
-
-    imgv_copy(&resized_view, &sudoku_corners_img_view);
-
     ParsedSudokuResult parse_rslt = sudoku_parse_from_lines(
-        extrem_lines, sudoku_corners_img_view.width,
-        sudoku_corners_img_view.height
+        extrem_lines, resized_view.width, resized_view.height
     );
-    some_pixel_t line_colors = (some_pixel_t){
-        .format = PixelFormat_Rgb8,
-        .value  = {
-                   .rgb8 =
-                 (rgb8_pixel_t){
-                     .r = 255,
-                     .g = 0,
-                     .b = 0,
-                }, }
-    };
-    for (int d = -5; d <= 5; d++) {
-        {
-            ipoint2d_t corners[4] = {
-                parse_rslt.shape.a, parse_rslt.shape.b, parse_rslt.shape.c,
-                parse_rslt.shape.d};
-            for (int i = 0; i < 4; i++) {
-                ipoint2d_t corner = corners[i];
-                if (imgv_in_bound(
-                        &sudoku_corners_img_view, corner.x + d, corner.y
-                    ))
-                    imgv_set_pixel_some(
-                        &sudoku_corners_img_view, corner.x + d, corner.y,
-                        line_colors
-                    );
-                if (imgv_in_bound(
-                        &sudoku_corners_img_view, corner.x, corner.y + d
-                    ))
-                    imgv_set_pixel_some(
-                        &sudoku_corners_img_view, corner.x, corner.y + d,
-                        line_colors
-                    );
-            }
-        }
-
-        for (int j = 0; j < 9 * 9; j++) {
-            iquadrilateral_t cell       = parse_rslt.cells[j];
-            ipoint2d_t       corners[4] = {cell.a, cell.b, cell.c, cell.d};
-            for (int i = 0; i < 4; i++) {
-                ipoint2d_t corner = corners[i];
-                if (imgv_in_bound(
-                        &sudoku_corners_img_view, corner.x + d, corner.y
-                    ))
-                    imgv_set_pixel_some(
-                        &sudoku_corners_img_view, corner.x + d, corner.y,
-                        line_colors
-                    );
-                if (imgv_in_bound(
-                        &sudoku_corners_img_view, corner.x, corner.y + d
-                    ))
-                    imgv_set_pixel_some(
-                        &sudoku_corners_img_view, corner.x, corner.y + d,
-                        line_colors
-                    );
-            }
-        }
-    }
-
-    printf("    Saving edges to sudoku-corners.bmp\n");
-    bmp_save_to_path("sudoku-corners.bmp", &sudoku_corners_img);
-    printf("    Done (%ldms)\n", timediff(start));
 
     gettimeofday(&start, NULL);
     printf("Isolating the suodku\n");
@@ -350,7 +281,6 @@ int main(int argc, char **argv) {
     img_destroy(gradient_dir);
     img_destroy(edges);
     img_destroy(hough);
-    img_destroy(sudoku_corners_img);
     img_destroy(sudoku);
     return 0;
 }
