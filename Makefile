@@ -1,147 +1,134 @@
 .SECONDEXPANSION:
 MAKEFLAGS += -rR
 
-$(guile (load "make_internal/utils.scm"))
-
-# -------------------
-# TARGETS
-#
-# Targets are a bunch of C files compiled into either an executable, a dynamic
-# library or a static library. They can be depending on other targets, meaning
-# they can include their files, and reference functions defined in them.
-# -------------------
-#
-# Target example:
-# 
-# $(guile (define-target "example_library" \
-#      # If given, another target named __example_library_tests will also be
-#      # created. It will use as source folder, the one of the current target
-#      # to which is appended '/tests'. It will have as target-type 'dynlib'.
-#      # This also adds the 'ignore' option to the current target for the
-#      # tests folder(s).
-#     `(enable-tests)\         # Optional
-#
-#      # Specified what kind of artefact should be created by the target.
-#      # Optional, defaults to staticlib
-#      # Possible values are 'dynlib', 'staticlib' or 'executable'
-#     `(target-type "dynlib")\
-#
-#      # If set to true, the final artefact will have all its depedencies
-#      # linked into it. Making depedents of the target not needing to link
-#      # them. Automatically enabled if target-type is executable, but can be
-#      # overwritten.
-#      # Optional, default to #f (false)
-#      # If no value is given, it default to #t.
-#     `(link-in-deps #t)
-#
-#      # List of one of more folder in which source files should be looked for,
-#      # this also will be the include folder for this target and its depedents.
-#      # Optional, defaults to:
-#      #   If target-type is executable         -> executables/NAME
-#      #   Otherwise (for dynlib and staticlib) -> libs/NAME
-#      # Where NAME is the target's name given at the begigning.
-#     `(source-dirs "source/folder" "other/source/folder")
-#      
-#      # List of targets which this target will depend on. This has for effect
-#      # for any other target depending directly, or not, on this target, to
-#      # link these depedencies if link-in-deps is true.
-#      # Optional, defaults to an empty list.
-#     `(deps "dep-one" "dep-two")
-#      
-#     `(cflags --flag-one -flags)
-#     
-#      # Blob of files to ignore while looking for source files in the given
-#      # source-dirs.
-#      # Optional, default to nothing.
-#     `(ignore ignore/*/fil?)
-#
-#      # Only does something for executable targets. Gives the given arguments
-#      # to the executable when running using the run-PROFILE-TARGET make rules.
-#      # Optional, default to empty string.
-#     `(run-args "arg1 --arg2 arg3" "-arg4")
-# ))
-#
-
 # LIBRARIES
 
-$(guile (define-target "example_library" \
-	`(enable-tests)\
-))
+targets += example_library
 
-$(guile (define-target "matrices" \
-	`(enable-tests)\
-	`(deps "utils")\
-))
+example_library_name = example_library
+example_library_target_type = staticlib
+example_library_source_dirs += libs/example_library
+example_library_depedencies = utils
 
-$(guile (define-target "sudoku" \
-	`(deps "vec")\
-	`(enable-tests)\
-))
+targets += matrices
 
-$(guile (define-target "ia" \
-	`(deps "matrices")\
-	`(source-dirs "libs/ia2")\
-))
+matrices_name = matrices
+matrices_target_type = staticlib
+matrices_source_dirs += libs/matrices
+matrices_depedencies = utils
 
-$(guile (define-target "utils"))
+targets += sudoku
 
-$(guile (define-target "vec"))
+sudoku_name = sudoku
+sudoku_target_type = staticlib
+sudoku_source_dirs += libs/sudoku
+sudoku_depedencies = vec
 
-$(guile (define-target "images" \
-	`(deps "utils")\
-))
+targets += ia
 
-$(guile (define-target "image_filters" \
-	`(deps "images" "matrices" "vec" "linear_algebra")\
-))
+ia_name = ia
+ia_target_type = staticlib
+ia_source_dirs += libs/ia2
+ia_depedencies = matrices
 
-$(guile (define-target "linear_algebra" \
-	`(deps "matrices" "utils") \
-	`(enable-tests) \
-))
+targets += utils
 
-$(guile (define-target "test_lib" \
-	`(source-dirs "tests/lib")\
-))
+utils_name = utils
+utils_target_type = staticlib
+utils_source_dirs += libs/utils
+
+targets += vec
+
+vec_name = vec
+vec_target_type = staticlib
+vec_source_dirs += libs/vec
+
+targets += images
+
+images_name = images
+images_target_type = staticlib
+images_source_dirs += libs/images
+images_depedencies = utils
+
+targets += image_filters
+
+image_filters_name = image_filters
+image_filters_target_type = staticlib
+image_filters_source_dirs += libs/image_filters
+image_filters_depedencies = images matrices vec linear_algebra
+
+targets += linear_algebra
+
+linear_algebra_name = linear_algebra
+linear_algebra_target_type = staticlib
+linear_algebra_source_dirs += libs/linear_algebra
+linear_algebra_depedencies = matrices utils
+
+targets += test_lib
+
+test_lib_name = test_lib
+test_lib_target_type = staticlib
+test_lib_source_dirs += tests/lib
 
 # EXECUTABLES
 
-$(guile (define-target "example_executable"\
-	`(target-type "executable")\
-	`(deps "example_library")\
-))
+targets += example_executable
 
-$(guile (define-target "tests"\
-	`(run-args "$$(patsubst %,lib%.so,$$(test_targets))")\
-	`(deps "test_lib")\
-	`(target-type "executable")\
-	`(source-dirs "tests/runner")\
-))
+example_executable_name = example_executable
+example_executable_target_type = executable
+example_executable_link_in_deps = true
+example_executable_source_dirs += executables/example_executable
+example_executable_depedencies = example_library
 
-$(guile (define-target "matrix_tests"\
-	`(target-type "executable")\
-	`(deps "matrices")\
-))
+targets += tests
 
-$(guile (define-target "sudoku_tests"\
-	`(target-type "executable")\
-	`(deps "sudoku")\
-))
+tests_name = tests
+tests_target_type = executable
+tests_link_in_deps = true
+tests_source_dirs += tests/runner
+tests_depedencies = test_lib
+tests_run_arguments = $(patsubst %,lib%.so,$(test_targets))
 
-$(guile (define-target "images_tests"\
-	`(target-type "executable")\
-	`(deps "images" "image_filters")\
-))
+targets += matrix_tests
 
-$(guile (define-target "ia_test"\
-	`(target-type "executable")\
-	`(deps "ia" "matrices")\
-))
+matrix_tests_name = matrix_tests
+matrix_tests_target_type = executable
+matrix_tests_link_in_deps = true
+matrix_tests_source_dirs += executables/matrix_tests
+matrix_tests_depedencies = matrices
 
-$(guile (define-target "least_squares_tests"\
-	`(target-type "executable")\
-	`(deps "linear_algebra")\
-))
+targets += sudoku_tests
+
+sudoku_tests_name = sudoku_tests
+sudoku_tests_target_type = executable
+sudoku_tests_link_in_deps = true
+sudoku_tests_source_dirs += executables/sudoku_tests
+sudoku_tests_depedencies = sudoku
+
+targets += images_tests
+
+images_tests_name = images_tests
+images_tests_target_type = executable
+images_tests_link_in_deps = true
+images_tests_source_dirs += executables/images_tests
+images_tests_depedencies = images image_filters
+
+targets += ia_test
+
+ia_test_name = ia_test
+ia_test_target_type = executable
+ia_test_link_in_deps = true
+ia_test_source_dirs += executables/ia_test
+ia_test_depedencies = ia matrices
+
+targets += least_squares_tests
+
+least_squares_tests_name = least_squares_tests
+least_squares_link_in_deps = true
+least_squares_tests_target_type = executable
+least_squares_tests_source_dirs += executables/least_squares_tests
+least_squares_tests_depedencies = linear_algebra
+
 # -------------------
 # (Build) PROFILES
 #
