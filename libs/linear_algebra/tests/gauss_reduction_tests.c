@@ -3,11 +3,13 @@
 #include "matrices_algebra.h"
 #include "tests.h"
 
-void gauss_reduction_tests(void) {
+#define PRECISION 0.0000000001
+
+void gauss_reduction_test1(void) {
     Matrix(double) a = m_new(double, 3, 3);
     m_copy(a, (double[]){
-        1, 1, 0,
-        0, 1, 0,
+        1, 0, 0,
+        0, 2, 0,
         0, 0, 1,
     });
 
@@ -21,36 +23,18 @@ void gauss_reduction_tests(void) {
         0, 0, 1,
     });
 
-    printf("-_-Input:_-_-_-\n");
-    m_fprint(a);
-    printf("-_-_-_-_-_-_-_-_-_-\n");
-
     mal_gauss_reduction(a, b);
-
-    printf("\n_-_-_- Done reduction\n");
-
-    printf("A:\n");
-    m_fprint(a);
-    printf("B:\n");
-    m_fprint(b);
-
-    printf("\n_-_-_-_-_-_-_-_-_-_-\n");
-
     mal_backward_propagation(a, b);
 
-    printf("A:\n");
-    m_fprint(a);
-    printf("B:\n");
-    m_fprint(b);
+    h_assert_double_eq(b[0], 1, PRECISION);
+    h_assert_double_eq(b[1], 0, PRECISION);
+    h_assert_double_eq(b[2], 0, PRECISION);
 
-    printf("\n\n_-_-_- Done\n");
+    h_assert_double_eq(b[3], 0, PRECISION);
+    h_assert_double_eq(b[4], 0.5, PRECISION);
+    h_assert_double_eq(b[5], 0, PRECISION);
 
-    printf("\n_-_Real Inverse-_-_-\n");
-
-    mal_inverse(bonjour);
-
-    m_fprint(bonjour);
-    printf("\n\n_-_-_- Done\n");
-
-    h_assert(false);
+    h_assert_double_eq(b[6], 0, PRECISION);
+    h_assert_double_eq(b[7], 0, PRECISION);
+    h_assert_double_eq(b[8], 1, PRECISION);
 }
