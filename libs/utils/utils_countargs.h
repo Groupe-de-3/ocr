@@ -23,5 +23,5 @@
  */
 #define utils_countargs(...)                                    \
     utils_countargs_helper(                                     \
-        __VA_ARGS__ __VA_OPT__(, ) 9, 8, 7, 6, 5, 4, 3, 2, 1, 0 \
+        __VA_ARGS__, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0 \
     )
