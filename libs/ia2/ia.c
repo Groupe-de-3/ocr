@@ -34,7 +34,7 @@ void Print_array(Matrix(double) m) // print matrix
     printf("-------------\n\n");
 }
 
-size_t array_max(Matrix(double) m) // search index of max element in Matrix
+size_t array_max_ind(Matrix(double) m) // search index of max element in Matrix
 {
     size_t ind = 0;
     double max = 0;
@@ -50,13 +50,23 @@ size_t array_max(Matrix(double) m) // search index of max element in Matrix
     return ind;
 }
 
+double array_max_val(Matrix(double) m) // search index of max element in Matrix
+{
+    double max = 0;
+    for (size_t i = 0; i < m_length(m); i++)
+    {
+        if (max < m[i])
+            max = m[i];
+    }
+    return max;
+}
+
 size_t Get_result(Matrix(double) output)
 {
-    size_t ind = array_max(output);
+    size_t ind = array_max_ind(output);
+    double val = array_max_val(output);
 
-    printf("result : %zu\n", ind); // print result
-    Print_array(output);
-
+    printf("result : %zu with %f %% \n", ind, val); // print result
     m_destroy(output);
 
     return ind;

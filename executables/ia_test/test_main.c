@@ -64,7 +64,7 @@ void input_user(neural_network NN)
     char *output = malloc(sizeof(char) * 10);
     while (output[0] != 'q')
     {
-        printf("Commande : ");
+        printf("Command : ");
 
         scanf("%s", output);
         printf("\n");
@@ -104,7 +104,7 @@ void input_user(neural_network NN)
                 break;
             
             default:
-                printf("only comand are: \n q : quit\n t : train\n l : learn\n L : load\n s : save\n\n");
+                printf("Only commands are: \n q : quit\n t : train\n l : learn\n L : load\n s : save\n\n");
                 break;
         }
     }
