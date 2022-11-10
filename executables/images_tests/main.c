@@ -128,7 +128,7 @@ int main(int argc, char **argv) {
     blur_view.wraping_mode = WrappingMode_Clamp;
 
     // Executing blur
-    gaussian_blur_run(&resized_view, &blur_view, 1.f);
+    gaussian_blur_run(&resized_view, &blur_view, 2.f);
 
     printf("    Saving blur to blured.bmp\n");
     // Saving blur
@@ -173,10 +173,10 @@ int main(int argc, char **argv) {
         img_new(resized.width, resized.height, PixelFormat_GrayScale);
     ImageView edges_mask_view    = imgv_default(&edges_mask);
     edges_mask_view.wraping_mode = WrappingMode_Clamp;
-    box_blur_run(&edges_view, &edges_mask_view, 9);
+    box_blur_run(&edges_view, &edges_mask_view, 11);
     printf("    Saving step one to edges-mask1.bmp\n");
     bmp_save_to_path("edges-mask1.bmp", &edges_mask);
-    global_threshold_run(&edges_mask_view, 0.1f);
+    global_threshold_run(&edges_mask_view, 0.09f);
     printf("    Saving step two to edges-mask2.bmp\n");
     bmp_save_to_path("edges-mask2.bmp", &edges_mask);
     blood_fill_largest_blob(&edges_mask_view);
