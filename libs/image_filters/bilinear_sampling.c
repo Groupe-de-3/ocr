@@ -75,9 +75,6 @@ void bilinear_apply_matrix(ImageView *from, ImageView *to, Matrix(double) m) {
     m_copy(inv, m);
     mal_inverse(inv);
 
-    printf("InvB:\n");
-    m_fprint(inv);
-
     for (int y = 0; y < to->height; y++) {
         for (int x = 0; x < to->width; x++) {
             m_copy(mat_a, (double[]){(double)x, (double)y, 1.});
@@ -100,17 +97,6 @@ void bilinear_perspective_transmute(
     ImageView *from_img, fquadrilateral_t from_shape, ImageView *to,
     fquadrilateral_t to_shape
 ) {
-    printf(
-        "[(%f, %f), (%f, %f), (%f, %f), (%f, %f)]\n", from_shape.a.x,
-        from_shape.a.y, from_shape.b.x, from_shape.b.y, from_shape.c.x,
-        from_shape.c.y, from_shape.d.x, from_shape.d.y
-    );
-    printf(
-        "[(%f, %f), (%f, %f), (%f, %f), (%f, %f)]\n", to_shape.a.x,
-        to_shape.a.y, to_shape.b.x, to_shape.b.y, to_shape.c.x, to_shape.c.y,
-        to_shape.d.x, to_shape.d.y
-    );
-
     Matrix(double) a = m_new(double, 8, 8);
     Matrix(double) b = m_new(double, 1, 8);
 
@@ -148,17 +134,17 @@ void bilinear_perspective_transmute(
     la_solve_least_squares(a, b, x);
 
     Matrix(double) m = m_new(double, 3, 3);
-    m_copy(m, (double[]){
-        1, 0, 0,
-        0, 2, 0,
-        0, 0, 1,
-    });
     memcpy(m, x, sizeof(double) * 8);
+    m_get2(m, 2, 2) = 1;
+    
+    Matrix(double) mt = m_new(double, 3, 3);
+    m_transpose(m, mt);
 
-    bilinear_apply_matrix(from_img, to, m);
+    bilinear_apply_matrix(from_img, to, mt);
 
     m_destroy(a);
     m_destroy(b);
     m_destroy(x);
     m_destroy(m);
+    m_destroy(mt);
 }

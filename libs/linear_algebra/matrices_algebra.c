@@ -26,9 +26,10 @@ void mal_gauss_reduction(Matrix(double) a, Matrix(double) b) {
     size_t pivot_x = 0;
     size_t pivot_y = 0;
     while (pivot_x < m_width(a) && pivot_y < m_height(a)) {
+        /*
         size_t max_y = 0;
         for (size_t y = pivot_y; y < m_height(a); y++)
-            if (fabs(m_get2(a, pivot_x, y)) > fabs(m_get2(a, pivot_x, max_y)))
+            if (m_get2(a, pivot_x, y) > m_get2(a, pivot_x, max_y))
                 max_y = y;
 
         // Swaping the first row with the max row
@@ -36,7 +37,7 @@ void mal_gauss_reduction(Matrix(double) a, Matrix(double) b) {
             pivot_x++;
             continue;
         }
-
+        
         if (max_y != pivot_y) {
             utils_memswap(
                 &m_get2(a, 0, max_y), &m_get2(a, 0, pivot_y),
@@ -47,6 +48,7 @@ void mal_gauss_reduction(Matrix(double) a, Matrix(double) b) {
                 sizeof(double) * m_width(b)
             );
         }
+        */
 
         // For each row we try to make the pivot = 1
         for (size_t y = pivot_y + 1; y < m_height(a); y++) {
@@ -61,6 +63,7 @@ void mal_gauss_reduction(Matrix(double) a, Matrix(double) b) {
         pivot_x++;
         pivot_y++;
     }
+
 }
 
 void mal_backward_propagation(Matrix(double) a, Matrix(double) b) {
@@ -81,7 +84,7 @@ void mal_backward_propagation(Matrix(double) a, Matrix(double) b) {
         // Set to zero the whole column
         for (size_t y = 0; y < pivot; y++) {
             for (size_t x = 0; x < w; x++)
-                m_get2(b, x, y) -= m_get2(a, pivot, y);
+                m_get2(b, x, y) -= m_get2(b, x, pivot) * m_get2(a, pivot, y);
             m_get2(a, pivot, y) = 0.;
         }
     }
@@ -145,7 +148,7 @@ static void mal_inverse_NbyN(Matrix(double) m) {
     memset(m, 0, sizeof(double) * m_length(m));
     for (size_t i = 0; i < m_width(m); i++)
         m_get2(m, i, i) = 1.;
-
+    
     mal_gauss_reduction(normal, m);
     mal_backward_propagation(normal, m);
     
