@@ -34,6 +34,8 @@ M=)
 	$($(target)_source_dirs) \
 )
 
+¤: build-$(DEFAULT_PROFILE)-¤
+
 format-¤:
 	clang-format -i --style=file $(¤_source_files) $(¤_header_files)
-.PHONY: format-¤
+.PHONY: ¤ format-¤

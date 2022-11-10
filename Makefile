@@ -179,9 +179,10 @@ release_cflags = $(default_cflags) -Ofast $(disable_asserts_cflags)
 # `all` will use the release profile by default, but can use debug if the
 # env variable `MODE` is set to debug.
 ifeq ($(MODE), debug)
-all: all-debug
+DEFAULT_PROFILE=debug
 else
 MODE=release
+DEFAULT_PROFILE=release
 all: all-release
 endif
 
@@ -198,6 +199,8 @@ format: $(addprefix format-,$(targets))
 dev: run-debug-xor_nn
 
 $(addprefix all-tests-,$(profiles)): all-tests-%: $(addprefix build-%-,$(test_targets))
+
+all: all-$(DEFAULT_PROFILE)
 
 doc:
 	mkdir -p build/doc
