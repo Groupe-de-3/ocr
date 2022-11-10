@@ -2,7 +2,7 @@
 #include "matrices.h"
 #include <stdio.h>
 
-Data data_init(size_t size)
+Data data_init(size_t size) //ini of the data
 {
     Data d;
     d.data = malloc(size * sizeof(DataPoint));
@@ -11,7 +11,7 @@ Data data_init(size_t size)
 }
 
 
-DataPoint To_dataPoint(double *input, double *expect, size_t size)
+DataPoint To_dataPoint(double *input, double *expect, size_t size) // create a datapoint
 {
 
     Matrix(double) m_input = m_new(double, size, 1);
@@ -30,22 +30,18 @@ DataPoint To_dataPoint(double *input, double *expect, size_t size)
     
 }
 
-void To_dataPoints(Data d, double **input, double **expect, size_t size)
-{
-    for (size_t i = 0; i < d.size; i++)
-        d.data[i] = To_dataPoint(input[i], expect[i], size);
-    
-}
 
-void datapoint_Destroy(DataPoint d)
+void datapoint_Destroy(DataPoint d) // free datapoint
 {
     m_destroy(d.expect);
-    //m_destroy(d.input);
+    m_destroy(d.input);
 }
 
-void data_Destroy(Data d)
+void data_Destroy(Data d) // destroy data
 {
+    printf("test %zu", d.size);
     for (size_t i = 0; i < d.size; i++)
         datapoint_Destroy(d.data[i]);
-    free(d.data);
+    //free(d.data);
+    
 }

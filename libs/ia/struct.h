@@ -28,4 +28,3 @@ typedef struct {
     DataPoint *data;
     size_t size;
 } Data;
-

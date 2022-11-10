@@ -16,7 +16,7 @@
 //---------------
 
 
-Matrix(double) CalculateOutputs_NN(Matrix(double) input, neural_network NN)
+Matrix(double) CalculateOutputs_NN(Matrix(double) input, neural_network NN) 
 {
     for (size_t i = 0; i < NN.layers_number; i++)
         input = CalculateOutputs_Layer(NN.layers_[i], input, (i == NN.layers_number-1));
@@ -33,7 +33,7 @@ void Print_array(Matrix(double) m) // print matrix
     printf("-------------\n\n");
 }
 
-size_t array_max(Matrix(double) m) // search index of max element in Matrix
+size_t array_max_ind(Matrix(double) m) // search index of max element in Matrix
 {
     size_t ind = 0;
     double max = 0;
@@ -49,28 +49,38 @@ size_t array_max(Matrix(double) m) // search index of max element in Matrix
     return ind;
 }
 
+double array_max_val(Matrix(double) m) // search index of max element in Matrix
+{
+    double max = 0;
+    for (size_t i = 0; i < m_length(m); i++)
+    {
+        if (max < m[i])
+            max = m[i];
+    }
+    return max;
+}
+
 size_t Get_result(Matrix(double) output)
 {
-    size_t ind = array_max(output);
+    size_t ind = array_max_ind(output);
+    double val = array_max_val(output);
 
-    printf("result : %zu\n", ind); // print result
-    Print_array(output);
-
+    printf("result : %zu with %d %% \n", ind, val); // print result
     m_destroy(output);
 
     return ind;
 }
 
 // Run the inputs through the network and return the output
-Matrix(double) Classify(neural_network NN, DataPoint datapoint)
+Matrix(double) Classify(neural_network NN, Matrix(double) input)
 {
     printf("inputs :\n"); //print input
-    Print_array(datapoint.input);
+    Print_array(input);
 
-    return CalculateOutputs_NN(datapoint.input, NN); // launch forward
+    return CalculateOutputs_NN(input, NN); // launch forward
 }
 
-void Launch(neural_network NN, Data d)
+void Launch(neural_network NN, Data d) // Start the IA
 {
     for (size_t i = 0; i < d.size; i++)
     {
@@ -112,7 +122,7 @@ void Learn_layer(neural_network NN, DataPoint datapoint, double learnRate)
 }
 
 
-void Learn(neural_network *NN, Data data, double learnRate)
+void Learn(neural_network *NN, Data data, double learnRate) // Start the learning
 {
     for (size_t data_ind = 0; data_ind < data.size; data_ind++)
     {
