@@ -39,6 +39,9 @@
         ((eq? (car option) 'run-args)
             (gmk-eval (string-append name"_run_arguments += " (string-join (cdr option) " ")))
         )
+        ((eq? (car option) 'pkgs)
+            (gmk-eval (string-append name"_pkgs += " (string-join (cdr option) " ")))
+        )
         (else
             (error "Invalid target option" (symbol->string (car option)))
         )

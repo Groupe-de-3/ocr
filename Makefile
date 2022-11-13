@@ -100,6 +100,10 @@ $(guile (define-target "linear_algebra" \
 	`(enable-tests) \
 ))
 
+$(guile (define-target "gui" \
+	`(pkgs "x11")\
+))
+
 $(guile (define-target "test_lib" \
 	`(source-dirs "tests/lib")\
 ))
@@ -142,6 +146,12 @@ $(guile (define-target "least_squares_tests"\
 	`(target-type "executable")\
 	`(deps "linear_algebra")\
 ))
+
+$(guile (define-target "gui_tests"\
+	`(target-type "executable")\
+	`(deps "gui")\
+))
+
 # -------------------
 # (Build) PROFILES
 #
