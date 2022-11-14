@@ -100,7 +100,7 @@ $(guile (define-target "linear_algebra" \
 	`(enable-tests) \
 ))
 
-$(guile (define-target "gui" \
+$(guile (define-target "doug" \
 	`(pkgs "xcb" "xcb-icccm")\
 ))
 
@@ -149,7 +149,7 @@ $(guile (define-target "least_squares_tests"\
 
 $(guile (define-target "gui_tests"\
 	`(target-type "executable")\
-	`(deps "gui")\
+	`(deps "doug")\
 ))
 
 # -------------------
