@@ -101,7 +101,7 @@ $(guile (define-target "linear_algebra" \
 ))
 
 $(guile (define-target "gui" \
-	`(pkgs "x11")\
+	`(pkgs "xcb" "xcb-icccm")\
 ))
 
 $(guile (define-target "test_lib" \
