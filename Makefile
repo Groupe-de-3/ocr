@@ -101,6 +101,7 @@ $(guile (define-target "linear_algebra" \
 ))
 
 $(guile (define-target "doug" \
+	`(deps "linear_algebra" "vec")\
 	`(pkgs "xcb" "xcb-icccm")\
 ))
 
