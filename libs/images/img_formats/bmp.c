@@ -28,7 +28,7 @@ enum BmpLoadResult bmp_load_file(
     uint32_t image_data_offset = readu32(file);
     uint32_t header_size       = readu32(file);
 
-    if (header_size < 40) {
+    if (header_size < 40 || header_size == 64) {
         printf(
             "Could not decode bmp: Unsuported header size (%d)\n", header_size
         );
