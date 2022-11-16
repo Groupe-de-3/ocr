@@ -2,6 +2,7 @@
     ; Set to true of the option source-dirs is present at least once
     (define has_source_dirs #f)
     (define has_enable_tests #f)
+    (define has_disable_deps_include #f)
     (define target_type "staticlib")
     (define link_in_deps 'default)
 
@@ -23,6 +24,9 @@
         ((eq? (car option) 'source-dirs) (begin
             (gmk-eval (string-append name"_source_dirs += " (string-join (cdr option) " ")))
             (set! has_source_dirs #t)
+        ))
+        ((eq? (car option) 'disable-deps-include) (begin
+            (set! has_disable_deps_include #t)
         ))
         ((eq? (car option) 'deps)
             (gmk-eval (string-append name"_depedencies += " (string-join (cdr option) " ")))
@@ -57,6 +61,10 @@
 
     (if link_in_deps
         (gmk-eval (string-append name"_link_in_deps = true")))
+
+    (if (not has_disable_deps_include)
+        (gmk-eval (string-append name"_include_dirs = $("name"_source_dirs)"))
+    )
 
     (if (not has_source_dirs)
         (cond

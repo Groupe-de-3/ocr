@@ -100,9 +100,18 @@ $(guile (define-target "linear_algebra" \
 	`(enable-tests) \
 ))
 
-$(guile (define-target "doug" \
-	`(deps "linear_algebra" "vec")\
+$(guile (define-target "doug_backend" \
+	`(deps "linear_algebra") \
+))
+
+$(guile (define-target "doug_backend_x11" \
+	`(disable-deps-include) \
+	`(deps "doug_backend" "vec")\
 	`(pkgs "xcb" "xcb-icccm")\
+))
+
+$(guile (define-target "doug" \
+	`(deps "linear_algebra" "doug_backend_x11" "doug_backend")\
 ))
 
 $(guile (define-target "test_lib" \

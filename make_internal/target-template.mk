@@ -30,12 +30,11 @@ M=)
 	$($(target)_rec_depedencies) \
 )
 
-¤_rec_pkgs += $(sort $(¤_pkgs) $(foreach target,$(¤_depedencies), \
+¤_rec_pkgs = $(foreach target,$(sort $(¤_rec_depedencies)), \
 	$($(target)_pkgs) \
-))
-
+)
 ¤_depedencies_include_dirs = $(foreach target,$(sort $(¤_rec_depedencies)), \
-	$($(target)_source_dirs) \
+	$($(target)_include_dirs) \
 )
 
 ¤: build-$(DEFAULT_PROFILE)-¤

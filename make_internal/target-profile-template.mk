@@ -6,7 +6,7 @@
 §_¤_dep_files = $(patsubst %.c,$(§_¤_obj_dir)/%.d,$(¤_source_files))
 
 §_¤_cflags = $(addprefix -I ,$(¤_depedencies_include_dirs) $(¤_source_dirs)) $(§_cflags) $(¤_cflags)
-ifneq ($(¤_rec_pkgs),"")
+ifneq ($(strip $(¤_rec_pkgs)),)
 §_¤_cflags += $(shell pkg-config --cflags --libs $(¤_rec_pkgs))
 endif
 

@@ -20,6 +20,10 @@ DougBackendWindow *doug_backend_window_new(
     DougBackendConnection *connection,
     DougWindowProperties properties
 );
+void doug_backend_window_destroy(
+    DougBackendWindow *window,
+    _Bool disconnect_if_possible
+);
 
 DougBackendConnection *doug_backend_window_get_connection(
     DougBackendWindow *window
@@ -33,5 +37,3 @@ void doug_backend_window_set_size(DougBackendWindow *window, ipoint2d_t size);
 void doug_backend_window_set_min_size(DougBackendWindow *window, ipoint2d_t min_size);
 void doug_backend_window_set_max_size(DougBackendWindow *window, ipoint2d_t min_size);
 void doug_backend_window_set_title(DougBackendWindow *window, const char *title);
-
-void doug_backend_window_destroy(DougBackendWindow *window);

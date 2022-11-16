@@ -1,4 +1,4 @@
-#include "../backend.h"
+#include "doug_backend.h"
 #include "utils.h"
 #include "xcccm.h"
 
@@ -32,7 +32,7 @@ DougBackendConnection *doug_backend_connect() {
 }
 void doug_backend_disconnect(DougBackendConnection *conn) {
     for (size_t i = 0; i < vec_size(conn->windows_vec); i++)
-        doug_backend_window_destroy(conn->windows_vec[i]);
+        doug_backend_window_destroy(conn->windows_vec[i], false);
 
     xcb_disconnect(conn->conn);
     vec_destroy(conn->windows_vec);
@@ -101,7 +101,10 @@ DougBackendWindow *doug_backend_window_new(
     return dbw;
 }
 
-void doug_backend_window_destroy(DougBackendWindow *window) {
+void doug_backend_window_destroy(
+    DougBackendWindow *window,
+    bool disconnect_if_possible
+) {
     // Find and remove this window from the connection's list
     for (size_t i = 0; i < vec_size(window->conn->windows_vec); i++) {
         if (window->conn->windows_vec[i] != window)
@@ -109,8 +112,11 @@ void doug_backend_window_destroy(DougBackendWindow *window) {
         vec_swap_remove(window->conn->windows_vec, i);
         break;
     }
-
     xcb_destroy_window(window->conn->conn, window->window);
+    
+    if (disconnect_if_possible && vec_size(window->conn->windows_vec) == 0)
+        doug_backend_disconnect(window->conn);
+
     free(window);
 }
 
