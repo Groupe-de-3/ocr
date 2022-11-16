@@ -1,9 +1,9 @@
 #include "utils.h"
 
+#include <err.h>
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
-#include <err.h>
 
 xcb_atom_t doug_natom(xcb_connection_t *conn, const char *at) {
     xcb_generic_error_t     *err;
@@ -16,4 +16,3 @@ xcb_atom_t doug_natom(xcb_connection_t *conn, const char *at) {
     free(reply);
     return atom;
 }
-

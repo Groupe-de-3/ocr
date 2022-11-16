@@ -37,7 +37,7 @@ void mal_gauss_reduction(Matrix(double) a, Matrix(double) b) {
             pivot_x++;
             continue;
         }
-        
+
         if (max_y != pivot_y) {
             utils_memswap(
                 &m_get2(a, 0, max_y), &m_get2(a, 0, pivot_y),
@@ -63,7 +63,6 @@ void mal_gauss_reduction(Matrix(double) a, Matrix(double) b) {
         pivot_x++;
         pivot_y++;
     }
-
 }
 
 void mal_backward_propagation(Matrix(double) a, Matrix(double) b) {
@@ -148,10 +147,10 @@ static void mal_inverse_NbyN(Matrix(double) m) {
     memset(m, 0, sizeof(double) * m_length(m));
     for (size_t i = 0; i < m_width(m); i++)
         m_get2(m, i, i) = 1.;
-    
+
     mal_gauss_reduction(normal, m);
     mal_backward_propagation(normal, m);
-    
+
     m_destroy(normal);
 }
 

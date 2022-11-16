@@ -21,7 +21,5 @@
  *  utils_countargs(a, b, 1, 12, 5 + t.T) // Expands to 5
  *  \endcode \endparblock
  */
-#define utils_countargs(...)                                    \
-    utils_countargs_helper(                                     \
-        __VA_ARGS__, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0 \
-    )
+#define utils_countargs(...) \
+    utils_countargs_helper(__VA_ARGS__, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0)

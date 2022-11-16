@@ -18,14 +18,14 @@ void la_solve_least_squares(
 ) {
     Matrix(double) at = m_new(double, m_width(a), m_height(a));
     m_transpose(a, at);
-    
+
     Matrix(double) at_inv = m_new(double, m_width(a), m_height(a));
     m_mul(at, a, at_inv);
     mal_inverse(at_inv);
-    
+
     Matrix(double) final_a = m_new(double, m_width(a), m_height(a));
     m_mul(at_inv, at, final_a);
-    
+
     m_mul(final_a, b, x);
 
     m_destroy(at);

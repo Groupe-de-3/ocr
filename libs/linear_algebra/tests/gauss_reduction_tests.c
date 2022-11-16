@@ -7,21 +7,39 @@
 
 void gauss_reduction_test1(void) {
     Matrix(double) a = m_new(double, 3, 3);
-    m_copy(a, (double[]){
-        1, 0, 0,
-        0, 2, 0,
-        0, 0, 1,
-    });
+    m_copy(
+        a,
+        (double[]){
+            1,
+            0,
+            0,
+            0,
+            2,
+            0,
+            0,
+            0,
+            1,
+        }
+    );
 
     Matrix(double) bonjour = m_new(double, 3, 3);
     m_copy(bonjour, a);
 
     Matrix(double) b = m_new(double, 3, 3);
-    m_copy(b, (double[]){
-        1, 0, 0,
-        0, 1, 0,
-        0, 0, 1,
-    });
+    m_copy(
+        b,
+        (double[]){
+            1,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0,
+            1,
+        }
+    );
 
     mal_gauss_reduction(a, b);
     mal_backward_propagation(a, b);

@@ -16,14 +16,13 @@
  *
  * \param out_width width of the given image.
  * \param out_height hight of the given image.
- * \return the max distance r between the center of the image and the furtherest point.
+ * \return the max distance r between the center of the image and the furtherest
+ * point.
  */
 static float get_image_max_dist(int out_width, int out_height) {
     return sqrtf((float)(out_width * out_width + out_height * out_height)) /
            2.f;
 }
-
-
 
 void hough_acc_space_run_at(
     ImageView *in, ImageView *gradient_dir, ImageView *out, int x, int y
@@ -62,8 +61,6 @@ void hough_acc_space_run_at(
     }
 }
 
-
-
 void hough_acc_space_run(
     ImageView *in, ImageView *gradient_dir, ImageView *out
 ) {
@@ -87,7 +84,6 @@ void hough_acc_space_run(
                 out, x, y, imgv_get_pixel_grayscale(out, x, y) / max_val
             );
 }
-
 
 void hough_acc_space_probabilistic_run(
     ImageView *in, ImageView *gradient_dir, ImageView *out, size_t m
@@ -308,8 +304,6 @@ void hough_acc_space_draw_all_lines(ImageView *acc_space, ImageView *out) {
         }
     }
 }
-
-
 
 static float hough_get_accurate_position_from_origin(HoughLine line) {
     if (line.theta < M_PI_4 || line.theta > 3.f * M_PI_4) {

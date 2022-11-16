@@ -136,7 +136,7 @@ void bilinear_perspective_transmute(
     Matrix(double) m = m_new(double, 3, 3);
     memcpy(m, x, sizeof(double) * 8);
     m_get2(m, 2, 2) = 1;
-    
+
     Matrix(double) mt = m_new(double, 3, 3);
     m_transpose(m, mt);
 
