@@ -95,23 +95,26 @@ $(guile (define-target "image_filters" \
 	`(deps "images" "matrices" "vec" "linear_algebra")\
 ))
 
-$(guile (define-target "linear_algebra" \
-	`(deps "matrices" "utils") \
-	`(enable-tests) \
+$(guile (define-target "linear_algebra"                                       \
+	`(deps "matrices" "utils")                                                \
+	`(enable-tests)                                                           \
 ))
 
-$(guile (define-target "doug_backend" \
-	`(deps "linear_algebra") \
+$(guile (define-target "doug_backend"                                         \
+	`(source-dirs "libs/doug/backend")                                        \
+	`(deps "linear_algebra")                                                  \
 ))
 
-$(guile (define-target "doug_backend_x11" \
-	`(disable-deps-include) \
-	`(deps "doug_backend" "vec")\
-	`(pkgs "xcb" "xcb-icccm")\
+$(guile (define-target "doug_backend_x11"                                     \
+	`(source-dirs "libs/doug/backend_x11")                                    \
+	`(disable-deps-include)                                                   \
+	`(deps "doug_backend" "vec")                                              \
+	`(pkgs "xcb" "xcb-icccm")                                                 \
 ))
 
-$(guile (define-target "doug" \
-	`(deps "linear_algebra" "doug_backend_x11" "doug_backend")\
+$(guile (define-target "doug"                                                 \
+	`(source-dirs "libs/doug/doug")                                           \
+	`(deps "linear_algebra" "doug_backend_x11" "doug_backend")                \
 ))
 
 $(guile (define-target "test_lib" \
