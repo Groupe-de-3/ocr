@@ -48,6 +48,7 @@
 
 /*! \brief Creates a new matrix, prefer using #m_new instead.
  *
+ *  For 2D matrices, the first dimension should be its height, and the second should be its width.
  *  Don't forget to call #m_destroy after usage!!!!
  *
  *  \param elem_size The size of a single matrix element in bytes.
@@ -151,8 +152,8 @@ bool m_eq(Matrix(void) a, Matrix(void) b);
  *  \endcode \endparblock
  *
  *  \param m The matrix to access.
- *  \param x The position in the first dimension.
- *  \param y The position in the second dimension.
+ *  \param x The position in the first dimension (the width).
+ *  \param y The position in the second dimension (the height).
  *  \return The value of the element at the given position.
  */
 #define m_get2(m, x, y) (m)[m_width((m)) * (y) + (x)]
