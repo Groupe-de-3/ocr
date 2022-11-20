@@ -3,12 +3,41 @@
 #include "matrices.h"
 
 typedef struct {
+    /*! \brief The number of neurons in the layer.
+     */
     size_t layer_size;
+    /*! \brief Column matrix of the biases of each neurons.
+     *
+     *  Its height should be equal to the number of neurons (#layer_size).
+     */
     Matrix(double) m_bias;
+    /*! \brief Matrix for the weights of each neurons.
+     *
+     *  Its height should be equal to the number of neurons (#layer_size).
+     *  Its width should be equal to the number of neurons in the previous layer.
+     */
     Matrix(double) m_weight;
+    /*! \brief Matrix of the gradients of the weights.
+     *
+     *  Initialized with zeros and accumulated during training.
+     *  Its size must be the same as #m_weight.
+     */
     Matrix(double) m_gradW;
+    /*! \brief Matrix of the gradients of the biases.
+     *
+     *  Initialized with zeros and accumulated during training.
+     *  Its size must be the same as #m_bias.
+     */
     Matrix(double) m_gradB;
+    /*! \brief Matrix containing the result of the last output before activation during training.
+     *
+     *  Its size must be the same as #m_bias.
+     */
     Matrix(double) last_output;
+    /*! \brief Matrix containing the previous prediction (after activation) during training.
+     *
+     *  Its size must be the same as #m_bias.
+     */
     Matrix(double) last_output_activated;
 } Layer;
 

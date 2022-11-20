@@ -32,6 +32,7 @@ void launch(neural_network NN)
 void train(neural_network NN, size_t nb_training)
 {
     //data
+    
     double inputs[4][2] = {
         {0, 0},
         {0, 1},
@@ -44,6 +45,13 @@ void train(neural_network NN, size_t nb_training)
         {0, 1},
         {1, 0}
     };
+    /*
+    double inputs[4][2] = {
+        {0, 0},
+    };
+    double expects[4][2] = {
+        {1, 0},
+    };*/
 
     Data d = data_init(4);
 
@@ -54,7 +62,10 @@ void train(neural_network NN, size_t nb_training)
     for (size_t i = 0; i < nb_training; i++)
     {
         Learn(&NN, d, 0.1);
+        Launch(NN, d);
     }
+
+    data_Destroy(d);
 
 }
 
@@ -94,6 +105,7 @@ void input_user(neural_network NN)
             case 'L':
                 printf("Name of the neural network to load? ");
                 scanf("%s", filename);
+                ia_memory_free(&NN);
                 NN = ia_load(filename); 
                 printf("Neural network have been load from the file %s\n", filename);
                 printf("\n");
@@ -115,9 +127,11 @@ void input_user(neural_network NN)
 
 
 int main() {
+
+    
     printf("%s", "Launch\n\n");    
-    size_t layers_number = 2;
-    size_t layers_sizes[] = {2,5,2};
+    size_t layers_number = 3;
+    size_t layers_sizes[] = {2,5,5,2};
 
     size_t *layers_sizes_ = malloc(sizeof(size_t) * (layers_number + 1));
     for (size_t i = 0; i < layers_number + 1; i++)
@@ -131,5 +145,7 @@ int main() {
     // free the memory
     ia_memory_free(&NN);
 
+
+    
     return 0;
 }

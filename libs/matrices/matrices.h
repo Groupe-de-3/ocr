@@ -281,10 +281,10 @@ void m_fmulf(Matrix(float) a, Matrix(float) b, Matrix(float) out);
 void m_iadd(Matrix(int) a, Matrix(int) out);
 /*! \brief Adds the given doubles matrices of together, see #m_add.
  *
- *  \param[in] a The first matrix.
  *  \param[out] out The matrix where to save the result.
+ *  \param[in] a The first matrix.
  */
-void m_fadd(Matrix(double) a, Matrix(double) out);
+void m_fadd(Matrix(double) out, Matrix(double) a);
 /*! \brief Adds the given floats matrices of together, see #m_add.
  *
  *  \param[in] a The first matrix.

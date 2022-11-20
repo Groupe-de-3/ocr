@@ -3,7 +3,7 @@
 
 Matrix(double) CalculateOutputs_NN(Matrix(double) input, neural_network NN);
 
-Matrix(double) Classify(neural_network NN, DataPoint datapoint);
+Matrix(double) Classify(neural_network NN, Matrix(double) input);
 
 double Cost(Matrix(double) outputs, Matrix(double) expects);
 

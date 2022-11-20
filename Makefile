@@ -28,7 +28,7 @@ targets += ia
 
 ia_name = ia
 ia_target_type = staticlib
-ia_source_dirs += libs/ia2
+ia_source_dirs += libs/ia
 ia_depedencies = matrices
 
 targets += utils

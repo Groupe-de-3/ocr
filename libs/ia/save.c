@@ -82,28 +82,27 @@ neural_network ia_load(char* file_name) // initialisation of the neural network 
         
         Layer Layer_;
         
-        Layer_.layer_size = NN.layers_sizes[layer_ind+1]; // ini size of the layer
-        Layer_.m_gradB = m_new(double, Layer_.layer_size, 1);
-        Layer_.m_bias = m_new(double, Layer_.layer_size, 1);
-        Layer_.last_output = m_new(double, Layer_.layer_size, 1);
-        Layer_.last_output_activated = m_new(double, Layer_.layer_size, 1);
-        Layer_.m_weight = m_new(double, Layer_.layer_size, NN.layers_sizes[layer_ind]);
-        Layer_.m_gradW  = m_new(double, Layer_.layer_size, 1);
-        
+        Layer_.layer_size = NN.layers_sizes[layer_ind + 1]; // ini size of the layer
+        Layer_.m_bias = m_new(double, 1, Layer_.layer_size);
+        Layer_.m_gradB = m_new(double, 1,  Layer_.layer_size);
+        Layer_.last_output = m_new(double, 1, Layer_.layer_size);
+        Layer_.last_output_activated = m_new(double, 1, Layer_.layer_size);
+        Layer_.m_weight = m_new(double, NN.layers_sizes[layer_ind], Layer_.layer_size);
+        Layer_.m_gradW  = m_new(double, 1, Layer_.layer_size);
         
         for (size_t i = 0; i < NN.layers_sizes[layer_ind]; i++) {
 
             for (size_t j = 0; j < Layer_.layer_size; j++)
             {
                 fgets(chaine, 15, fichier);
-                m_get2(Layer_.m_weight, j, i) = (double) atof(chaine); // ini weights
+                m_get2(Layer_.m_weight, i, j) = (double) atof(chaine); // ini weights
             }
         }
 
         for (size_t i = 0; i < Layer_.layer_size; i++) {
 
             fgets(chaine, 15, fichier); // biais
-            m_get2(Layer_.m_bias, i, 0) = (double) atof(chaine); // ini biais
+            m_get2(Layer_.m_bias, 0, i) = (double) atof(chaine); // ini biais
         }
 
         
@@ -155,20 +154,20 @@ neural_network ia_init(size_t layers_number, size_t* layers_sizes)// initialisat
         Layer Layer_;
         
         Layer_.layer_size = layers_sizes[layer_ind + 1]; // ini size of the layer
-        Layer_.m_bias = m_new(double, Layer_.layer_size, 1);
-        Layer_.m_gradB = m_new(double, Layer_.layer_size, 1);
-        Layer_.last_output = m_new(double, Layer_.layer_size, 1);
-        Layer_.last_output_activated = m_new(double, Layer_.layer_size, 1);
-        Layer_.m_weight = m_new(double, Layer_.layer_size, layers_sizes[layer_ind]);
-        Layer_.m_gradW  = m_new(double, Layer_.layer_size, 1);
+        Layer_.m_bias = m_new(double, 1, Layer_.layer_size);
+        Layer_.m_gradB = m_new(double, 1,  Layer_.layer_size);
+        Layer_.last_output = m_new(double, 1, Layer_.layer_size);
+        Layer_.last_output_activated = m_new(double, 1, Layer_.layer_size);
+        Layer_.m_weight = m_new(double, layers_sizes[layer_ind], Layer_.layer_size);
+        Layer_.m_gradW  = m_new(double, 1, Layer_.layer_size);
         
         for (size_t i = 0; i < Layer_.layer_size; i++) {
 
-            m_get2(Layer_.m_bias, i, 0) = (double) (rand() / ((double)RAND_MAX) * 2 +1); // ini biais
+            m_get2(Layer_.m_bias, 0, i) = (double) (rand() / ((double)RAND_MAX) * 2 +1); // ini biais
             
             for (size_t j = 0; j < layers_sizes[layer_ind]; j++)
             {
-                m_get2(Layer_.m_weight, i, j) = (double) (rand() / ((double)RAND_MAX) * 2 +1); // ini weights
+                m_get2(Layer_.m_weight, j, i) = (double) (rand() / ((double)RAND_MAX) * 2 +1); // ini weights
             }
         }
         

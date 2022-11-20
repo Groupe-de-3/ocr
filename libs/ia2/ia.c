@@ -65,9 +65,9 @@ size_t Get_result(Matrix(double) output)
 {
     size_t ind = array_max_ind(output);
     double val = array_max_val(output);
-
+    Print_array(output);
     printf("result : %zu with %f %% \n", ind, val); // print result
-    m_destroy(output);
+    //m_destroy(output);
 
     return ind;
 }
