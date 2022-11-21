@@ -14,6 +14,8 @@ const char *test_functions[] = {
     "test_double_add2",
     "test_double_mul2",
     "test_double_mul3",
+    "test_double_mulLinear",
+    "test_double_mulLinear2",
     NULL};
 
 void test_basics(void) {
@@ -267,6 +269,60 @@ void test_double_mul3(void) {
     h_assert_double_eq(m_get2(out, 2, 1), 2830.24, 0.001);
     h_assert_double_eq(m_get2(out, 2, 2), -41.18, 0.001);
 
+    m_destroy(a);
+    m_destroy(b);
+    m_destroy(out);
+}
+
+void test_double_mulLinear(void) {
+    Matrix(double) a = m_new(double, 3, 1);
+    // clang-format off
+    m_copy(a, (double[]){
+        1, -23, 0.34,
+    });
+    // clang-format on
+
+    Matrix(double) b = m_new(double, 1, 3);
+    // clang-format off
+    m_copy(b, (double[]){
+        1,
+        10,
+        -123,
+    });
+    // clang-format on
+
+    Matrix(double) out = m_new(double, 1, 1);
+
+    m_mul(a, b, out);
+    h_assert_double_eq(out[0], -270.82, 0.001);
+    m_destroy(a);
+    m_destroy(b);
+    m_destroy(out);
+}
+
+void test_double_mulLinear2(void) {
+    Matrix(double) a = m_new(double, 3, 3);
+    // clang-format off
+    m_copy(a, (double[]){
+        1, -23, 0.34,
+        1, -23, 0.34,
+        1, -23, 0.34,
+    });
+    // clang-format on
+
+    Matrix(double) b = m_new(double, 1, 3);
+    // clang-format off
+    m_copy(b, (double[]){
+        1,
+        10,
+        -123,
+    });
+    // clang-format on
+
+    Matrix(double) out = m_new(double, 1, 1);
+
+    m_mul(a, b, out);
+    h_assert_double_eq(out[0], -270.82, 0.001);
     m_destroy(a);
     m_destroy(b);
     m_destroy(out);
