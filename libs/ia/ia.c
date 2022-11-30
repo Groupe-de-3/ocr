@@ -109,14 +109,18 @@ double Aply_cost(neural_network *NN, DataPoint d)
 
 void Calcul_gradient_layer(neural_network NN, DataPoint datapoint)
 {
-    get_last_layer_gradientW(NN.layers_[NN.layers_number-1], datapoint.expect, NN.layers_[NN.layers_number-1].last_output_activated);
-    //get_last_layer_gradientB(NN.layers_[NN.layers_number-1], datapoint.expect);
-    
-    for (int layer_ind = (int) NN.layers_number - 2; layer_ind >= 0; layer_ind--)
+    Matrix(double) loss = get_loss_last_layer(NN.layers_[NN.layers_number-1], datapoint.expect);
+    get_hidden_layer_gradient(NN.layers_[NN.layers_number-1], NN.layers_[NN.layers_number-2].last_output_activated, loss);
+
+    for (int layer_ind = (int) NN.layers_number - 2; layer_ind > 0; layer_ind--)
     {
-        get_hidden_layer_gradientW(NN.layers_[layer_ind], NN.layers_[layer_ind+1].m_gradW, NN.layers_[layer_ind +1].m_weight);
-        //get_hidden_layer_gradientB(NN.layers_[layer_ind], NN.layers_[layer_ind+1].m_gradB, NN.layers_[layer_ind +1].m_bias);
+        printf("middle\n");
+        loss = get_loss(NN.layers_[layer_ind], NN.layers_[layer_ind+1]);
+        get_hidden_layer_gradient(NN.layers_[layer_ind], NN.layers_[layer_ind-1].last_output_activated, loss);
     }
+    
+    loss = get_loss(NN.layers_[0], NN.layers_[1]);
+    get_hidden_layer_gradient(NN.layers_[0], datapoint.input, loss);
 }
 
 void ApplyGradients_all_layer(neural_network NN, Matrix(double) *grad_W_train, Matrix(double) *grad_B_train, double learnRate)
@@ -130,7 +134,7 @@ void ApplyGradients_all_layer(neural_network NN, Matrix(double) *grad_W_train, M
             for (size_t j = 0; j < m_height(layer.m_weight); j++)
             {
                 //Print_array(grad_W_train[ind_layer]);
-                m_get2(layer.m_weight, i, j) -= m_get2(grad_W_train[ind_layer], 0, j) * learnRate;
+                m_get2(layer.m_weight, i, j) -= m_get2(grad_W_train[ind_layer], i, j) * learnRate;
             }
         }
 
@@ -150,7 +154,7 @@ void Learn(neural_network *NN, Data data, double learnRate) // Start the learnin
     Matrix(double) *grad_B_train = malloc(sizeof(Matrix(double)) * NN->layers_number);
     for (size_t i = 0; i < NN->layers_number; i++)
     {
-        grad_W_train[i] = m_new(double, 1, NN->layers_sizes[i+1]);
+        grad_W_train[i] = m_new(double, NN->layers_sizes[i], NN->layers_sizes[i+1]);
         grad_B_train[i] = m_new(double, 1, NN->layers_sizes[i+1]);
         memset(grad_W_train[i], 0, sizeof(double) * m_length(grad_W_train[i]));
         memset(grad_B_train[i], 0, sizeof(double) * m_length(grad_B_train[i]));

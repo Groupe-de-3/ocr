@@ -159,12 +159,13 @@ neural_network ia_init(size_t layers_number, size_t* layers_sizes)// initialisat
         Layer Layer_;
         
         Layer_.layer_size = layers_sizes[layer_ind + 1]; // ini size of the layer
+        
         Layer_.m_bias = m_new(double, 1, Layer_.layer_size);
         Layer_.m_gradB = m_new(double, 1,  Layer_.layer_size);
         Layer_.last_output = m_new(double, 1, Layer_.layer_size);
         Layer_.last_output_activated = m_new(double, 1, Layer_.layer_size);
         Layer_.m_weight = m_new(double, layers_sizes[layer_ind], Layer_.layer_size);
-        Layer_.m_gradW  = m_new(double, 1, Layer_.layer_size);
+        Layer_.m_gradW  = m_new(double, layers_sizes[layer_ind], Layer_.layer_size);
         
         Layer_.loss = m_new(double, 1,  Layer_.layer_size);
 

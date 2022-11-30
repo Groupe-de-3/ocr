@@ -19,7 +19,7 @@ void launch(neural_network NN)
     
     //data
     double inputs[2] = {val1, val2};
-    double expects[2] = {0,0};
+    double expects[2] = {-1,-1};
     Data d = data_init(1);
     d.data[0] = To_dataPoint(inputs, expects, NN.layers_sizes[0]);
 
@@ -40,13 +40,13 @@ void train(neural_network NN, size_t nb_training)
         {1, 1}
     };
     double expects[4][2] = {
-        {1, 0},
-        {0, 1},
-        {0, 1},
-        {1, 0}
+        {5, 0},
+        {0, 5},
+        {0, 5},
+        {5, 0}
     };
 
-    Data d = data_init(4);
+    Data d = data_init(1);
 
     for (size_t i = 0; i < d.size; i++)
         d.data[i] = To_dataPoint(inputs[i], expects[i], NN.layers_sizes[0]);
