@@ -80,10 +80,9 @@ void get_last_layer_gradientW(Layer layer, Matrix(double) expected, Matrix(doubl
     Matrix(double) cost_derivate = CostFunction_derivative(layer.last_output_activated, expected); // C
     m_hadamard_product(layer.last_output, cost_derivate);
 
-    printf("%zu,  %zu\n", m_width(cost_derivate), m_height(cost_derivate));
     m_copy(layer.loss, cost_derivate);
-    m_mul(cost_derivate, previous_activated, layer.m_gradW);
-    //m_copy(layer.m_gradW, cost_derivate);
+    //m_mul(cost_derivate, previous_activated, cost_derivate);
+    m_copy(layer.m_gradW, cost_derivate);
     //m_copy(layer.m_gradB, cost_derivate);
     m_destroy(cost_derivate);
     

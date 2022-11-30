@@ -66,7 +66,7 @@ size_t Get_result(Matrix(double) output)
 {
     size_t ind = array_max_ind(output);
     double val = array_max_val(output);
-    Print_array(output);
+    //Print_array(output);
     printf("result : %zu with %f %% \n", ind, val*100); // print result
     //m_destroy(output);
 
@@ -79,6 +79,7 @@ Matrix(double) Classify(neural_network NN, Matrix(double) input)
     //printf("inputs :\n"); //print input
     //Print_array(input);
     Matrix(double) input_ = m_new(double, 1, m_height(input));
+    m_copy(input_, input);
 
     return CalculateOutputs_NN(input_, NN); // launch forward
 }
@@ -145,8 +146,8 @@ void ApplyGradients_all_layer(neural_network NN, Matrix(double) *grad_W_train, M
 
 void Learn(neural_network *NN, Data data, double learnRate) // Start the learning
 {
-    Matrix(double) *grad_W_train = malloc(sizeof(Matrix(double)) * data.size); //list of the list of grad
-    Matrix(double) *grad_B_train = malloc(sizeof(Matrix(double)) * data.size);
+    Matrix(double) *grad_W_train = malloc(sizeof(Matrix(double)) * NN->layers_number); //list of the list of grad
+    Matrix(double) *grad_B_train = malloc(sizeof(Matrix(double)) * NN->layers_number);
     for (size_t i = 0; i < NN->layers_number; i++)
     {
         grad_W_train[i] = m_new(double, 1, NN->layers_sizes[i+1]);

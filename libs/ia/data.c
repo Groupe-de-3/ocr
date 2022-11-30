@@ -42,6 +42,6 @@ void data_Destroy(Data d) // destroy data
     //printf("test %zu", d.size);
     for (size_t i = 0; i < d.size; i++)
         datapoint_Destroy(d.data[i]);
-    //free(d.data);
+    free(d.data);
     
 }

@@ -91,6 +91,7 @@ neural_network ia_load(char* file_name) // initialisation of the neural network 
         Layer_.last_output = m_new(double, 1, Layer_.layer_size);
         Layer_.last_output_activated = m_new(double, 1, Layer_.layer_size);
 
+        Layer_.loss = m_new(double, 1,  Layer_.layer_size);
         
         
         for (size_t i = 0; i < NN.layers_sizes[layer_ind]; i++) {
@@ -132,6 +133,7 @@ void ia_memory_free(neural_network *NN) // free the memory
         m_destroy(NN->layers_[i].m_gradB);
         m_destroy(NN->layers_[i].m_gradW);
 
+        m_destroy(NN->layers_[i].loss);
     }
 
     free(NN->layers_);
