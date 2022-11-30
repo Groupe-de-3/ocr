@@ -39,6 +39,8 @@ typedef struct {
      *  Its size must be the same as #m_bias.
      */
     Matrix(double) last_output_activated;
+
+    Matrix(double) loss;
 } Layer;
 
 typedef struct {

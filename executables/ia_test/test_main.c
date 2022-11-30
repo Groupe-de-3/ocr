@@ -32,7 +32,7 @@ void launch(neural_network NN)
 void train(neural_network NN, size_t nb_training)
 {
     //data
-    
+    /*
     double inputs[4][2] = {
         {0, 0},
         {0, 1},
@@ -44,16 +44,16 @@ void train(neural_network NN, size_t nb_training)
         {0, 1},
         {0, 1},
         {1, 0}
-    };
-    /*
+    }*/
+    
     double inputs[4][2] = {
-        {0, 0},
+        {1, 0},
     };
     double expects[4][2] = {
-        {1, 0},
-    };*/
+        {0, 1},
+    };
 
-    Data d = data_init(4);
+    Data d = data_init(2);
 
     for (size_t i = 0; i < d.size; i++)
         d.data[i] = To_dataPoint(inputs[i], expects[i], NN.layers_sizes[0]);
@@ -130,8 +130,8 @@ int main() {
 
     
     printf("%s", "Launch\n\n");    
-    size_t layers_number = 3;
-    size_t layers_sizes[] = {2,5,5,2};
+    size_t layers_number = 2;
+    size_t layers_sizes[] = {2,5,2};
 
     size_t *layers_sizes_ = malloc(sizeof(size_t) * (layers_number + 1));
     for (size_t i = 0; i < layers_number + 1; i++)
