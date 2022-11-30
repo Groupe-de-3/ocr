@@ -13,12 +13,8 @@
  */
 Matrix(double) CalculateOutputs_Layer(Layer layer, Matrix(double) input, int last);
 
-//void ApplyGradients_layer(Layer layer, double learnRate);
+void get_loss_hidden_layer(Layer layer, Layer next_layer);
 
+void get_loss_last_layer(Layer layer, Matrix(double) expects);
 
-
-
-Matrix(double) get_loss(Layer layer, Layer next_layer);
-Matrix(double) get_loss_last_layer(Layer layer, Matrix(double) expects);
-
-void get_hidden_layer_gradient(Layer layer, Matrix(double) inputs, Matrix(double) loss);
+void get_layer_gradient(Layer layer, Matrix(double) inputs, Matrix(double) loss);

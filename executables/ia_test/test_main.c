@@ -48,7 +48,7 @@ void train(neural_network NN, size_t nb_training)
 
     Data d = data_init(1);
 
-    for (size_t i = 0; i < d.size; i++)
+    for (int i = 0; i < d.size; i++)
         d.data[i] = To_dataPoint(inputs[i], expects[i], NN.layers_sizes[0]);
 
 
@@ -132,13 +132,11 @@ int main() {
 
     //init neural network
     neural_network NN = ia_init(layers_number, layers_sizes_);
-    //neural_network NN = ia_load("xor.txt");
 
     input_user(NN);
+
     // free the memory
     ia_memory_free(&NN);
-
-
     
     return 0;
 }

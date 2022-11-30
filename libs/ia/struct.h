@@ -57,6 +57,6 @@ typedef struct {
 
 typedef struct {
     DataPoint *data;
-    size_t size;
+    int size;
 } Data;
 

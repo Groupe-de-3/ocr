@@ -39,43 +39,7 @@ Matrix(double) CalculateOutputs_Layer(Layer layer, Matrix(double) input, int las
 
 
 
-//---------------
-// Gradient
-//---------------
-
-/*
-void ApplyGradients_layer(Layer layer, double learnRate)
-{
-    
-    for (size_t i = 0; i < m_width(layer.m_gradW); i++)
-    {
-        for (size_t j = 0; j < m_height(layer.m_gradW); j++)
-        {
-            m_get2(layer.m_weight, i, j) -= m_get2(layer.m_gradW, i, j) * learnRate;
-        }
-    }
-
-    for (size_t i = 0; i < m_height(layer.m_gradB); i++)
-    {
-        m_get2(layer.m_bias, 0, i) -= m_get2(layer.m_gradB, 0, i) * learnRate;
-    }
-}*/
-/*
-Matrix(double) get_last_layer_gradient(Layer layer, Matrix(double) expected, Matrix(double) inputs)
-{
-    Sigmoid_Derivative(inputs);
-    CostDerivative(layer.last_output_activated, expected);
-
-    for (size_t i = 0; i < m_length(expected); i++)
-    {
-        layer.m_gradW[i] = layer.m_weight * expected[i];
-
-    }
-} */
-
-
-
-void get_hidden_layer_gradient(Layer layer, Matrix(double) inputs, Matrix(double) loss)
+void get_layer_gradient(Layer layer, Matrix(double) inputs, Matrix(double) loss)
 {
     // L = loss
     // a[l-1] = input
@@ -97,7 +61,7 @@ void get_hidden_layer_gradient(Layer layer, Matrix(double) inputs, Matrix(double
 
 
 
-Matrix(double) get_loss_last_layer(Layer layer, Matrix(double) expects)
+void get_loss_last_layer(Layer layer, Matrix(double) expects)
 {
     Sigmoid_Derivative(layer.last_output_activated); // g′(z(l))
     Matrix(double) m_cost = CostFunction_derivative(layer.last_output, expects);
@@ -105,13 +69,12 @@ Matrix(double) get_loss_last_layer(Layer layer, Matrix(double) expects)
     //printf("C : %zu     %zu\n", m_width(m_cost), m_height(m_cost));
     //m_mul(layer.last_output_activated, m_cost, layer.loss);
 
-    m_copy(layer.last_output, m_cost);
+    m_copy(layer.loss, m_cost);
     m_destroy(m_cost);
-    return layer.last_output;
 }
 
 
-Matrix(double) get_loss(Layer layer, Layer next_layer)
+void get_loss_hidden_layer(Layer layer, Layer next_layer)
 {
     // loss_next_layer : (l+1)J
     // next_weight : W(l+1)
@@ -121,16 +84,15 @@ Matrix(double) get_loss(Layer layer, Layer next_layer)
     Matrix(double) transpose_weight = m_new(double, m_height(next_layer.m_weight), m_width(next_layer.m_weight));
     m_transpose(next_layer.m_weight, transpose_weight); // W(l+1)T
 
-    Matrix(double) m_res = m_new(double, m_width(next_layer.last_output), m_height(transpose_weight));
-/////////////////////////////////////////*////////////////////*
-    m_mul(transpose_weight, next_layer.last_output, m_res); // ( W(l+1)T ⋅ ∇z(l+1)J )
+    Matrix(double) m_res = m_new(double, m_width(next_layer.loss), m_height(transpose_weight));
+
+    m_mul(transpose_weight, next_layer.loss, m_res); // ( W(l+1)T ⋅ ∇z(l+1)J )
     
     //printf("%zu     %zu\n", m_width(m_res), m_height(m_res));
     Sigmoid_Derivative(layer.last_output); // g′(z(l))
     m_hadamard_product(m_res, layer.last_output); //  ( W(l+1)T ⋅ ∇z(l+1)J ) ⊙ g′(z(l))
 
+    m_copy(layer.loss, layer.last_output);
     m_destroy(m_res);
     m_destroy(transpose_weight);
-
-    return layer.last_output;
 }
