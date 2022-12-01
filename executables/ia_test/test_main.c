@@ -18,14 +18,13 @@ void launch(neural_network NN)
     printf("\n");
     
     //data
-    double inputs[2] = {val1, val2};
-    double expects[2] = {-1,-1};
-    Data d = data_init(1);
-    d.data[0] = To_dataPoint(inputs, expects, NN.layers_sizes[0]);
+    Matrix(double) input = m_new(double, 1, 2);
+    input[0] = val1;
+    input[1] = val2;
 
-    Launch(NN, d);
-
-    data_Destroy(d);
+    Launch(NN, input);
+    m_destroy(input);
+    
 }
 
 
@@ -46,7 +45,7 @@ void train(neural_network NN, size_t nb_training)
         {5, 0}
     };
 
-    Data d = data_init(1);
+    Data d = data_init(4);
 
     for (int i = 0; i < d.size; i++)
         d.data[i] = To_dataPoint(inputs[i], expects[i], NN.layers_sizes[0]);
@@ -55,7 +54,6 @@ void train(neural_network NN, size_t nb_training)
     for (size_t i = 0; i < nb_training; i++)
     {
         Learn(&NN, d, 0.05);
-        Launch(NN, d);
     }
 
     data_Destroy(d);

@@ -26,7 +26,7 @@ double Cost(Matrix(double) outputs, Matrix(double) expects);
  * 
  *  \return void
  */
-void Launch(neural_network NN, Data d);
+void Launch(neural_network NN, Matrix(double) input);
 
 /*! \brief Start the learning of the neural network
 

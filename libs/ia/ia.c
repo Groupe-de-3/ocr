@@ -84,15 +84,11 @@ Matrix(double) Classify(neural_network NN, Matrix(double) input)
     return CalculateOutputs_NN(input_, NN); // launch forward
 }
 
-void Launch(neural_network NN, Data d) // Start the IA
+void Launch(neural_network NN, Matrix(double) input) // Start the IA
 {
-    for (int i = 0; i < d.size; i++)
-    {
-        Matrix(double) output = Classify(NN, d.data[i].input);
-        Get_result(output);
-        m_destroy(output);
-        printf("\n\n");
-    }
+    Matrix(double) output = Classify(NN, input);
+    Get_result(output);
+    m_destroy(output);
 }
 
 
@@ -164,7 +160,9 @@ void Calcul_gradient_layer(neural_network NN, DataPoint datapoint)
     m_copy(m_fist_input, datapoint.input);
     //m_add(m_fist_input, NN.layers_[0].m_bias);
     get_layer_gradient(NN.layers_[0], m_fist_input);
-    Print_array(NN.layers_[0].m_gradW);
+    //Print_array(NN.layers_[0].m_gradW);
+
+    m_destroy(m_fist_input);
 }
 
 void Learn(neural_network *NN, Data data, double learnRate) // Start the learning
@@ -182,6 +180,7 @@ void Learn(neural_network *NN, Data data, double learnRate) // Start the learnin
     for (int data_ind = 0; data_ind < data.size; data_ind++)
     {
         DataPoint datapoint = data.data[data_ind];
+        Launch(*NN, datapoint.input);
         Calcul_gradient_layer(*NN, datapoint);
         
         for (size_t i = 0; i < NN->layers_number; i++)
