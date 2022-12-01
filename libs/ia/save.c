@@ -129,7 +129,6 @@ void ia_memory_free(neural_network *NN) // free the memory
         m_destroy(NN->layers_[i].last_output_activated);
         m_destroy(NN->layers_[i].m_gradB);
         m_destroy(NN->layers_[i].m_gradW);
-
         m_destroy(NN->layers_[i].loss);
     }
 

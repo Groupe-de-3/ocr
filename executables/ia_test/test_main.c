@@ -27,7 +27,6 @@ void launch(neural_network NN)
     
 }
 
-
 void train(neural_network NN, size_t nb_training)
 {
     //data
@@ -118,7 +117,6 @@ void input_user(neural_network NN)
 
 int main() {
 
-    
     printf("%s", "Launch\n\n");
     size_t layers_number = 2;
     size_t layers_sizes[] = {2,5,2};

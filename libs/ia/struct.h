@@ -39,7 +39,10 @@ typedef struct {
      *  Its size must be the same as #m_bias.
      */
     Matrix(double) last_output_activated;
-
+    /*! \brief Matrix containing the loss after the training.
+     *
+     *  Its size must be the same as #m_bias.
+     */
     Matrix(double) loss;
 } Layer;
 
