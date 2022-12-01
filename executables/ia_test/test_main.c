@@ -96,7 +96,6 @@ void input_user(neural_network NN)
             case 'L':
                 printf("Name of the neural network to load? ");
                 scanf("%s", filename);
-                ia_memory_free(&NN);
                 NN = ia_load(filename); 
                 printf("Neural network have been load from the file %s\n", filename);
                 printf("\n");

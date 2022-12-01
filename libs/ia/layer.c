@@ -60,11 +60,7 @@ void get_layer_gradient(Layer layer, Matrix(double) inputs)
 
 void get_loss_last_layer(Layer layer, Matrix(double) expects)
 {
-    // modif if need to...
-    //Softmax_Derivative(layer.last_output);
     Matrix(double) m_cost = CostFunction_derivative(layer.last_output, expects);
-    
-    //m_mul(layer.last_output_activated, m_cost, layer.loss);
 
     m_copy(layer.loss, m_cost);
     m_destroy(m_cost);
@@ -84,8 +80,7 @@ void get_loss_hidden_layer(Layer layer, Layer next_layer)
     Matrix(double) m_res = m_new(double, m_width(next_layer.loss), m_height(transpose_weight));
 
     m_mul(transpose_weight, next_layer.loss, m_res); // ( W(l+1)T ⋅ ∇z(l+1)J )
-    
-    //printf("%zu     %zu\n", m_width(m_res), m_height(m_res));
+
     Sigmoid_Derivative(layer.last_output); // g′(z(l))
     m_hadamard_product(m_res, layer.last_output); //  ( W(l+1)T ⋅ ∇z(l+1)J ) ⊙ g′(z(l))
 
