@@ -17,4 +17,4 @@ void get_loss_hidden_layer(Layer layer, Layer next_layer);
 
 void get_loss_last_layer(Layer layer, Matrix(double) expects);
 
-void get_layer_gradient(Layer layer, Matrix(double) inputs, Matrix(double) loss);
+void get_layer_gradient(Layer layer, Matrix(double) inputs);

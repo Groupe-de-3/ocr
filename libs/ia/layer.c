@@ -39,7 +39,7 @@ Matrix(double) CalculateOutputs_Layer(Layer layer, Matrix(double) input, int las
 
 
 
-void get_layer_gradient(Layer layer, Matrix(double) inputs, Matrix(double) loss)
+void get_layer_gradient(Layer layer, Matrix(double) inputs)
 {
     // L = loss
     // a[l-1] = input
@@ -50,23 +50,20 @@ void get_layer_gradient(Layer layer, Matrix(double) inputs, Matrix(double) loss)
     Matrix(double) transpose_inputs = m_new(double, m_height(inputs), m_width(inputs));
     m_transpose(inputs, transpose_inputs); // W(l+1)T
     
-    m_mul(loss, transpose_inputs, layer.m_gradW);
-
-    m_copy(layer.m_gradB, loss);
+    m_mul(layer.loss, transpose_inputs, layer.m_gradW);
+    m_copy(layer.m_gradB, layer.loss);
     
     m_destroy(transpose_inputs);
-
-    //printf("test hidden layer\n");
 }
 
 
 
 void get_loss_last_layer(Layer layer, Matrix(double) expects)
 {
-    Sigmoid_Derivative(layer.last_output_activated); // g′(z(l))
+    // modif if need to...
+    //Softmax_Derivative(layer.last_output);
     Matrix(double) m_cost = CostFunction_derivative(layer.last_output, expects);
-    //printf("I : %zu     %zu\n", m_width(layer.last_output_activated), m_height(layer.last_output_activated));
-    //printf("C : %zu     %zu\n", m_width(m_cost), m_height(m_cost));
+    
     //m_mul(layer.last_output_activated, m_cost, layer.loss);
 
     m_copy(layer.loss, m_cost);

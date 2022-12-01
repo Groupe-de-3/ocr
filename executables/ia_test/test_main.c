@@ -35,8 +35,8 @@ void train(neural_network NN, size_t nb_training)
     
     double inputs[4][2] = {
         {0, 0},
-        {0, 1},
         {1, 0},
+        {0, 1},
         {1, 1}
     };
     double expects[4][2] = {
@@ -54,7 +54,7 @@ void train(neural_network NN, size_t nb_training)
 
     for (size_t i = 0; i < nb_training; i++)
     {
-        Learn(&NN, d, 0.1);
+        Learn(&NN, d, 0.05);
         Launch(NN, d);
     }
 
@@ -122,7 +122,7 @@ void input_user(neural_network NN)
 int main() {
 
     
-    printf("%s", "Launch\n\n");    
+    printf("%s", "Launch\n\n");
     size_t layers_number = 2;
     size_t layers_sizes[] = {2,5,2};
 
