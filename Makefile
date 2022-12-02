@@ -64,6 +64,13 @@ linear_algebra_target_type = staticlib
 linear_algebra_source_dirs += libs/linear_algebra
 linear_algebra_depedencies = matrices utils
 
+targets += mnist_loader
+
+mnist_loader_name = mnist_loader
+mnist_loader_target_type = staticlib
+mnist_loader_source_dirs += libs/mnist_loader
+mnist_loader_depedencies = images
+
 targets += test_lib
 
 test_lib_name = test_lib
