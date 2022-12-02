@@ -86,26 +86,24 @@ neural_network ia_load(char* file_name) // initialisation of the neural network 
         Layer_.m_gradB = m_new(double, 1,  Layer_.layer_size);
 
         Layer_.m_weight = m_new(double, NN.layers_sizes[layer_ind], Layer_.layer_size);
-        Layer_.m_gradW  = m_new(double, 1, Layer_.layer_size);
+        Layer_.m_gradW  = m_new(double, NN.layers_sizes[layer_ind], Layer_.layer_size);
+
 
         Layer_.last_output = m_new(double, 1, Layer_.layer_size);
         Layer_.last_output_activated = m_new(double, 1, Layer_.layer_size);
 
+        Layer_.loss = m_new(double, 1,  Layer_.layer_size);
         
         
-        for (size_t i = 0; i < NN.layers_sizes[layer_ind]; i++) {
+        for (size_t i = 0; i < m_length(Layer_.m_weight); i++) {
 
-            for (size_t j = 0; j < Layer_.layer_size; j++)
-            {
-                fgets(chaine, 15, fichier);
-                m_get2(Layer_.m_weight, i, j) = (double) atof(chaine); // ini weights
-            }
+            fgets(chaine, 15, fichier);
+            Layer_.m_weight[i] = (double) atof(chaine); // ini weights
         }
 
-        for (size_t i = 0; i < Layer_.layer_size; i++) {
-
+        for (size_t i = 0; i <  m_length(Layer_.m_bias); i++) {
             fgets(chaine, 15, fichier); // biais
-            m_get2(Layer_.m_bias, 0, i) = (double) atof(chaine); // ini biais
+            Layer_.m_bias[i] = (double) atof(chaine); // ini biais
         }
 
         
@@ -131,7 +129,7 @@ void ia_memory_free(neural_network *NN) // free the memory
         m_destroy(NN->layers_[i].last_output_activated);
         m_destroy(NN->layers_[i].m_gradB);
         m_destroy(NN->layers_[i].m_gradW);
-
+        m_destroy(NN->layers_[i].loss);
     }
 
     free(NN->layers_);
@@ -157,12 +155,13 @@ neural_network ia_init(size_t layers_number, size_t* layers_sizes)// initialisat
         Layer Layer_;
         
         Layer_.layer_size = layers_sizes[layer_ind + 1]; // ini size of the layer
+
         Layer_.m_bias = m_new(double, 1, Layer_.layer_size);
         Layer_.m_gradB = m_new(double, 1,  Layer_.layer_size);
         Layer_.last_output = m_new(double, 1, Layer_.layer_size);
         Layer_.last_output_activated = m_new(double, 1, Layer_.layer_size);
         Layer_.m_weight = m_new(double, layers_sizes[layer_ind], Layer_.layer_size);
-        Layer_.m_gradW  = m_new(double, 1, Layer_.layer_size);
+        Layer_.m_gradW  = m_new(double, layers_sizes[layer_ind], Layer_.layer_size);
         
         Layer_.loss = m_new(double, 1,  Layer_.layer_size);
 

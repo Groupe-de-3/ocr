@@ -18,51 +18,41 @@ void launch(neural_network NN)
     printf("\n");
     
     //data
-    double inputs[2] = {val1, val2};
-    double expects[2] = {0,0};
-    Data d = data_init(1);
-    d.data[0] = To_dataPoint(inputs, expects, NN.layers_sizes[0]);
+    Matrix(double) input = m_new(double, 1, 2);
+    input[0] = val1;
+    input[1] = val2;
 
-    Launch(NN, d);
-
-    data_Destroy(d);
+    Launch(NN, input, 1);
+    m_destroy(input);
+    
 }
-
 
 void train(neural_network NN, size_t nb_training)
 {
     //data
-    /*
+    
     double inputs[4][2] = {
         {0, 0},
-        {0, 1},
         {1, 0},
+        {0, 1},
         {1, 1}
     };
     double expects[4][2] = {
-        {1, 0},
-        {0, 1},
-        {0, 1},
-        {1, 0}
-    }*/
-    
-    double inputs[4][2] = {
-        {1, 0},
-    };
-    double expects[4][2] = {
-        {0, 1},
+        {5, 0},
+        {0, 5},
+        {0, 5},
+        {5, 0}
     };
 
-    Data d = data_init(2);
+    Data d = data_init(4);
 
-    for (size_t i = 0; i < d.size; i++)
+    for (int i = 0; i < d.size; i++)
         d.data[i] = To_dataPoint(inputs[i], expects[i], NN.layers_sizes[0]);
 
 
     for (size_t i = 0; i < nb_training; i++)
     {
-        Learn(&NN, d, 0.1);
-        Launch(NN, d);
+        Learn(&NN, d, 0.05);
     }
 
     data_Destroy(d);
@@ -105,7 +95,6 @@ void input_user(neural_network NN)
             case 'L':
                 printf("Name of the neural network to load? ");
                 scanf("%s", filename);
-                ia_memory_free(&NN);
                 NN = ia_load(filename); 
                 printf("Neural network have been load from the file %s\n", filename);
                 printf("\n");
@@ -128,8 +117,7 @@ void input_user(neural_network NN)
 
 int main() {
 
-    
-    printf("%s", "Launch\n\n");    
+    printf("%s", "Launch\n\n");
     size_t layers_number = 2;
     size_t layers_sizes[] = {2,5,2};
 
@@ -139,13 +127,11 @@ int main() {
 
     //init neural network
     neural_network NN = ia_init(layers_number, layers_sizes_);
-    //neural_network NN = ia_load("xor.txt");
 
     input_user(NN);
+
     // free the memory
     ia_memory_free(&NN);
-
-
     
     return 0;
 }

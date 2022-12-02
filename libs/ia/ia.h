@@ -13,7 +13,7 @@
  */
 Matrix(double) CalculateOutputs_NN(Matrix(double) input, neural_network NN);
 
-Matrix(double) Classify(neural_network NN, Matrix(double) input);
+void Print_array(Matrix(double) m);
 
 double Cost(Matrix(double) outputs, Matrix(double) expects);
 
@@ -26,7 +26,7 @@ double Cost(Matrix(double) outputs, Matrix(double) expects);
  * 
  *  \return void
  */
-void Launch(neural_network NN, Data d);
+void Launch(neural_network NN, Matrix(double) input, int show);
 
 /*! \brief Start the learning of the neural network
 

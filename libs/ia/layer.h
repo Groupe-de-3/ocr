@@ -13,29 +13,35 @@
  */
 Matrix(double) CalculateOutputs_Layer(Layer layer, Matrix(double) input, int last);
 
-//void ApplyGradients_layer(Layer layer, double learnRate);
-
-/*! \brief Initialize the gradient of the last layer
+/*! \brief Calcul loss of a layer
  *  
- *  Gradient is save inside the structure of layer
- *
- *  \param layer last layer of the neural network
- *  \param expected vector of the expected result
+ *  Calcul the loss of the hidden layers (stock inside the struct)
+ * 
+ *  \param layer layer of the neural network
+ *  \param next_layer next layer
  * 
  *  \return void
  */
-void get_last_layer_gradientW(Layer layer, Matrix(double) expected, Matrix(double) previous_activated);
-void get_last_layer_gradientB(Layer layer, Matrix(double) expected);
+void get_loss_hidden_layer(Layer layer, Layer next_layer);
 
-/*! \brief Initialize the gradient of the inside layers
- *
- *  Gradient is save inside the structure of layer
- *
- *  \param layer a idden layer of the neural network
- *  \param loss_next_layer matrice of the loss of the next layer
- *  \param next_weight matrice of the weights of the next layer
+/*! \brief Calcul loss of a layer
+ *  
+ *  Calcul the loss of the last layers (stock inside the struct)
+ * 
+ *  \param layer layer of the neural network
+ *  \param expects the expected result
  * 
  *  \return void
  */
-void get_hidden_layer_gradientW(Layer layer, Matrix(double) loss_next_layer, Matrix(double) next_weight);
-void get_hidden_layer_gradientB(Layer layer, Matrix(double) loss_next_layer, Matrix(double) next_weight);
+void get_loss_last_layer(Layer layer, Matrix(double) expects);
+
+/*! \brief Get the gradient of the layer
+ *  
+ *  Initialize the weight and bias gradients (stock inside the struct)
+ * 
+ *  \param layer layer of the neural network
+ *  \param inputs the inputs is the result of the previous layer
+ * 
+ *  \return void
+ */
+void get_layer_gradient(Layer layer, Matrix(double) inputs);

@@ -39,84 +39,52 @@ Matrix(double) CalculateOutputs_Layer(Layer layer, Matrix(double) input, int las
 
 
 
-//---------------
-// Gradient
-//---------------
-
-/*
-void ApplyGradients_layer(Layer layer, double learnRate)
+void get_layer_gradient(Layer layer, Matrix(double) inputs)
 {
+    // L = loss
+    // a[l-1] = input
+
+    // G_W = L * a[l-1]T
+    // G_B = L
+
+    Matrix(double) transpose_inputs = m_new(double, m_height(inputs), m_width(inputs));
+    m_transpose(inputs, transpose_inputs); // W(l+1)T
     
-    for (size_t i = 0; i < m_width(layer.m_gradW); i++)
-    {
-        for (size_t j = 0; j < m_height(layer.m_gradW); j++)
-        {
-            m_get2(layer.m_weight, i, j) -= m_get2(layer.m_gradW, i, j) * learnRate;
-        }
-    }
-
-    for (size_t i = 0; i < m_height(layer.m_gradB); i++)
-    {
-        m_get2(layer.m_bias, 0, i) -= m_get2(layer.m_gradB, 0, i) * learnRate;
-    }
-}*/
-/*
-Matrix(double) get_last_layer_gradient(Layer layer, Matrix(double) expected, Matrix(double) inputs)
-{
-    Sigmoid_Derivative(inputs);
-    CostDerivative(layer.last_output_activated, expected);
-
-    for (size_t i = 0; i < m_length(expected); i++)
-    {
-        layer.m_gradW[i] = layer.m_weight * expected[i];
-
-    }
-} */
-
-void get_last_layer_gradientW(Layer layer, Matrix(double) expected, Matrix(double) previous_activated)
-{
-    // ∇z(L)J = C ⊙ g′(z(l))
-    Sigmoid_Derivative(layer.last_output); // g′(z(l))
-    Matrix(double) cost_derivate = CostFunction_derivative(layer.last_output_activated, expected); // C
-    m_hadamard_product(layer.last_output, cost_derivate);
-
-    printf("%zu,  %zu\n", m_width(cost_derivate), m_height(cost_derivate));
-    m_copy(layer.loss, cost_derivate);
-    m_mul(cost_derivate, previous_activated, layer.m_gradW);
-    //m_copy(layer.m_gradW, cost_derivate);
-    //m_copy(layer.m_gradB, cost_derivate);
-    m_destroy(cost_derivate);
+    m_mul(layer.loss, transpose_inputs, layer.m_gradW);
+    m_copy(layer.m_gradB, layer.loss);
     
-    //printf("test last layer\n");
-    //printf("%zu     %zu\n", m_width(layer.m_gradW), m_height(layer.m_gradW));
-    
+    m_destroy(transpose_inputs);
 }
 
-void get_hidden_layer_gradientW(Layer layer, Matrix(double) loss_next_layer, Matrix(double) next_weight)
+
+
+void get_loss_last_layer(Layer layer, Matrix(double) expects)
+{
+    Matrix(double) m_cost = CostFunction_derivative(layer.last_output, expects);
+
+    m_copy(layer.loss, m_cost);
+    m_destroy(m_cost);
+}
+
+
+void get_loss_hidden_layer(Layer layer, Layer next_layer)
 {
     // loss_next_layer : (l+1)J
     // next_weight : W(l+1)
     // layer.last_output : z(l)
 
     //∇z(l)J = ( W(l+1)T ⋅ ∇z(l+1)J ) ⊙ g′(z(l))
+    Matrix(double) transpose_weight = m_new(double, m_height(next_layer.m_weight), m_width(next_layer.m_weight));
+    m_transpose(next_layer.m_weight, transpose_weight); // W(l+1)T
 
-    Matrix(double) transpose_weight = m_new(double, m_height(next_weight), m_width(next_weight));
-    m_transpose(next_weight, transpose_weight); // W(l+1)T
+    Matrix(double) m_res = m_new(double, m_width(next_layer.loss), m_height(transpose_weight));
 
-    Matrix(double) m_last_output = m_new(double, m_height(layer.last_output), m_width(layer.last_output));
-    m_copy(m_last_output, layer.last_output);
-    Sigmoid_Derivative(m_last_output); // g′(z(l))
+    m_mul(transpose_weight, next_layer.loss, m_res); // ( W(l+1)T ⋅ ∇z(l+1)J )
 
-    //Matrix(double) tmp_mat = m_new(double, m_height(layer.last_output), m_width(loss_next_layer));
-    
-    m_mul(transpose_weight, loss_next_layer, layer.m_gradW); // mult ( W(l+1)T ⋅ ∇z(l+1)J )
+    Sigmoid_Derivative(layer.last_output); // g′(z(l))
+    m_hadamard_product(m_res, layer.last_output); //  ( W(l+1)T ⋅ ∇z(l+1)J ) ⊙ g′(z(l))
 
-    m_hadamard_product(m_last_output, layer.m_gradW); //  ( W(l+1)T ⋅ ∇z(l+1)J ) ⊙ g′(z(l))
-    m_hadamard_product(m_last_output, layer.m_gradB); //  ( W(l+1)T ⋅ ∇z(l+1)J ) ⊙ g′(z(l))
-
+    m_copy(layer.loss, layer.last_output);
+    m_destroy(m_res);
     m_destroy(transpose_weight);
-    m_destroy(m_last_output);
-
-
-    //printf("test hidden layer\n");
 }

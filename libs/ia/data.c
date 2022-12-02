@@ -2,10 +2,11 @@
 #include "matrices.h"
 #include <stdio.h>
 
-Data data_init(size_t size) //ini of the data
+Data data_init(int size) //ini of the data
 {
     Data d;
-    d.data = malloc(size * sizeof(DataPoint));
+    size_t s = (size_t) size;
+    d.data = malloc(s * sizeof(DataPoint));
     d.size = size;
     return d;
 }
@@ -40,8 +41,8 @@ void datapoint_Destroy(DataPoint d) // free datapoint
 void data_Destroy(Data d) // destroy data
 {
     //printf("test %zu", d.size);
-    for (size_t i = 0; i < d.size; i++)
+    for (int i = 0; i < d.size; i++)
         datapoint_Destroy(d.data[i]);
-    //free(d.data);
+    free(d.data);
     
 }

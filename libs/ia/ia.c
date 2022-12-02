@@ -62,63 +62,34 @@ double array_max_val(Matrix(double) m) // search index of max element in Matrix
     return max;
 }
 
-size_t Get_result(Matrix(double) output)
+size_t Get_result(Matrix(double) output, int show)
 {
     size_t ind = array_max_ind(output);
     double val = array_max_val(output);
-    Print_array(output);
-    printf("result : %zu with %f %% \n", ind, val*100); // print result
-    //m_destroy(output);
-
+    if (show)
+        printf("result : %zu with %f %% \n", ind, val*100); // print result
+    
     return ind;
 }
 
 // Run the inputs through the network and return the output
 Matrix(double) Classify(neural_network NN, Matrix(double) input)
 {
-    //printf("inputs :\n"); //print input
-    //Print_array(input);
     Matrix(double) input_ = m_new(double, 1, m_height(input));
+    m_copy(input_, input);
 
     return CalculateOutputs_NN(input_, NN); // launch forward
 }
 
-void Launch(neural_network NN, Data d) // Start the IA
+void Launch(neural_network NN, Matrix(double) input, int show) // Start the IA
 {
-    for (size_t i = 0; i < d.size; i++)
-    {
-        Matrix(double) output = Classify(NN, d.data[i].input);
-        Get_result(output);
-        m_destroy(output);
-        printf("\n\n");
-    }
+    Matrix(double) output = Classify(NN, input);
+    Get_result(output, show);
+    m_destroy(output);
 }
 
 
-double Aply_cost(neural_network *NN, DataPoint d)
-{
-    Matrix(double) inputs2 = m_new(double, m_width(d.input), m_height(d.input)); 
-    for (size_t i = 0; i < m_length(d.input); i++)
-        inputs2[i] = d.input[i];
-    
-    
-    Matrix(double) outputs = CalculateOutputs_NN(inputs2, *NN);
-    return Cost(outputs, d.expect);
-}
-
-void Calcul_gradient_layer(neural_network NN, DataPoint datapoint)
-{
-    get_last_layer_gradientW(NN.layers_[NN.layers_number-1], datapoint.expect, NN.layers_[NN.layers_number-1].last_output_activated);
-    //get_last_layer_gradientB(NN.layers_[NN.layers_number-1], datapoint.expect);
-    
-    for (int layer_ind = (int) NN.layers_number - 2; layer_ind >= 0; layer_ind--)
-    {
-        get_hidden_layer_gradientW(NN.layers_[layer_ind], NN.layers_[layer_ind+1].m_gradW, NN.layers_[layer_ind +1].m_weight);
-        //get_hidden_layer_gradientB(NN.layers_[layer_ind], NN.layers_[layer_ind+1].m_gradB, NN.layers_[layer_ind +1].m_bias);
-    }
-}
-
-void ApplyGradients_all_layer(neural_network NN, Matrix(double) *grad_W_train, Matrix(double) *grad_B_train, double learnRate)
+void ApplyGradients_all_layer(neural_network NN, Matrix(double) *grad_W_train, Matrix(double) *grad_B_train, double learnRate, int size_data)
 {
     for (size_t ind_layer = 0; ind_layer < NN.layers_number; ind_layer++) 
     {
@@ -127,39 +98,78 @@ void ApplyGradients_all_layer(neural_network NN, Matrix(double) *grad_W_train, M
         for (size_t i = 0; i < m_width(layer.m_weight); i++)
         {
             for (size_t j = 0; j < m_height(layer.m_weight); j++)
-            {
-                //Print_array(grad_W_train[ind_layer]);
-                m_get2(layer.m_weight, i, j) -= m_get2(grad_W_train[ind_layer], 0, j) * learnRate;
-            }
+                m_get2(layer.m_weight, i, j) -= m_get2(grad_W_train[ind_layer], i, j) * learnRate /size_data;
         }
 
         for (size_t i = 0; i < m_height(layer.m_bias); i++)
-        {
-            //Print_array(grad_B_train[ind_layer]);
-            m_get2(layer.m_bias, 0, i) -= m_get2(grad_B_train[ind_layer], 0, i) * learnRate;
-        }
+            m_get2(layer.m_bias, 0, i) -= m_get2(grad_B_train[ind_layer], 0, i) * learnRate /size_data;
     }
 
 }
 
 
+void ApplyGradients_layer_(Layer layer, double learnRate)
+{
+    for (size_t i = 0; i < m_width(layer.m_weight); i++)
+    {
+        for (size_t j = 0; j < m_height(layer.m_weight); j++)
+            m_get2(layer.m_weight, i, j) -= m_get2(layer.m_gradW, i, j) * learnRate;
+    }
+
+    for (size_t i = 0; i < m_height(layer.m_bias); i++)
+        m_get2(layer.m_bias, 0, i) -= m_get2(layer.m_gradB , 0, i) * learnRate;
+}
+
+void Calcul_gradient_layer(neural_network NN, DataPoint datapoint)
+{
+
+    //last layer
+    get_loss_last_layer(NN.layers_[NN.layers_number-1], datapoint.expect);
+    get_layer_gradient(NN.layers_[NN.layers_number-1], NN.layers_[NN.layers_number-2].last_output_activated);
+    
+    for (int layer_ind = (int) NN.layers_number - 2; layer_ind > 0; layer_ind--)
+    {
+        // middle layers
+        get_loss_hidden_layer(NN.layers_[layer_ind], NN.layers_[layer_ind+1]);
+        get_layer_gradient(NN.layers_[layer_ind], NN.layers_[layer_ind-1].last_output_activated);
+    }
+    
+
+    // first layer
+    get_loss_hidden_layer(NN.layers_[0], NN.layers_[1]);
+    //Print_array(NN.layers_[0].loss);
+    Matrix(double) m_fist_input = m_new(double, m_width(datapoint.input), m_height(datapoint.input));
+    m_copy(m_fist_input, datapoint.input);
+    //m_add(m_fist_input, NN.layers_[0].m_bias);
+    get_layer_gradient(NN.layers_[0], m_fist_input);
+    //Print_array(NN.layers_[0].m_gradW);
+
+    m_destroy(m_fist_input);
+}
+
 void Learn(neural_network *NN, Data data, double learnRate) // Start the learning
 {
-    Matrix(double) *grad_W_train = malloc(sizeof(Matrix(double)) * data.size); //list of the list of grad
-    Matrix(double) *grad_B_train = malloc(sizeof(Matrix(double)) * data.size);
+    Matrix(double) *grad_W_train = malloc(sizeof(Matrix(double)) * NN->layers_number); //list of the list of grad
+    Matrix(double) *grad_B_train = malloc(sizeof(Matrix(double)) * NN->layers_number);
     for (size_t i = 0; i < NN->layers_number; i++)
     {
-        grad_W_train[i] = m_new(double, 1, NN->layers_sizes[i+1]);
+        grad_W_train[i] = m_new(double, NN->layers_sizes[i], NN->layers_sizes[i+1]);
         grad_B_train[i] = m_new(double, 1, NN->layers_sizes[i+1]);
         memset(grad_W_train[i], 0, sizeof(double) * m_length(grad_W_train[i]));
         memset(grad_B_train[i], 0, sizeof(double) * m_length(grad_B_train[i]));
     }
 
-
-    for (size_t data_ind = 0; data_ind < data.size; data_ind++)
+    for (int data_ind = 0; data_ind < data.size; data_ind++)
     {
         DataPoint datapoint = data.data[data_ind];
+        Launch(*NN, datapoint.input, 0);
         Calcul_gradient_layer(*NN, datapoint);
+        
+        for (size_t i = 0; i < NN->layers_number; i++)
+        {
+            //ApplyGradients_layer_(NN->layers_[i], learnRate);
+        }
+        
         
         for (size_t i = 0; i < NN->layers_number; i++)
         {
@@ -168,8 +178,7 @@ void Learn(neural_network *NN, Data data, double learnRate) // Start the learnin
         }
     }
 
-    ApplyGradients_all_layer(*NN, grad_W_train, grad_B_train, learnRate);
-
+    ApplyGradients_all_layer(*NN, grad_W_train, grad_B_train, learnRate, 1); // aply gradient to all layer after all data
 
     for (size_t i = 0; i < NN->layers_number; i++)
     {
