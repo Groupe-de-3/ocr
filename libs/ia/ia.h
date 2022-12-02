@@ -1,6 +1,8 @@
 #pragma once
 #include "struct.h"
 
+Matrix(double) arr_to_mat(ImageView * img);
+
 /*! \brief Calcul output of the neural network
  *  
  *  Return the output of the pass forward of the neural network with

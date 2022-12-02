@@ -12,11 +12,11 @@ Data data_init(int size) //ini of the data
 }
 
 
-DataPoint To_dataPoint(double *input, double *expect, size_t size) // create a datapoint
+DataPoint To_dataPoint(double *input, double *expect, size_t size_input, size_t size_output) // create a datapoint
 {
 
-    Matrix(double) m_input = m_new(double, 1, size);
-    Matrix(double) m_expect = m_new(double, 1, size);
+    Matrix(double) m_input = m_new(double, 1, size_input);
+    Matrix(double) m_expect = m_new(double, 1, size_output);
     for (size_t i = 0; i < size; i++)
     {
         m_input[i] = input[i];

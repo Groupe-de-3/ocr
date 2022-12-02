@@ -4,6 +4,7 @@
 #include "data.h"
 #include "ia.h"
 #include "save.h"
+#include "image_view.h"
 
 
 void launch(neural_network NN)
@@ -13,14 +14,9 @@ void launch(neural_network NN)
     double val2 = 0;
     printf("value of input number 1: ");
     scanf("%lf", &val1);
-    printf("value of input number 2: ");
-    scanf("%lf", &val2);
-    printf("\n");
     
     //data
-    Matrix(double) input = m_new(double, 1, 2);
-    input[0] = val1;
-    input[1] = val2;
+    Matrix(double) input = arr_to_mat();
 
     Launch(NN, input, 1);
     m_destroy(input);
@@ -30,24 +26,12 @@ void launch(neural_network NN)
 void train(neural_network NN, size_t nb_training)
 {
     //data
-    
-    double inputs[4][2] = {
-        {0, 0},
-        {1, 0},
-        {0, 1},
-        {1, 1}
-    };
-    double expects[4][2] = {
-        {5, 0},
-        {0, 5},
-        {0, 5},
-        {5, 0}
-    };
 
-    Data d = data_init(4);
+    Matrix(double) input = arr_to_mat();
+    Data d = data_init(1);
 
     for (int i = 0; i < d.size; i++)
-        d.data[i] = To_dataPoint(inputs[i], expects[i], NN.layers_sizes[0]);
+        d.data[i] = To_dataPoint(inputs[i], expects[i], NN.layers_sizes[0], NN.layers_sizes[NN.]);
 
 
     for (size_t i = 0; i < nb_training; i++)
@@ -119,7 +103,7 @@ int main() {
 
     printf("%s", "Launch\n\n");
     size_t layers_number = 2;
-    size_t layers_sizes[] = {2,5,2};
+    size_t layers_sizes[] = {784,25, 10};
 
     size_t *layers_sizes_ = malloc(sizeof(size_t) * (layers_number + 1));
     for (size_t i = 0; i < layers_number + 1; i++)

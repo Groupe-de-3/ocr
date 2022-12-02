@@ -13,6 +13,21 @@
 #include <time.h>
 
 
+Matrix(double) arr_to_mat(ImageView * img)
+{
+    Matrix(double) input = m_new(double, 1, 784)
+
+    for(int i = 0; i < 28; i++)
+    {
+        for(int j = 0; j < 28; j++)
+        {
+            m_get2(input, i, j) = (double) imgv_get_pixel_grayscale(img, i, j);
+        }
+    }
+
+    return input;
+}
+
 //---------------
 // Neural Network Forward
 //---------------
