@@ -62,11 +62,12 @@ double array_max_val(Matrix(double) m) // search index of max element in Matrix
     return max;
 }
 
-size_t Get_result(Matrix(double) output)
+size_t Get_result(Matrix(double) output, int show)
 {
     size_t ind = array_max_ind(output);
     double val = array_max_val(output);
-    printf("result : %zu with %f %% \n", ind, val*100); // print result
+    if (show)
+        printf("result : %zu with %f %% \n", ind, val*100); // print result
     
     return ind;
 }
@@ -80,10 +81,10 @@ Matrix(double) Classify(neural_network NN, Matrix(double) input)
     return CalculateOutputs_NN(input_, NN); // launch forward
 }
 
-void Launch(neural_network NN, Matrix(double) input) // Start the IA
+void Launch(neural_network NN, Matrix(double) input, int show) // Start the IA
 {
     Matrix(double) output = Classify(NN, input);
-    Get_result(output);
+    Get_result(output, show);
     m_destroy(output);
 }
 
@@ -161,7 +162,7 @@ void Learn(neural_network *NN, Data data, double learnRate) // Start the learnin
     for (int data_ind = 0; data_ind < data.size; data_ind++)
     {
         DataPoint datapoint = data.data[data_ind];
-        Launch(*NN, datapoint.input);
+        Launch(*NN, datapoint.input, 0);
         Calcul_gradient_layer(*NN, datapoint);
         
         for (size_t i = 0; i < NN->layers_number; i++)

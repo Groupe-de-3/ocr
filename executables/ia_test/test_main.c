@@ -22,7 +22,7 @@ void launch(neural_network NN)
     input[0] = val1;
     input[1] = val2;
 
-    Launch(NN, input);
+    Launch(NN, input, 1);
     m_destroy(input);
     
 }
