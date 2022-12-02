@@ -3,4 +3,7 @@
 /.idea/
 /compile_commands.json
 
+train-images-idx3-ubyte
+train-labels-idx1-ubyte
+
 .vscode/settings.json

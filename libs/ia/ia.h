@@ -1,5 +1,10 @@
 #pragma once
 #include "struct.h"
+#include "image_view.h"
+
+size_t array_max_ind(Matrix(double) m);
+
+Matrix(double) arr_to_mat(ImageView img);
 
 /*! \brief Calcul output of the neural network
  *  

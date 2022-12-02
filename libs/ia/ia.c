@@ -4,6 +4,7 @@
 #include "activation.h"
 #include "cost.h"
 #include "layer.h"
+#include "image_view.h"
 
 #include <err.h>
 #include <math.h>
@@ -12,6 +13,18 @@
 #include <string.h>
 #include <time.h>
 
+
+Matrix(double) arr_to_mat(ImageView img)
+{
+    Matrix(double) res = m_new(double, 1, 784);
+    for(int i = 0; i < 28; i++)
+    {
+        for(int j = 0; j < 28; j++)
+            res[j * m_width(res) + i] = (double) imgv_get_pixel_grayscale(&img, i, j);
+    }
+
+    return res;
+}
 
 //---------------
 // Neural Network Forward

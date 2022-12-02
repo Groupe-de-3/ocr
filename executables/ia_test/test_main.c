@@ -3,7 +3,10 @@
 
 #include "data.h"
 #include "ia.h"
+#include "matrices.h"
 #include "save.h"
+#include "mnist.h"
+#include "struct.h"
 
 
 void launch(neural_network NN)
@@ -29,25 +32,26 @@ void launch(neural_network NN)
 
 void train(neural_network NN, size_t nb_training)
 {
+    
+    MnistDataSet mnist = mnist_dataset_read("train-images-idx3-ubyte", "train-labels-idx1-ubyte");
     //data
     
-    double inputs[4][2] = {
-        {0, 0},
-        {1, 0},
-        {0, 1},
-        {1, 1}
-    };
-    double expects[4][2] = {
-        {5, 0},
-        {0, 5},
-        {0, 5},
-        {5, 0}
-    };
-
-    Data d = data_init(4);
+    Data d = data_init(2); // a modif
 
     for (int i = 0; i < d.size; i++)
-        d.data[i] = To_dataPoint(inputs[i], expects[i], NN.layers_sizes[0]);
+    {
+        Matrix(double) input = arr_to_mat(imgv_default(&mnist.images[i]));
+        uint8_t e = mnist.labels[i];
+        Matrix(double) output = m_new(double, 1, NN.layers_sizes[NN.layers_number]);
+        for (int j = 0; j < m_length(output); j++) {
+            if (e == j)
+                output[j] = 5;
+            else
+                output[j] = 0;
+        }
+        DataPoint dp = To_dataPoint(input , output, NN.layers_sizes[0], NN.layers_sizes[NN.layers_number]);
+        d.data[i] = dp;
+    }
 
 
     for (size_t i = 0; i < nb_training; i++)
@@ -55,7 +59,15 @@ void train(neural_network NN, size_t nb_training)
         Learn(&NN, d, 0.05);
     }
 
+    for (int i = 0; i < d.size; i++) 
+    {
+        Launch(NN, d.data[i].input, 1);
+        size_t ind = array_max_ind(d.data[i].expect);
+        printf(" true result : %zu\n", ind); // print result
+    }
+
     data_Destroy(d);
+    mnist_dataset_destroy(mnist);
 
 }
 
@@ -119,7 +131,7 @@ int main() {
 
     printf("%s", "Launch\n\n");
     size_t layers_number = 2;
-    size_t layers_sizes[] = {2,5,2};
+    size_t layers_sizes[] = {784,25,10};
 
     size_t *layers_sizes_ = malloc(sizeof(size_t) * (layers_number + 1));
     for (size_t i = 0; i < layers_number + 1; i++)

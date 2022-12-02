@@ -29,7 +29,8 @@ targets += ia
 ia_name = ia
 ia_target_type = staticlib
 ia_source_dirs += libs/ia
-ia_depedencies = matrices
+ia_depedencies = matrices mnist_loader utils
+
 
 targets += utils
 
@@ -55,7 +56,7 @@ targets += image_filters
 image_filters_name = image_filters
 image_filters_target_type = staticlib
 image_filters_source_dirs += libs/image_filters
-image_filters_depedencies = images matrices vec linear_algebra
+image_filters_depedencies = images matrices vec linear_algebra utils
 
 targets += linear_algebra
 
@@ -126,7 +127,8 @@ ia_test_name = ia_test
 ia_test_target_type = executable
 ia_test_link_in_deps = true
 ia_test_source_dirs += executables/ia_test
-ia_test_depedencies = ia matrices
+ia_test_depedencies = ia matrices utils
+
 
 targets += least_squares_tests
 
