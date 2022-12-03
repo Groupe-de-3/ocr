@@ -189,7 +189,7 @@ void Learn(neural_network *NN, Data data, double learnRate) // Start the learnin
         }
     }
 
-    ApplyGradients_all_layer(*NN, grad_W_train, grad_B_train, learnRate, 1); // aply gradient to all layer after all data
+    ApplyGradients_all_layer(*NN, grad_W_train, grad_B_train, learnRate, data.size); // aply gradient to all layer after all data
 
     for (size_t i = 0; i < NN->layers_number; i++)
     {

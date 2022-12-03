@@ -12,7 +12,7 @@
 void launch(neural_network NN, MnistDataSet mnist)
 {
     
-    Data d = data_init(20); // a modif
+    Data d = data_init(100); // a modif
 
     for (int i = 0; i < d.size; i++)
     {
@@ -95,10 +95,10 @@ void input_user(neural_network NN, MnistDataSet mnist)
                 printf("number of training? ");
                 size_t nb_training = 0;
                 scanf("%zu", &nb_training);
-                //printf("size of sample? ");
-                //size_t nb_sample = 0;
-                //scanf("%zu", &nb_sample);
-                train(NN, nb_training, 20, mnist);
+                printf("size of sample? ");
+                size_t nb_sample = 0;
+                scanf("%zu", &nb_sample);
+                train(NN, nb_training, nb_sample, mnist);
                 printf("\n");
                 break;
 
