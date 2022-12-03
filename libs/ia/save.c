@@ -56,9 +56,12 @@ neural_network ia_load(char* file_name) // initialisation of the neural network 
     
     neural_network NN;
 
+             
+
     FILE *fichier = NULL;
     fichier       = fopen(file_name, "r");
-
+    if (!fichier)
+        errx(1, "File do not exist.");
     // ini base
     char chaine[15] = "";
 
@@ -133,7 +136,6 @@ void ia_memory_free(neural_network *NN) // free the memory
     }
 
     free(NN->layers_);
-    
 }
 
 neural_network ia_init(size_t layers_number, size_t* layers_sizes)// initialisation of a new neural network

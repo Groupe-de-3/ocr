@@ -64,7 +64,7 @@ void train(neural_network NN, size_t nb_training, size_t nb_sample, MnistDataSet
 
     for (size_t i = 0; i < nb_training; i++)
     {
-        Learn(&NN, d, 0.05);
+        Learn(&NN, d, 0.01);
     }
 
     for (int i = 0; i < d.size; i++) 
