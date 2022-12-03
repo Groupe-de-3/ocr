@@ -9,41 +9,49 @@
 #include "struct.h"
 
 
-void launch(neural_network NN)
+void launch(neural_network NN, MnistDataSet mnist)
 {
     
-    double val1 = 0;
-    double val2 = 0;
-    printf("value of input number 1: ");
-    scanf("%lf", &val1);
-    printf("value of input number 2: ");
-    scanf("%lf", &val2);
-    printf("\n");
-    
-    //data
-    Matrix(double) input = m_new(double, 1, 2);
-    input[0] = val1;
-    input[1] = val2;
+    Data d = data_init(20); // a modif
 
-    Launch(NN, input, 1);
-    m_destroy(input);
+    for (int i = 0; i < d.size; i++)
+    {
+
+        Matrix(double) input = arr_to_mat(imgv_default(&mnist.images[i]));
+        uint8_t e = mnist.labels[i];
+        Matrix(double) output = m_new(double, 1, NN.layers_sizes[NN.layers_number]);
+        for (size_t j = 0; j < m_length(output); j++) {
+            if (e == j)
+                output[j] = 5;
+            else
+                output[j] = 0;
+        }
+        DataPoint dp = To_dataPoint(input , output, NN.layers_sizes[0], NN.layers_sizes[NN.layers_number]);
+        d.data[i] = dp;
+    }
+
+    for (int i = 0; i < d.size; i++) 
+    {
+        size_t ind = array_max_ind(d.data[i].expect);
+        Launch(NN, d.data[i].input, ind, 1);
+    }
+
+    data_Destroy(d);
     
 }
 
-void train(neural_network NN, size_t nb_training)
+void train(neural_network NN, size_t nb_training, size_t nb_sample, MnistDataSet mnist)
 {
-    
-    MnistDataSet mnist = mnist_dataset_read("train-images-idx3-ubyte", "train-labels-idx1-ubyte");
     //data
     
-    Data d = data_init(2); // a modif
+    Data d = data_init(nb_sample); // a modif
 
     for (int i = 0; i < d.size; i++)
     {
         Matrix(double) input = arr_to_mat(imgv_default(&mnist.images[i]));
         uint8_t e = mnist.labels[i];
         Matrix(double) output = m_new(double, 1, NN.layers_sizes[NN.layers_number]);
-        for (int j = 0; j < m_length(output); j++) {
+        for (size_t j = 0; j < m_length(output); j++) {
             if (e == j)
                 output[j] = 5;
             else
@@ -61,17 +69,15 @@ void train(neural_network NN, size_t nb_training)
 
     for (int i = 0; i < d.size; i++) 
     {
-        Launch(NN, d.data[i].input, 1);
         size_t ind = array_max_ind(d.data[i].expect);
-        printf(" true result : %zu\n", ind); // print result
+        Launch(NN, d.data[i].input, ind, 1);
     }
 
-    data_Destroy(d);
-    mnist_dataset_destroy(mnist);
+    data_Destroy(d);;
 
 }
 
-void input_user(neural_network NN)
+void input_user(neural_network NN, MnistDataSet mnist)
 {
     char *filename = malloc(sizeof(char) * 30);
     char *output = malloc(sizeof(char) * 10);
@@ -87,7 +93,10 @@ void input_user(neural_network NN)
                 printf("number of training? ");
                 size_t nb_training = 0;
                 scanf("%zu", &nb_training);
-                train(NN, nb_training);
+                //printf("size of sample? ");
+                //size_t nb_sample = 0;
+                //scanf("%zu", &nb_sample);
+                train(NN, nb_training, 20, mnist);
                 printf("\n");
                 break;
 
@@ -101,7 +110,7 @@ void input_user(neural_network NN)
 
              case 'l':
                 printf("Launch\n");
-                launch(NN);
+                launch(NN, mnist);
                 break;
             
             case 'L':
@@ -124,6 +133,7 @@ void input_user(neural_network NN)
 
     free(output);
     free(filename);
+
 }
 
 
@@ -139,11 +149,12 @@ int main() {
 
     //init neural network
     neural_network NN = ia_init(layers_number, layers_sizes_);
+    MnistDataSet mnist = mnist_dataset_read("train-images-idx3-ubyte", "train-labels-idx1-ubyte");
 
-    input_user(NN);
+    input_user(NN, mnist);
 
     // free the memory
     ia_memory_free(&NN);
-    
+    mnist_dataset_destroy(mnist);
     return 0;
 }

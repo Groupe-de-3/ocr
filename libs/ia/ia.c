@@ -20,7 +20,7 @@ Matrix(double) arr_to_mat(ImageView img)
     for(int i = 0; i < 28; i++)
     {
         for(int j = 0; j < 28; j++)
-            res[j * m_width(res) + i] = (double) imgv_get_pixel_grayscale(&img, i, j);
+            res[j * 28 + i] = (double) imgv_get_pixel_grayscale(&img, i, j);
     }
 
     return res;
@@ -75,13 +75,17 @@ double array_max_val(Matrix(double) m) // search index of max element in Matrix
     return max;
 }
 
-size_t Get_result(Matrix(double) output, int show)
+size_t Get_result(Matrix(double) output, size_t expected, int show)
 {
     size_t ind = array_max_ind(output);
     double val = array_max_val(output);
     if (show)
-        printf("result : %zu with %f %% \n", ind, val*100); // print result
-    
+    {        
+        if (ind == expected)
+            printf("Success : %zu with %f %% \n", ind, val*100); // print result
+        else
+            printf("Failed : %zu != %zu  ( %f %% )\n", ind, expected, val*100); // print result
+    }
     return ind;
 }
 
@@ -94,11 +98,12 @@ Matrix(double) Classify(neural_network NN, Matrix(double) input)
     return CalculateOutputs_NN(input_, NN); // launch forward
 }
 
-void Launch(neural_network NN, Matrix(double) input, int show) // Start the IA
+int Launch(neural_network NN, Matrix(double) input, size_t expected, int show) // Start the IA
 {
     Matrix(double) output = Classify(NN, input);
-    Get_result(output, show);
+    Get_result(output, expected, show);
     m_destroy(output);
+    return 0;
 }
 
 
@@ -147,17 +152,10 @@ void Calcul_gradient_layer(neural_network NN, DataPoint datapoint)
         get_layer_gradient(NN.layers_[layer_ind], NN.layers_[layer_ind-1].last_output_activated);
     }
     
-
     // first layer
     get_loss_hidden_layer(NN.layers_[0], NN.layers_[1]);
-    //Print_array(NN.layers_[0].loss);
-    Matrix(double) m_fist_input = m_new(double, m_width(datapoint.input), m_height(datapoint.input));
-    m_copy(m_fist_input, datapoint.input);
-    //m_add(m_fist_input, NN.layers_[0].m_bias);
-    get_layer_gradient(NN.layers_[0], m_fist_input);
-    //Print_array(NN.layers_[0].m_gradW);
+    get_layer_gradient(NN.layers_[0], datapoint.input);
 
-    m_destroy(m_fist_input);
 }
 
 void Learn(neural_network *NN, Data data, double learnRate) // Start the learning
@@ -175,7 +173,7 @@ void Learn(neural_network *NN, Data data, double learnRate) // Start the learnin
     for (int data_ind = 0; data_ind < data.size; data_ind++)
     {
         DataPoint datapoint = data.data[data_ind];
-        Launch(*NN, datapoint.input, 0);
+        Launch(*NN, datapoint.input, 0, 0);
         Calcul_gradient_layer(*NN, datapoint);
         
         for (size_t i = 0; i < NN->layers_number; i++)
