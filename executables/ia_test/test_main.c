@@ -7,18 +7,19 @@
 #include "save.h"
 #include "mnist.h"
 #include "struct.h"
+#include "time.h"
 
 
-void launch(neural_network NN, MnistDataSet mnist)
+void launch(neural_network NN, size_t nb_sample, MnistDataSet mnist)
 {
     
-    Data d = data_init(100); // a modif
-
+    Data d = data_init(nb_sample); // a modif
+    //srand(126);
     for (int i = 0; i < d.size; i++)
     {
-
-        Matrix(double) input = arr_to_mat(imgv_default(&mnist.images[i]));
-        uint8_t e = mnist.labels[i];
+        unsigned long ind_pic = ((unsigned long)rand()%mnist.size);
+        Matrix(double) input = arr_to_mat(imgv_default(&mnist.images[ind_pic]));
+        uint8_t e = mnist.labels[ind_pic];
         Matrix(double) output = m_new(double, 1, NN.layers_sizes[NN.layers_number]);
         for (size_t j = 0; j < m_length(output); j++) {
             if (e == j)
@@ -36,7 +37,7 @@ void launch(neural_network NN, MnistDataSet mnist)
         size_t ind = array_max_ind(d.data[i].expect);
         nb_result += Launch(NN, d.data[i].input, ind, 1);
     }
-    printf("\nSuccess rate : %f %%\n", ((float) nb_result) / ((float) d.size) *100.f);
+    printf("\nSuccess rate : %f %%\n\n", ((float) nb_result) / ((float) d.size) *100.f);
     data_Destroy(d);
     
 }
@@ -49,8 +50,9 @@ void train(neural_network NN, size_t nb_training, size_t nb_sample, MnistDataSet
 
     for (int i = 0; i < d.size; i++)
     {
-        Matrix(double) input = arr_to_mat(imgv_default(&mnist.images[i]));
-        uint8_t e = mnist.labels[i];
+        unsigned long ind_pic = ((unsigned long)rand()%mnist.size);
+        Matrix(double) input = arr_to_mat(imgv_default(&mnist.images[ind_pic]));
+        uint8_t e = mnist.labels[ind_pic];
         Matrix(double) output = m_new(double, 1, NN.layers_sizes[NN.layers_number]);
         for (size_t j = 0; j < m_length(output); j++) {
             if (e == j)
@@ -74,7 +76,7 @@ void train(neural_network NN, size_t nb_training, size_t nb_sample, MnistDataSet
         size_t ind = array_max_ind(d.data[i].expect);
         nb_result += Launch(NN, d.data[i].input, ind, 1);
     }
-    printf("\nSuccess rate : %f %%\n", ((float) nb_result) / ((float) d.size) *100.f);
+    printf("\nSuccess rate : %f %%\n\n", ((float) nb_result) / ((float) d.size) *100.f);
     data_Destroy(d);
 
 }
@@ -83,6 +85,7 @@ void input_user(neural_network NN, MnistDataSet mnist)
 {
     char *filename = malloc(sizeof(char) * 30);
     char *output = malloc(sizeof(char) * 10);
+    size_t nb_sample = 0;
     while (output[0] != 'q')
     {
         printf("Command : ");
@@ -92,13 +95,19 @@ void input_user(neural_network NN, MnistDataSet mnist)
         switch (output[0])
         {
             case 't':
+                printf("number of sample training? ");
+                size_t nb_training_sample = 0;
+                scanf("%zu", &nb_training_sample);
                 printf("number of training? ");
                 size_t nb_training = 0;
                 scanf("%zu", &nb_training);
                 printf("size of sample? ");
-                size_t nb_sample = 0;
+                nb_sample = 0;
                 scanf("%zu", &nb_sample);
-                train(NN, nb_training, nb_sample, mnist);
+                for (size_t i = 0; i < nb_training_sample; i++)
+                {
+                    train(NN, nb_training, nb_sample, mnist);
+                }
                 printf("\n");
                 break;
 
@@ -111,8 +120,11 @@ void input_user(neural_network NN, MnistDataSet mnist)
                 break;
 
              case 'l':
+                printf("size of sample? ");
+                nb_sample = 0;
+                scanf("%zu", &nb_sample);
                 printf("Launch\n");
-                launch(NN, mnist);
+                launch(NN, nb_sample, mnist);
                 break;
             
             case 'L':
