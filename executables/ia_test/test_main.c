@@ -26,16 +26,17 @@ void launch(neural_network NN, MnistDataSet mnist)
             else
                 output[j] = 0;
         }
-        DataPoint dp = To_dataPoint(input , output, NN.layers_sizes[0], NN.layers_sizes[NN.layers_number]);
+        DataPoint dp = To_dataPoint(input , output);
         d.data[i] = dp;
     }
 
+    int nb_result = 0;
     for (int i = 0; i < d.size; i++) 
     {
         size_t ind = array_max_ind(d.data[i].expect);
-        Launch(NN, d.data[i].input, ind, 1);
+        nb_result += Launch(NN, d.data[i].input, ind, 1);
     }
-
+    printf("\nSuccess rate : %f %%\n", ((float) nb_result) / ((float) d.size) *100.f);
     data_Destroy(d);
     
 }
@@ -57,7 +58,7 @@ void train(neural_network NN, size_t nb_training, size_t nb_sample, MnistDataSet
             else
                 output[j] = 0;
         }
-        DataPoint dp = To_dataPoint(input , output, NN.layers_sizes[0], NN.layers_sizes[NN.layers_number]);
+        DataPoint dp = To_dataPoint(input , output);
         d.data[i] = dp;
     }
 
@@ -67,13 +68,14 @@ void train(neural_network NN, size_t nb_training, size_t nb_sample, MnistDataSet
         Learn(&NN, d, 0.01);
     }
 
+    int nb_result = 0;
     for (int i = 0; i < d.size; i++) 
     {
         size_t ind = array_max_ind(d.data[i].expect);
-        Launch(NN, d.data[i].input, ind, 1);
+        nb_result += Launch(NN, d.data[i].input, ind, 1);
     }
-
-    data_Destroy(d);;
+    printf("\nSuccess rate : %f %%\n", ((float) nb_result) / ((float) d.size) *100.f);
+    data_Destroy(d);
 
 }
 

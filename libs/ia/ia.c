@@ -75,7 +75,7 @@ double array_max_val(Matrix(double) m) // search index of max element in Matrix
     return max;
 }
 
-size_t Get_result(Matrix(double) output, size_t expected, int show)
+int Get_result(Matrix(double) output, size_t expected, int show)
 {
     size_t ind = array_max_ind(output);
     double val = array_max_val(output);
@@ -86,7 +86,7 @@ size_t Get_result(Matrix(double) output, size_t expected, int show)
         else
             printf("Failed : %zu != %zu  ( %f %% )\n", ind, expected, val*100); // print result
     }
-    return ind;
+    return ind == expected;
 }
 
 // Run the inputs through the network and return the output
@@ -101,9 +101,9 @@ Matrix(double) Classify(neural_network NN, Matrix(double) input)
 int Launch(neural_network NN, Matrix(double) input, size_t expected, int show) // Start the IA
 {
     Matrix(double) output = Classify(NN, input);
-    Get_result(output, expected, show);
+    int res = Get_result(output, expected, show);
     m_destroy(output);
-    return 0;
+    return res;
 }
 
 
