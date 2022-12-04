@@ -16,6 +16,12 @@
 #include <time.h>
 
 
+int ia_launch(neural_network NN, ImageView im)
+{
+    Matrix(double) input = arr_to_mat(im);   
+    return Launch(NN, input, 0, 2);
+}
+
 
 void launch(neural_network NN, size_t nb_sample, MnistDataSet mnist)
 {

@@ -79,7 +79,7 @@ int Get_result(Matrix(double) output, size_t expected, int show)
 {
     size_t ind = array_max_ind(output);
     double val = array_max_val(output);
-    if (show)
+    if (show == 1)
     {        
         if (ind == expected)
             printf("Success : %zu with %f %% \n", ind, val*100); // print result
@@ -102,7 +102,11 @@ int Launch(neural_network NN, Matrix(double) input, size_t expected, int show) /
 {
     Matrix(double) output = Classify(NN, input);
     int res = Get_result(output, expected, show);
+    
+    size_t ind = array_max_ind(output);
     m_destroy(output);
+    if (show == 2)
+        return ind;
     return res;
 }
 
