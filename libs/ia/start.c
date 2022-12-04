@@ -16,10 +16,20 @@
 #include <time.h>
 
 
-int ia_launch(neural_network NN, ImageView im)
+
+int ia_launch_single(neural_network NN, ImageView im)
 {
     Matrix(double) input = arr_to_mat(im);   
     return Launch(NN, input, 0, 2);
+}
+
+int* ia_launch(neural_network NN, ImageView* images, size_t size)
+{
+    int *result = malloc(sizeof(int) * size);
+    for (size_t i = 0; i < size; i++)
+        result[i] = ia_launch_single(NN, images[i]);
+    
+    return result;
 }
 
 

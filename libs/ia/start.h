@@ -22,11 +22,12 @@
  *  Print the result of the pass forward of the ImageView
  * 
  *  \param NN neural_network
- *  \param im the image of a number (input)
+ *  \param images list of images of the numbers (inputs)
+ *  \param size the number of images to analyse
  * 
- *  \return the guess number
+ *  \return a list of the guess numbers
  */
-int ia_launch(neural_network NN, ImageView im);
+int* ia_launch(neural_network NN, ImageView* images, size_t size);
 
 void launch(neural_network NN, size_t nb_sample, MnistDataSet mnist);
 void train(neural_network NN, size_t nb_training, size_t nb_sample, MnistDataSet mnist);

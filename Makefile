@@ -129,6 +129,13 @@ ia_test_link_in_deps = true
 ia_test_source_dirs += executables/ia_test
 ia_test_depedencies = ia matrices utils
 
+targets += ocr
+
+ocr_name = ocr
+ocr_target_type = executable
+ocr_link_in_deps = true
+ocr_source_dirs += executables/ocr
+ocr_depedencies = ia matrices utils image_filters images linear_algebra
 
 targets += least_squares_tests
 
