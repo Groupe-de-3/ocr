@@ -26,3 +26,8 @@ void la_subdivide_concave_iquadrilateral(
 void la_perspective_subdivide_concave_fquadrilateral(
     fquadrilateral_t from, int width, int height, fquadrilateral_t *out
 );
+
+typedef struct {
+    ipoint2d_t position;
+    ipoint2d_t size;
+} irectangle_t;
