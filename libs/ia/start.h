@@ -23,11 +23,10 @@
  * 
  *  \param NN neural_network
  *  \param images list of images of the numbers (inputs)
- *  \param size the number of images to analyse
  * 
  *  \return a list of the guess numbers
  */
-int* ia_launch(neural_network NN, ImageView* images, size_t size);
+char* ia_launch(neural_network NN, ImageView* images);
 
 void launch(neural_network NN, size_t nb_sample, MnistDataSet mnist);
 void train(neural_network NN, size_t nb_training, size_t nb_sample, MnistDataSet mnist);

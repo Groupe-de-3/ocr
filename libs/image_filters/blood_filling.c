@@ -2,6 +2,7 @@
 
 #include <stdbool.h>
 #include <stdio.h>
+#include <limits.h>
 
 #include "vec.h"
 
@@ -12,17 +13,15 @@ typedef struct {
 typedef struct {
     int       sx, sy;
     int       ex, ey;
+    long total_weight;
     PixelPos *pixels;
 } Blob;
 
 static long get_blob_size(Blob blob) {
-    return (long)vec_size(blob.pixels);
-    int width  = blob.ex - blob.sx + 1; // + 1 Because ex is exclusive
-    int height = blob.ey - blob.sy + 1; // + 1 Because ex is exclusive
-    return (long)width * (long)height;
+    return blob.total_weight;
 }
 
-static Blob find_blob_at(ImageView *img, int start_x, int start_y) {
+static Blob find_blob_at(ImageView *img, int start_x, int start_y, blood_fill_weighter weighter) {
     const any_pixel_t black = ANY_BLACK(img->image->format);
     // Stack of unvisited pixels
     PixelPos *poses = vec_new(PixelPos);
@@ -38,6 +37,7 @@ static Blob find_blob_at(ImageView *img, int start_x, int start_y) {
     };
     *vec_push(&extent.pixels, PixelPos) =
         (PixelPos){.x = start_x, .y = start_y};
+    extent.total_weight = weighter(img, start_x, start_y);
 
     while (vec_size(poses) > 0) {
         PixelPos pp = vec_pop(poses, PixelPos);
@@ -50,6 +50,7 @@ static Blob find_blob_at(ImageView *img, int start_x, int start_y) {
                     PixelPos dpp                = (PixelPos){.x = dx, .y = dy};
                     *vec_push(&poses, PixelPos) = dpp;
                     *vec_push(&extent.pixels, PixelPos) = dpp;
+                    extent.total_weight += weighter(img, dx, dy);
 
                     // Update the extent if the pixel isn't in the current one
                     if (dx < extent.sx)
@@ -71,14 +72,14 @@ static Blob find_blob_at(ImageView *img, int start_x, int start_y) {
     return extent;
 }
 
-void blood_fill_largest_blob(ImageView *img) {
+void blood_fill_largest_weighted_blob(ImageView *img, blood_fill_weighter weighter) {
     Blob biggest_extent      = {.pixels = NULL};
-    long biggest_extent_size = 0;
+    long biggest_extent_size = LONG_MIN;
 
     for (int y = 0; y < img->height; y++) {
         for (int x = 0; x < img->width; x++) {
             if (imgv_get_pixel_grayscale(img, x, y) > 0.5) {
-                Blob ex = find_blob_at(img, x, y);
+                Blob ex = find_blob_at(img, x, y, weighter);
                 if (get_blob_size(ex) > biggest_extent_size) {
                     vec_destroy(biggest_extent.pixels);
                     biggest_extent      = ex;
@@ -98,4 +99,17 @@ void blood_fill_largest_blob(ImageView *img) {
         );
     }
     vec_destroy(biggest_extent.pixels);
+}
+
+static int id() {
+    return 1;
+} 
+
+void blood_fill_largest_blob(ImageView *img) {
+    blood_fill_largest_weighted_blob(img, id);
+}
+
+long blood_fill_center_weighter(ImageView *imgv, int x, int y) {
+    return -((x - imgv->width/2)*(x - imgv->width/2) +
+           (y - imgv->height/2)*(y - imgv->height/2));
 }

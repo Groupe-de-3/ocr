@@ -105,7 +105,8 @@ int Launch(neural_network NN, Matrix(double) input, size_t expected, int show) /
     
     size_t ind = array_max_ind(output);
     m_destroy(output);
-    if (show == 2)
+
+    if (show == 2) // for real pass
         return ind;
     return res;
 }

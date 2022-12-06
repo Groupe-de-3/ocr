@@ -6,6 +6,7 @@
 #include <string.h>
 
 #include "images.h"
+#include "image_view.h"
 
 static uint32_t readu32(FILE *file) {
     uint32_t value;
@@ -123,7 +124,7 @@ static void writeu16(FILE *file, uint16_t value) {
     fwrite(&value, sizeof(uint16_t), 1, file);
 }
 
-void bmp_save_to_file(FILE *file, Image *image) {
+void bmp_save_to_file(FILE *file, ImageView *image) {
     writeu8(file, (uint8_t)'B');
     writeu8(file, (uint8_t)'M'); // Magic first bytes
     writeu32(
@@ -153,10 +154,10 @@ void bmp_save_to_file(FILE *file, Image *image) {
     while (((row_size + row_padding) & 0x3) != 0)
         row_padding++;
 
-    for (uint32_t y = 0; y < image->height; y++) {
-        for (uint32_t x = 0; x < image->width;
+    for (int y = 0; y < image->height; y++) {
+        for (int x = 0; x < image->width;
              x++) { // pixels are still left to right so no problem there
-            rgb8_pixel_t pixel_value = img_get_pixel_rgb8(
+            rgb8_pixel_t pixel_value = imgv_get_pixel_rgb8(
                 image, x,
                 // BMP files have pixel bottom to top, while we want to load to
                 // top to bottom
@@ -172,7 +173,7 @@ void bmp_save_to_file(FILE *file, Image *image) {
     }
 }
 
-void bmp_save_to_path(const char *filepath, Image *image) {
+void bmp_save_to_path(const char *filepath, ImageView *image) {
     FILE *file = fopen(filepath, "wb");
     bmp_save_to_file(file, image);
     fclose(file);
