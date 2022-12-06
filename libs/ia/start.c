@@ -29,6 +29,7 @@ char* ia_launch(neural_network NN, Matrix(ImageView) images)
     char *result = malloc(sizeof(int) * size);
     for (size_t i = 0; i < size; i++)
         result[i] = (char) ia_launch_single(NN, images[i]);
+       
     return result;
 }
 

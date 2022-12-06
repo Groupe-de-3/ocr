@@ -280,7 +280,7 @@ int main(int argc, char **argv) {
     }
 
     bmp_save_to_path("SUDOKU_Z.bmp", &sudoku_view);
-    neural_network NN = ia_load("ocr.txt");
+    neural_network NN = ia_load("ocr5.txt");
     // 
     char * sudoku__ = ia_launch(NN, sudoku_imgs);
 

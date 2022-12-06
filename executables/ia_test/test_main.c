@@ -10,7 +10,7 @@
 #include "time.h"
 #include "start.h"
 
-void input_user(neural_network NN, MnistDataSet mnist)
+void input_user(neural_network NN, MnistDataSet mnist, MnistDataSet mnist2)
 {
     char *filename = malloc(sizeof(char) * 30);
     char *output = malloc(sizeof(char) * 10);
@@ -53,7 +53,7 @@ void input_user(neural_network NN, MnistDataSet mnist)
                 nb_sample = 0;
                 scanf("%zu", &nb_sample);
                 printf("Launch\n");
-                launch(NN, nb_sample, mnist);
+                launch(NN, nb_sample, mnist2);
                 break;
             
             case 'L':
@@ -84,7 +84,7 @@ int main() {
 
     printf("%s", "Launch\n\n");
     size_t layers_number = 2;
-    size_t layers_sizes[] = {784,40,10};
+    size_t layers_sizes[] = {784,25,25,10};
 
     size_t *layers_sizes_ = malloc(sizeof(size_t) * (layers_number + 1));
     for (size_t i = 0; i < layers_number + 1; i++)
@@ -93,11 +93,12 @@ int main() {
     //init neural network
     neural_network NN = ia_init(layers_number, layers_sizes_);
     MnistDataSet mnist = mnist_dataset_read("train-images-idx3-ubyte", "train-labels-idx1-ubyte");
-
-    input_user(NN, mnist);
+    MnistDataSet mnist2 = mnist_dataset_read("t10k-images-idx3-ubyte", "t10k-labels-idx1-ubyte");
+    input_user(NN, mnist, mnist2);
 
     // free the memory
     ia_memory_free(&NN);
     mnist_dataset_destroy(mnist);
+    mnist_dataset_destroy(mnist2);
     return 0;
 }
