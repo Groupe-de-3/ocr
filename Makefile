@@ -143,11 +143,6 @@ $(guile (define-target "least_squares_tests"\
 	`(deps "linear_algebra")\
 ))
 
-$(guile (define-target "gui_tests"\
-	`(target-type "executable")\
-	`(deps "doug")\
-))
-
 # -------------------
 # (Build) PROFILES
 #
