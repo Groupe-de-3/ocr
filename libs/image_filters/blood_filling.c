@@ -101,7 +101,7 @@ void blood_fill_largest_weighted_blob(ImageView *img, blood_fill_weighter weight
     vec_destroy(biggest_extent.pixels);
 }
 
-static int id() {
+static long id() {
     return 1;
 } 
 

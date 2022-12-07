@@ -31,17 +31,6 @@
 #include "time.h"
 #include "start.h"
 
-
-static void print_m(float *m) {
-    for (size_t y = 0; y < m_height(m); y++) {
-        for (size_t x = 0; x < m_width(m); x++) {
-            printf("%03.4f", m_get2(m, x, y));
-            printf(" - ");
-        }
-        printf("\n");
-    }
-}
-
 static long timediff(struct timeval start) {
     struct timeval now;
     gettimeofday(&now, NULL);
