@@ -72,7 +72,7 @@ static Blob find_blob_at(ImageView *img, int start_x, int start_y, blood_fill_we
     return extent;
 }
 
-void blood_fill_largest_weighted_blob(ImageView *img, blood_fill_weighter weighter) {
+long blood_fill_largest_weighted_blob(ImageView *img, blood_fill_weighter weighter, bool center) {
     Blob biggest_extent      = {.pixels = NULL};
     long biggest_extent_size = LONG_MIN;
 
@@ -91,25 +91,49 @@ void blood_fill_largest_weighted_blob(ImageView *img, blood_fill_weighter weight
             }
         }
     }
+    
+    if (biggest_extent.pixels == NULL)
+        return 0;
+    
+    int delta_x = 0,
+        delta_y = 0;
+    
+    if (center) {
+        delta_x = -biggest_extent.sx;
+        delta_y = -biggest_extent.sy;
+
+        delta_x += img->height / 2;
+        delta_y += img->width  / 2;
+        
+        delta_x -= (biggest_extent.ex - biggest_extent.sx) / 2;
+        delta_y -= (biggest_extent.ey - biggest_extent.sy) / 2;
+    }
 
     const any_pixel_t white = ANY_WHITE(img->image->format);
     for (size_t i = 0; i < vec_size(biggest_extent.pixels); i++) {
+        int x = biggest_extent.pixels[i].x + delta_x;
+        int y = biggest_extent.pixels[i].y + delta_y;
+        if (!imgv_in_bound(img, x, y))
+            continue;
         imgv_set_pixel_any(
-            img, biggest_extent.pixels[i].x, biggest_extent.pixels[i].y, white
+            img, x, y, white
         );
     }
     vec_destroy(biggest_extent.pixels);
+    
+    return biggest_extent_size;
 }
 
 static long id() {
     return 1;
 } 
 
-void blood_fill_largest_blob(ImageView *img) {
-    blood_fill_largest_weighted_blob(img, id);
+long blood_fill_largest_blob(ImageView *img, bool center) {
+    return blood_fill_largest_weighted_blob(img, id, center);
 }
 
 long blood_fill_center_weighter(ImageView *imgv, int x, int y) {
-    return -((x - imgv->width/2)*(x - imgv->width/2) +
-           (y - imgv->height/2)*(y - imgv->height/2));
+    double dx = (x - (double)imgv->width/2)*(x - (double)imgv->width/2);
+    double dy = (y - (double)imgv->height/2)*(y - (double)imgv->height/2);
+    return (long)sqrt(imgv->width*imgv->width + imgv->height*imgv->height) - (long)sqrt(dx*dx + dy*dy);
 }

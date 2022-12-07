@@ -152,7 +152,7 @@ int main(int argc, char **argv) {
     box_blur_run(&edges_view, &edges_mask_view, 11);
     global_threshold_run(&edges_mask_view, 0.09f);
 
-    blood_fill_largest_blob(&edges_mask_view);
+    blood_fill_largest_blob(&edges_mask_view, false);
 
 
     image_mask_run(&edges_view, &edges_mask_view);
@@ -238,18 +238,21 @@ int main(int argc, char **argv) {
     img_destroy(hough);
 
     sudoku_view.wraping_mode = WrappingMode_Clamp;
-    bmp_save_to_path("SUDOKU_B.bmp", &sudoku_view);
-    gaussian_adaptive_threshold_run(&sudoku_view, 3.f);
-    bmp_save_to_path("SUDOKU_A.bmp", &sudoku_view);
+    gaussian_adaptive_threshold_run(&sudoku_view, 10.f);
 
+    // Each cells from the sudoku that has numbers in it will be set to the correct
+    // image view of it here, values where sudoku_fill_mask is false should not be
+    // read
     Matrix(ImageView) sudoku_imgs = m_new(ImageView, 9, 9);
+    // Will be set to true for each existing numbers from the sudoku
+    Matrix(bool) sudoku_fill_mask = m_new(bool, 9, 9);
+
     for (size_t x = 0; x < 9; x += 1) {
         int start_x = (int)(x * 28 * 9) / 9;
         
         for (size_t y = 0; y < 9; y += 1) {
             int start_y = (int)(y * 28 * 9) / 9;
 
-            printf("%d x %d\n", start_x, start_y);
             ImageView view = {
                 .image = &sudoku,
                 .wraping_mode = WrappingMode_Clamp,
@@ -257,18 +260,25 @@ int main(int argc, char **argv) {
                 .width = 28, .height = 28
             };
 
-            blood_fill_largest_weighted_blob(&view, blood_fill_center_weighter);
+            long v = blood_fill_largest_weighted_blob(&view, blood_fill_center_weighter, true);
 
-            /*char bjr[100];
-            snprintf(bjr, 100, "%02dx%02d.bmp", x, y);
-            printf("Start %s\n", bjr);
-            bmp_save_to_path(bjr, &view);
-            printf("End %s\n", bjr);*/
+            m_get2(sudoku_fill_mask, x, y) = false;
+            if (v <= 100)
+                continue;
+
+            // char bjr[100];
+            // snprintf(bjr, 100, "%02zux%02zu.bmp", x, y);
+            // printf("Start %s\n", bjr);
+            // bmp_save_to_path(bjr, &view);
+            // printf("End %s\n", bjr);
             m_get2(sudoku_imgs, x, y) = view;
+            m_get2(sudoku_fill_mask, x, y) = true;
         }
     }
-
+    
     bmp_save_to_path("SUDOKU_Z.bmp", &sudoku_view);
+    return 0;
+
     neural_network NN = ia_load("ocr40.txt");
     
     char * sudoku__ = ia_launch(NN, sudoku_imgs);

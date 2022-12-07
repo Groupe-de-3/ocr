@@ -148,7 +148,7 @@ int main(int argc, char **argv) {
 
     sobel_execute(&blur_view, &gradient_view, &gradient_dir_view);
     printf("    Saving gradient to gradient.bmp\n");
-    bmp_save_to_path("gradient.bmp", &gradient);
+    bmp_save_to_path("gradient.bmp", &gradient_view);
     printf("    Done (%ldms)\n", timediff(start));
 
     gettimeofday(&start, NULL);
@@ -164,7 +164,7 @@ int main(int argc, char **argv) {
     );
 
     printf("    Saving edges to edges.bmp\n");
-    bmp_save_to_path("edges.bmp", &edges);
+    bmp_save_to_path("edges.bmp", &edges_view);
     printf("    Done (%ldms)\n", timediff(start));
 
     gettimeofday(&start, NULL);
@@ -175,18 +175,18 @@ int main(int argc, char **argv) {
     edges_mask_view.wraping_mode = WrappingMode_Clamp;
     box_blur_run(&edges_view, &edges_mask_view, 11);
     printf("    Saving step one to edges-mask1.bmp\n");
-    bmp_save_to_path("edges-mask1.bmp", &edges_mask);
+    bmp_save_to_path("edges-mask1.bmp", &edges_mask_view);
     global_threshold_run(&edges_mask_view, 0.09f);
     printf("    Saving step two to edges-mask2.bmp\n");
-    bmp_save_to_path("edges-mask2.bmp", &edges_mask);
-    blood_fill_largest_blob(&edges_mask_view);
+    bmp_save_to_path("edges-mask2.bmp", &edges_mask_view);
+    blood_fill_largest_blob(&edges_mask_view, false);
     printf("    Saving step three to edges-mask3.bmp\n");
-    bmp_save_to_path("edges-mask3.bmp", &edges_mask);
+    bmp_save_to_path("edges-mask3.bmp", &edges_mask_view);
 
     printf("    Applying the mask to the edges\n");
     image_mask_run(&edges_view, &edges_mask_view);
     printf("    Saving masked edges to masked-edges.bmp\n");
-    bmp_save_to_path("masked-edges.bmp", &edges);
+    bmp_save_to_path("masked-edges.bmp", &edges_view);
 
     printf("    Done (%ldms)\n", timediff(start));
 
@@ -199,7 +199,7 @@ int main(int argc, char **argv) {
 
     hough_acc_space_run(&edges_view, &gradient_dir_view, &hough_view);
     printf("    Saving edges to hough.bmp\n");
-    bmp_save_to_path("hough.bmp", &hough);
+    bmp_save_to_path("hough.bmp", &hough_view);
 
     Image hough_all_lines_img =
         img_new(resized.width, resized.height, resized.format);
@@ -207,7 +207,7 @@ int main(int argc, char **argv) {
 
     hough_acc_space_draw_all_lines(&hough_view, &hough_all_lines_img_view);
     printf("    Saving all lines to hough-all-lines.bmp\n");
-    bmp_save_to_path("hough-all-lines.bmp", &hough_all_lines_img);
+    bmp_save_to_path("hough-all-lines.bmp", &hough_all_lines_img_view);
 
     printf("    Done (%ldms)\n", timediff(start));
 
@@ -232,14 +232,14 @@ int main(int argc, char **argv) {
 
     draw_all_lines_on(&hough_peak_lines_img_view, hough_lines);
     printf("    Saving peak lines to hough-peak-lines.bmp\n");
-    bmp_save_to_path("hough-peak-lines.bmp", &hough_peak_lines_img);
+    bmp_save_to_path("hough-peak-lines.bmp", &hough_peak_lines_img_view);
 
     HoughLine *extrem_lines = hough_extract_extermum_lines(hough_lines);
     printf("    Extracted %zu extrem lines\n", vec_size(extrem_lines));
 
     draw_all_lines_on(&hough_lines_img_view, extrem_lines);
     printf("    Saving lines to hough-lines.bmp\n");
-    bmp_save_to_path("hough-lines.bmp", &hough_lines_img);
+    bmp_save_to_path("hough-lines.bmp", &hough_lines_img_view);
     printf("    Done (%ldms)\n", timediff(start));
 
     ParsedSudokuResult parse_rslt = sudoku_parse_from_lines(
@@ -264,7 +264,7 @@ int main(int argc, char **argv) {
     );
 
     printf("    Saving edges to sudoku.bmp\n");
-    bmp_save_to_path("sudoku.bmp", &sudoku);
+    bmp_save_to_path("sudoku.bmp", &sudoku_view);
     printf("    Done (%ldms)\n", timediff(start));
 
     vec_destroy(extrem_lines);
