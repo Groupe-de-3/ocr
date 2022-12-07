@@ -319,6 +319,23 @@ void input_user(neural_network NN, MnistDataSet mnist, MnistDataSet mnist2, Matr
                 }
                 printf("\n");
                 break;
+            case 'y':
+                printf("number of sample training? ");
+                size_t nb_training_sample2 = 0;
+                scanf("%zu", &nb_training_sample2);
+                printf("number of training? ");
+                size_t nb_training2 = 0;
+                scanf("%zu", &nb_training2);
+                printf("size of sample? ");
+                nb_sample = 0;
+                scanf("%zu", &nb_sample);
+                for (size_t i = 0; i < nb_training_sample2; i++)
+                {
+                    printf(" %zu / %zu\n", i+1, nb_training_sample2);
+                    train2(NN, nb_training2, nb_sample, sudoku_imgs);
+                }
+                printf("\n");
+                break;
 
             case 's':
                 printf("name of the neural network to save? ");
@@ -383,6 +400,7 @@ int main() {
 
     // free the memory
     ia_memory_free(&NN);
+    m_destroy(sudoku);
     mnist_dataset_destroy(mnist);
     mnist_dataset_destroy(mnist2);
     return 0;

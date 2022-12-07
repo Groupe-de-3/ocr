@@ -30,3 +30,5 @@ char* ia_launch(neural_network NN, ImageView* images);
 
 void launch(neural_network NN, size_t nb_sample, MnistDataSet mnist);
 void train(neural_network NN, size_t nb_training, size_t nb_sample, MnistDataSet mnist);
+
+void train2(neural_network NN, size_t nb_training, size_t nb_sample, Matrix(ImageView) sudo);
