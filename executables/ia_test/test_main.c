@@ -78,7 +78,7 @@ static void draw_all_lines_on(ImageView *in, HoughLine *lines) {
     }
 }
 
-Matrix(ImageView) sudoku_init() {
+Matrix(ImageView) sudoku_init(void) {
 
 
     struct timeval start;

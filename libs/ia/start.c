@@ -127,7 +127,7 @@ void train2(neural_network NN, size_t nb_training, size_t nb_sample, Matrix(Imag
     Data d = data_init(nb_sample); // a modif
 
 
-    Matrix(int) labels = m_new(int, 1, m_length(sudo));
+    Matrix(size_t) labels = m_new(size_t, 1, m_length(sudo));
     size_t labels_[] = {
         5,3,0,0,7,0,0,0,0,
         6,0,0,1,9,5,0,0,0,
@@ -146,7 +146,7 @@ void train2(neural_network NN, size_t nb_training, size_t nb_sample, Matrix(Imag
     for (int i = 0; i < d.size; i++)
     {
         Matrix(double) input = arr_to_mat(sudo[i]);
-        uint8_t e = labels[i];
+        size_t e = labels[i];
         Matrix(double) output = m_new(double, 1, NN.layers_sizes[NN.layers_number]);
         for (size_t j = 0; j < m_length(output); j++) {
             if (e == j)
