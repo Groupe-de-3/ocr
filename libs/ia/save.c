@@ -56,8 +56,6 @@ neural_network ia_load(char* file_name) // initialisation of the neural network 
     
     neural_network NN;
 
-             
-
     FILE *fichier = NULL;
     fichier       = fopen(file_name, "r");
     if (!fichier)
@@ -112,8 +110,6 @@ neural_network ia_load(char* file_name) // initialisation of the neural network 
         
         NN.layers_[layer_ind] = Layer_; //add layer
     }
-
-    NN.layers_ = NN.layers_;
 
     fclose(fichier);
 

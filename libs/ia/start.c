@@ -19,17 +19,21 @@
 
 int ia_launch_single(neural_network NN, ImageView im)
 {
-    Matrix(double) input = arr_to_mat(im);   
-    return Launch(NN, input, 0, 2);
+    Matrix(double) input = arr_to_mat(im);
+    int res = Launch(NN, input, 0, 2);
+    m_destroy(input);
+    return res;
 }
 
 char* ia_launch(neural_network NN, Matrix(ImageView) images)
 {
-    int size = (int) m_length(images);
+    size_t size = m_length(images);
     char *result = malloc(sizeof(int) * size);
     for (size_t i = 0; i < size; i++)
+    {
         result[i] = (char) ia_launch_single(NN, images[i]);
-       
+    }
+    
     return result;
 }
 
@@ -47,7 +51,7 @@ void launch(neural_network NN, size_t nb_sample, MnistDataSet mnist)
         Matrix(double) output = m_new(double, 1, NN.layers_sizes[NN.layers_number]);
         for (size_t j = 0; j < m_length(output); j++) {
             if (e == j)
-                output[j] = 5;
+                output[j] = 1;
             else
                 output[j] = 0;
         }
@@ -72,7 +76,16 @@ void train(neural_network NN, size_t nb_training, size_t nb_sample, MnistDataSet
     
     Data d = data_init(nb_sample); // a modif
 
-    for (int i = 0; i < d.size; i++)
+    Matrix(double) input1 = get_blanck();
+    Matrix(double) output1 = m_new(double, 1, NN.layers_sizes[NN.layers_number]);
+    output1[0] = 5;
+    for (size_t j = 1; j < m_length(output1); j++) {
+         output1[j] = 0;
+    }
+
+    d.data[0] = To_dataPoint(input1 , output1);
+
+    for (int i = 1; i < d.size; i++)
     {
         unsigned long ind_pic = ((unsigned long)rand()%mnist.size);
         Matrix(double) input = arr_to_mat(imgv_default(&mnist.images[ind_pic]));
@@ -80,7 +93,7 @@ void train(neural_network NN, size_t nb_training, size_t nb_sample, MnistDataSet
         Matrix(double) output = m_new(double, 1, NN.layers_sizes[NN.layers_number]);
         for (size_t j = 0; j < m_length(output); j++) {
             if (e == j)
-                output[j] = 5;
+                output[j] = 1;
             else
                 output[j] = 0;
         }
@@ -94,13 +107,14 @@ void train(neural_network NN, size_t nb_training, size_t nb_sample, MnistDataSet
         Learn(&NN, d, 0.01);
     }
 
+    /*
     int nb_result = 0;
     for (int i = 0; i < d.size; i++) 
     {
         size_t ind = array_max_ind(d.data[i].expect);
         nb_result += Launch(NN, d.data[i].input, ind, 1);
     }
-    printf("\nSuccess rate : %f %%\n\n", ((float) nb_result) / ((float) d.size) *100.f);
+    printf("\nSuccess rate : %f %%\n\n", ((float) nb_result) / ((float) d.size) *100.f);*/
     data_Destroy(d);
 
 }

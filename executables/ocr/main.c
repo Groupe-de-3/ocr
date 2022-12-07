@@ -270,17 +270,17 @@ int main(int argc, char **argv) {
 
             blood_fill_largest_weighted_blob(&view, blood_fill_center_weighter);
 
-            char bjr[100];
+            /*char bjr[100];
             snprintf(bjr, 100, "%02dx%02d.bmp", x, y);
             printf("Start %s\n", bjr);
             bmp_save_to_path(bjr, &view);
-            printf("End %s\n", bjr);
+            printf("End %s\n", bjr);*/
             m_get2(sudoku_imgs, x, y) = view;
         }
     }
 
     bmp_save_to_path("SUDOKU_Z.bmp", &sudoku_view);
-    neural_network NN = ia_load("ocr5.txt");
+    neural_network NN = ia_load("ocr20.txt");
     // 
     char * sudoku__ = ia_launch(NN, sudoku_imgs);
 
@@ -290,6 +290,8 @@ int main(int argc, char **argv) {
     //solve(0, 0, sudoku__);
 
     sudoku_print(sudoku__);
+
+    free(sudoku__);
     ia_memory_free(&NN);
     img_destroy(sudoku);
     return 0;

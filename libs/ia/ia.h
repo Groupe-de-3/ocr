@@ -2,6 +2,8 @@
 #include "struct.h"
 #include "image_view.h"
 
+Matrix(double) get_blanck(void);
+
 size_t array_max_ind(Matrix(double) m);
 
 Matrix(double) arr_to_mat(ImageView img);

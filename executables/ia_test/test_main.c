@@ -13,7 +13,7 @@
 void input_user(neural_network NN, MnistDataSet mnist, MnistDataSet mnist2)
 {
     char *filename = malloc(sizeof(char) * 30);
-    char *output = malloc(sizeof(char) * 10);
+    char *output = malloc(sizeof(char) * 30);
     size_t nb_sample = 0;
     while (output[0] != 'q')
     {
@@ -35,6 +35,7 @@ void input_user(neural_network NN, MnistDataSet mnist, MnistDataSet mnist2)
                 scanf("%zu", &nb_sample);
                 for (size_t i = 0; i < nb_training_sample; i++)
                 {
+                    printf(" %zu / %zu\n", i+1, nb_training_sample);
                     train(NN, nb_training, nb_sample, mnist);
                 }
                 printf("\n");
@@ -49,16 +50,14 @@ void input_user(neural_network NN, MnistDataSet mnist, MnistDataSet mnist2)
                 break;
 
              case 'l':
-                printf("size of sample? ");
-                nb_sample = 0;
-                scanf("%zu", &nb_sample);
                 printf("Launch\n");
-                launch(NN, nb_sample, mnist2);
+                launch(NN, 10000, mnist2);
                 break;
             
             case 'L':
                 printf("Name of the neural network to load? ");
                 scanf("%s", filename);
+                ia_memory_free(&NN);
                 NN = ia_load(filename); 
                 printf("Neural network have been load from the file %s\n", filename);
                 printf("\n");
@@ -84,7 +83,7 @@ int main() {
 
     printf("%s", "Launch\n\n");
     size_t layers_number = 2;
-    size_t layers_sizes[] = {784,25,25,10};
+    size_t layers_sizes[] = {784,50,10};
 
     size_t *layers_sizes_ = malloc(sizeof(size_t) * (layers_number + 1));
     for (size_t i = 0; i < layers_number + 1; i++)

@@ -13,6 +13,17 @@
 #include <string.h>
 #include <time.h>
 
+Matrix(double) get_blanck()
+{
+    Matrix(double) res = m_new(double, 1, 784);
+    for(int i = 0; i < 28; i++)
+    {
+        for(int j = 0; j < 28; j++)
+            res[j * 28 + i] = 0;
+    }
+
+    return res;
+}
 
 Matrix(double) arr_to_mat(ImageView img)
 {
@@ -22,7 +33,7 @@ Matrix(double) arr_to_mat(ImageView img)
         for(int j = 0; j < 28; j++)
         {
             double val = (double) imgv_get_pixel_grayscale(&img, i, j);
-            if (val > 0.3)
+            if (val > 0.1)
                 val = 1;
             else
                 val = 0;
@@ -201,7 +212,7 @@ void Learn(neural_network *NN, Data data, double learnRate) // Start the learnin
         }
     }
 
-    //ApplyGradients_all_layer(*NN, grad_W_train, grad_B_train, learnRate, data.size); // aply gradient to all layer after all data
+    ApplyGradients_all_layer(*NN, grad_W_train, grad_B_train, learnRate, data.size); // aply gradient to all layer after all data
 
     for (size_t i = 0; i < NN->layers_number; i++)
     {
