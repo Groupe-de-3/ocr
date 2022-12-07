@@ -78,7 +78,7 @@ void train(neural_network NN, size_t nb_training, size_t nb_sample, MnistDataSet
 
     Matrix(double) input1 = get_blanck();
     Matrix(double) output1 = m_new(double, 1, NN.layers_sizes[NN.layers_number]);
-    output1[0] = 5;
+    output1[0] = 3;
     for (size_t j = 1; j < m_length(output1); j++) {
          output1[j] = 0;
     }
@@ -93,7 +93,7 @@ void train(neural_network NN, size_t nb_training, size_t nb_sample, MnistDataSet
         Matrix(double) output = m_new(double, 1, NN.layers_sizes[NN.layers_number]);
         for (size_t j = 0; j < m_length(output); j++) {
             if (e == j)
-                output[j] = 1;
+                output[j] = 5;
             else
                 output[j] = 0;
         }

@@ -127,7 +127,7 @@ ia_test_name = ia_test
 ia_test_target_type = executable
 ia_test_link_in_deps = true
 ia_test_source_dirs += executables/ia_test
-ia_test_depedencies = ia matrices utils
+ia_test_depedencies = ia matrices utils image_filters images linear_algebra sudoku
 
 targets += ocr
 

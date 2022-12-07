@@ -19,7 +19,13 @@ Matrix(double) get_blanck()
     for(int i = 0; i < 28; i++)
     {
         for(int j = 0; j < 28; j++)
-            res[j * 28 + i] = 0;
+        {
+            if ((unsigned long)rand()%784 < 40)
+                res[j * 28 + i] = 1;
+            else
+                res[j * 28 + i] = 0;
+        }
+            
     }
 
     return res;
@@ -32,12 +38,18 @@ Matrix(double) arr_to_mat(ImageView img)
     {
         for(int j = 0; j < 28; j++)
         {
-            double val = (double) imgv_get_pixel_grayscale(&img, i, j);
-            if (val > 0.1)
-                val = 1;
+            if ((unsigned long)rand()%784 < 40)
+                res[j * 28 + i] = 1;
             else
-                val = 0;
-            res[j * 28 + i] = val;
+            {
+                double val = (double) imgv_get_pixel_grayscale(&img, i, j);
+                if (val > 0.1)
+                    val = 1;
+                else
+                    val = 0;
+                res[j * 28 + i] = val;
+            }
+            
         }
     }
 
@@ -201,7 +213,7 @@ void Learn(neural_network *NN, Data data, double learnRate) // Start the learnin
         
         for (size_t i = 0; i < NN->layers_number; i++)
         {
-            ApplyGradients_layer_(NN->layers_[i], learnRate);
+            //ApplyGradients_layer_(NN->layers_[i], learnRate);
         }
         
         
