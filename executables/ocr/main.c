@@ -5,6 +5,7 @@
 #include <time.h>
 
 #include "bilinear_sampling.h"
+#include "otsu_threshold.h"
 #include "blood_filling.h"
 #include "box_blur.h"
 #include "canny_edge_detector.h"
@@ -30,13 +31,6 @@
 #include "struct.h"
 #include "time.h"
 #include "start.h"
-
-static long timediff(struct timeval start) {
-    struct timeval now;
-    gettimeofday(&now, NULL);
-    return (now.tv_sec - start.tv_sec) * 1000 + now.tv_usec / 1000 -
-           start.tv_usec / 1000;
-}
 
 static void draw_all_lines_on(ImageView *in, HoughLine *lines) {
     some_pixel_t line_colors = (some_pixel_t){
@@ -75,9 +69,6 @@ int main(int argc, char **argv) {
     }
     ImageView image_view    = imgv_default(&image);
     image_view.wraping_mode = WrappingMode_Clamp;
-
-    // Save input
-    printf("    Done (%ldms)\n", timediff(start));
 
     size_t target_width =
         image.width > image.height ? 800 : (image.width * 800) / image.height;
@@ -207,7 +198,7 @@ int main(int argc, char **argv) {
 
     gettimeofday(&start, NULL);
 
-    Image     sudoku      = img_new(28*9, 28*9, resized.format);
+    Image     sudoku      = img_new(900, 900, resized.format);
     ImageView sudoku_view = imgv_default(&sudoku);
 
     bilinear_perspective_transmute(
@@ -238,45 +229,76 @@ int main(int argc, char **argv) {
     img_destroy(hough);
 
     sudoku_view.wraping_mode = WrappingMode_Clamp;
-    gaussian_adaptive_threshold_run(&sudoku_view, 10.f);
+    Image prep_sudoku = img_new(
+        (size_t)sudoku_view.width, (size_t)sudoku_view.height,
+        PixelFormat_GrayScale
+    );
+    ImageView prep_view = imgv_default(&prep_sudoku);
+    prep_view.wraping_mode= WrappingMode_Clamp;
+    imgv_copy(&sudoku_view, &prep_view);
+    
+    bmp_save_to_path("SUDOKU_A.bmp", &prep_view);
+    // bmp_save_to_path("SUDOKU_B.bmp", &prep_view);
+    
+    Image sudoku_cells = img_new(
+        28 * 9, 28 * 9, PixelFormat_GrayScale
+    );
+    ImageView cells_view = imgv_default(&sudoku_cells);
+    cells_view.wraping_mode= WrappingMode_Clamp;
 
-    // Each cells from the sudoku that has numbers in it will be set to the correct
-    // image view of it here, values where sudoku_fill_mask is false should not be
-    // read
     Matrix(ImageView) sudoku_imgs = m_new(ImageView, 9, 9);
-    // Will be set to true for each existing numbers from the sudoku
-    Matrix(bool) sudoku_fill_mask = m_new(bool, 9, 9);
-
     for (size_t x = 0; x < 9; x += 1) {
+        int original_start_x = (int)(x * prep_sudoku.width) / 9;
         int start_x = (int)(x * 28 * 9) / 9;
         
         for (size_t y = 0; y < 9; y += 1) {
+            int original_start_y = (int)(y * prep_sudoku.height) / 9;
             int start_y = (int)(y * 28 * 9) / 9;
 
-            ImageView view = {
-                .image = &sudoku,
+            // printf("start   : %dx%d\n", start_x, start_y);
+            // printf("og start: %dx%d\n", original_start_x, original_start_y);
+
+            ImageView original_view = {
+                .image = &prep_sudoku,
+                .wraping_mode = WrappingMode_Clamp,
+                .x = original_start_x, .y = original_start_y,
+                .width = sudoku_view.width/9, .height = sudoku_view.height/9
+            };
+
+            double thresh = otsus_method(&original_view);
+            size_t white_pixs = global_threshold_run(&original_view, (float)thresh);
+            // Inverse if there is more white than blacks
+            if ((int)white_pixs > (original_view.width * original_view.height) / 2) {
+                for (int sx = 0; sx < original_view.width; sx++)
+                    for (int sy = 0; sy < original_view.height; sy++)
+                        imgv_set_pixel_grayscale(
+                            &original_view, sx, sy,
+                            1.f - imgv_get_pixel_grayscale(&original_view, sx, sy)
+                        );
+            }
+            
+            long v = blood_fill_largest_weighted_blob(&original_view, blood_fill_center_weighter, true);
+            if (v < 500000)
+                continue;
+
+            ImageView cell_view = {
+                .image = &sudoku_cells,
                 .wraping_mode = WrappingMode_Clamp,
                 .x = start_x, .y = start_y,
                 .width = 28, .height = 28
             };
+            bilinear_resize(&original_view, &cell_view);
 
-            long v = blood_fill_largest_weighted_blob(&view, blood_fill_center_weighter, true);
-
-            m_get2(sudoku_fill_mask, x, y) = false;
-            if (v <= 100)
-                continue;
-
-            // char bjr[100];
-            // snprintf(bjr, 100, "%02zux%02zu.bmp", x, y);
+            char bjr[100];
+            snprintf(bjr, 100, "%02zux%02zu.bmp", x, y);
             // printf("Start %s\n", bjr);
-            // bmp_save_to_path(bjr, &view);
+            bmp_save_to_path(bjr, &cell_view);
             // printf("End %s\n", bjr);
-            m_get2(sudoku_imgs, x, y) = view;
-            m_get2(sudoku_fill_mask, x, y) = true;
+            m_get2(sudoku_imgs, x, y) = cell_view;
         }
     }
     
-    bmp_save_to_path("SUDOKU_Z.bmp", &sudoku_view);
+    bmp_save_to_path("SUDOKU_Z.bmp", &cells_view);
     return 0;
 
     neural_network NN = ia_load("ocr40.txt");

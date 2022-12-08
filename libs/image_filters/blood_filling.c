@@ -37,7 +37,7 @@ static Blob find_blob_at(ImageView *img, int start_x, int start_y, blood_fill_we
     };
     *vec_push(&extent.pixels, PixelPos) =
         (PixelPos){.x = start_x, .y = start_y};
-    extent.total_weight = weighter(img, start_x, start_y);
+    extent.total_weight = 0;
 
     while (vec_size(poses) > 0) {
         PixelPos pp = vec_pop(poses, PixelPos);
@@ -133,7 +133,14 @@ long blood_fill_largest_blob(ImageView *img, bool center) {
 }
 
 long blood_fill_center_weighter(ImageView *imgv, int x, int y) {
-    double dx = (x - (double)imgv->width/2)*(x - (double)imgv->width/2);
-    double dy = (y - (double)imgv->height/2)*(y - (double)imgv->height/2);
-    return (long)sqrt(imgv->width*imgv->width + imgv->height*imgv->height) - (long)sqrt(dx*dx + dy*dy);
+    double w2 = ((double)imgv->width)/2.;
+    double h2 = ((double)imgv->height)/2.;
+
+    double dx = x - w2;
+    double dy = y - h2;
+    
+    double max = w2*w2 + h2*h2;
+    double d = dx*dx + dy*dy;
+    
+    return (long)((max/2) - d);
 }
