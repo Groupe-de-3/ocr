@@ -80,14 +80,6 @@ test_lib_source_dirs += tests/lib
 
 # EXECUTABLES
 
-targets += example_executable
-
-example_executable_name = example_executable
-example_executable_target_type = executable
-example_executable_link_in_deps = true
-example_executable_source_dirs += executables/example_executable
-example_executable_depedencies = example_library
-
 targets += tests
 
 tests_name = tests
@@ -137,6 +129,14 @@ ocr_link_in_deps = true
 ocr_source_dirs += executables/ocr
 ocr_depedencies = ia matrices utils image_filters images linear_algebra sudoku
 
+targets += ocr_gui
+
+ocr_gui_name = ocr_gui
+ocr_gui_target_type = executable
+ocr_gui_link_in_deps = true
+ocr_gui_source_dirs += executables/ocr_gui
+ocr_gui_depedencies = ia matrices utils image_filters images linear_algebra sudoku
+
 targets += least_squares_tests
 
 least_squares_tests_name = least_squares_tests
@@ -160,7 +160,7 @@ c_warnings = -Wall -Wextra -Wpedantic -Wshadow -Wpointer-arith -Wcast-align \
 			 -Wno-unused-command-line-argument
 c_errors = -Werror=implicit-function-declaration
 # Flags all profiles share
-default_cflags = $(c_warnings) $(c_errors) -std=gnu17 -lm
+default_cflags = $(c_warnings) $(c_errors) -std=gnu17 -lm $(shell pkg-config --cflags --libs gtk+-3.0)
 # Some flags required to remove all asserts()
 disable_asserts_cflags = -DNDEBUG -Wno-unused-variable -Wno-unused-parameter
 
@@ -169,7 +169,7 @@ profiles = valgrind-debug debug release
 # Available but not required variables for a profile
 # PROFILE_NAME_cflags - List of flags to give to $CC
 
-debug_cflags = $(default_cflags) -fsanitize=address -static-libsan -g -Og
+debug_cflags = $(default_cflags) -fsanitize=address -static-libsan -g -Og 
 valgrind-debug_cflags = $(default_cflags) -gdwarf-4 -g -Og
 release_cflags = $(default_cflags) -Ofast $(disable_asserts_cflags)
 
