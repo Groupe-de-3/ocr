@@ -269,6 +269,7 @@ PipelineSecondaryResult pipeline_seconday(PipelineIntermediaryResult *prslt) {
             compose_image(
                 &in_view, &out_view, (some_pixel_t) {
                     .value.rgbf = { 1., 0., 0. },
+                    .format = PixelFormat_Rgbf,
                 }
             );
         }

@@ -78,5 +78,9 @@ int main(int argc, char **argv) {
     PipelineSecondaryResult rslt_2 =
         pipeline_seconday(&rslt_1);
     printf("Done\n");
+
+    ImageView p = imgv_default(&rslt_2.result);
+    bmp_save_to_path("test.bmp", &p);
+
     sudoku_print(rslt_2.sudoku);
 }
