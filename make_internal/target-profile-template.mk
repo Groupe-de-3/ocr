@@ -45,7 +45,7 @@ $(§_¤_obj_dir)/%.o: %.c
 $(§_¤_output_file_path): $$(§_¤_obj_files) $$(§_¤_depedencies_files)
 	mkdir -p $(dir $@)
 ifeq ($(¤_target_type),executable)
-	$(CC) $(§_¤_cflags) -Wl,-rpath,'$$ORIGIN' $^ -o $@
+	$(CC) $(§_¤_cflags) -Wl,--start-group -Wl,-rpath,'$$ORIGIN' $^ -o $@  -Wl,--end-group
 else ifeq ($(¤_target_type),dynlib)
 	$(CC) $(§_¤_cflags) -shared $^ -o $@
 else

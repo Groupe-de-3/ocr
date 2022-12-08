@@ -72,6 +72,14 @@ mnist_loader_target_type = staticlib
 mnist_loader_source_dirs += libs/mnist_loader
 mnist_loader_depedencies = images
 
+targets += pipeline
+
+pipeline_name = pipeline
+pipeline_target_type = staticlib
+pipeline_source_dirs += libs/pipeline
+pipeline_depedencies = ia matrices utils image_filters images linear_algebra sudoku
+pipeline_link_in_deps = true
+
 targets += test_lib
 
 test_lib_name = test_lib
@@ -127,7 +135,7 @@ ocr_name = ocr
 ocr_target_type = executable
 ocr_link_in_deps = true
 ocr_source_dirs += executables/ocr
-ocr_depedencies = ia matrices utils image_filters images linear_algebra sudoku
+ocr_depedencies = ia matrices utils image_filters images linear_algebra sudoku pipeline
 
 targets += ocr_gui
 
@@ -135,7 +143,7 @@ ocr_gui_name = ocr_gui
 ocr_gui_target_type = executable
 ocr_gui_link_in_deps = true
 ocr_gui_source_dirs += executables/ocr_gui
-ocr_gui_depedencies = ia matrices utils image_filters images linear_algebra sudoku
+ocr_gui_depedencies = ia matrices utils image_filters images linear_algebra sudoku pipeline
 
 targets += least_squares_tests
 
