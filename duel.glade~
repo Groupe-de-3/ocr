@@ -31,7 +31,7 @@
               </packing>
             </child>
             <child>
-              <object class="GtkButton" id="solve_sudoku">
+              <object class="GtkButton">
                 <property name="label" translatable="yes">Solve Sudoku</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>

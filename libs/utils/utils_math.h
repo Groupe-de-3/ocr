@@ -4,21 +4,21 @@
 #define clamp(X, MIN, MAX) \
     _Generic((X), int : iclamp, float : fclampf, double : fclamp)(X, MIN, MAX)
 
-inline int iclamp(int x, int min, int max) {
+inline static  int iclamp(int x, int min, int max) {
     if (x < min)
         return min;
     if (x > max)
         return max;
     return x;
 }
-inline float fclampf(float x, float min, float max) {
+inline static float fclampf(float x, float min, float max) {
     if (x < min)
         return min;
     if (x > max)
         return max;
     return x;
 }
-inline double fclamp(double x, double min, double max) {
+inline static double fclamp(double x, double min, double max) {
     if (x < min)
         return min;
     if (x > max)
@@ -28,11 +28,11 @@ inline double fclamp(double x, double min, double max) {
 
 #define min(X, Y) _Generic((X), int : imin, float : fmin, double : fminf)(X, Y)
 
-inline int imin(int x, int y) {
+inline static int imin(int x, int y) {
     return y < x ? y : x;
 }
 
-inline int imax(int x, int y) {
+inline static int imax(int x, int y) {
     return y > x ? y : x;
 }
 
