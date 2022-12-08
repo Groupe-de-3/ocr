@@ -322,13 +322,15 @@ char* solving(gchar* filename)
         }
     }
 
-    neural_network NN = ia_load("ocr40.txt");
+    neural_network NN = ia_load("ocr3.txt");
+
+    char * sudoku__ = calloc(81 ,sizeof(char));
     
-    char * sudoku__ = ia_launch(NN, sudoku_mask, sudoku_imgs);
+    ia_launch(NN, sudoku_mask, sudoku_imgs, sudoku__);
 
-    //char * sudoku__ = calloc(81 ,sizeof(char));
-
-    //solve(0, 0, sudoku__);
+    sudoku_print(sudoku__);
+    
+    solve(0, 0, sudoku__);
 
     sudoku_print(sudoku__);
 

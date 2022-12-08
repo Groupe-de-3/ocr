@@ -304,23 +304,14 @@ int main(int argc, char **argv) {
     
     bmp_save_to_path("SUDOKU_Z.bmp", &cells_view);
 
-<<<<<<< Updated upstream
     neural_network NN = ia_load("ocr3.txt");
 
     char * sudoku__ = calloc(81 ,sizeof(char));
     
     ia_launch(NN, sudoku_mask, sudoku_imgs, sudoku__);
 
-
-    //solve(0, 0, sudoku__);
-
-=======
-    neural_network NN = ia_load("ocr40.txt");
-    
-    char * sudoku__ = ia_launch(NN, sudoku_mask, sudoku_imgs);
-    // char * sudoku__ = calloc(81 ,sizeof(char));
     solve(0, 0, sudoku__);
->>>>>>> Stashed changes
+
     sudoku_print(sudoku__);
         
     m_destroy(sudoku_imgs);

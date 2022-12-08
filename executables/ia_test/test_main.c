@@ -361,7 +361,7 @@ void input_user(neural_network NN, MnistDataSet mnist, MnistDataSet mnist2, coop
                 size_t nb_training2 = 0;
                 scanf("%zu", &nb_training2);
 
-                train2(NN, nb_training2, ret, ret2);
+                train2(NN, nb_training2, ret);
                 break;
 
             case 's':
@@ -379,9 +379,7 @@ void input_user(neural_network NN, MnistDataSet mnist, MnistDataSet mnist2, coop
             case 'm':
                 printf("Launch\n");
                 char * sudoku__ = calloc(81 ,sizeof(char));
-                ia_launch(NN, ret.sudoku_mask, ret.sudoku_imgs, sudoku__);
-                //solve(0, 0, sudoku__);
-
+                ia_launch(NN, ret2.sudoku_mask, ret2.sudoku_imgs, sudoku__);
                 sudoku_print(sudoku__);
                 break;
             
@@ -413,8 +411,8 @@ void input_user(neural_network NN, MnistDataSet mnist, MnistDataSet mnist2, coop
 int main() {
 
     printf("%s", "Launch\n\n");
-    size_t layers_number = 3;
-    size_t layers_sizes[] = {784,300,300,10};
+    size_t layers_number = 2;
+    size_t layers_sizes[] = {784,100,10};
 
     size_t *layers_sizes_ = malloc(sizeof(size_t) * (layers_number + 1));
     for (size_t i = 0; i < layers_number + 1; i++)
