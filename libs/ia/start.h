@@ -26,7 +26,7 @@
  * 
  *  \return a list of the guess numbers
  */
-char* ia_launch(neural_network NN, ImageView* images);
+char* ia_launch(neural_network NN, bool *image_masks, ImageView* images);
 
 void launch(neural_network NN, size_t nb_sample, MnistDataSet mnist);
 void train(neural_network NN, size_t nb_training, size_t nb_sample, MnistDataSet mnist);

@@ -247,6 +247,8 @@ int main(int argc, char **argv) {
     cells_view.wraping_mode= WrappingMode_Clamp;
 
     Matrix(ImageView) sudoku_imgs = m_new(ImageView, 9, 9);
+    Matrix(bool) sudoku_mask = m_new(bool, 9, 9);
+
     for (size_t x = 0; x < 9; x += 1) {
         int original_start_x = (int)(x * prep_sudoku.width) / 9;
         int start_x = (int)(x * 28 * 9) / 9;
@@ -278,8 +280,10 @@ int main(int argc, char **argv) {
             }
             
             long v = blood_fill_largest_weighted_blob(&original_view, blood_fill_center_weighter, true);
+            m_get2(sudoku_mask, x, y) = false;
             if (v < 500000)
                 continue;
+            m_get2(sudoku_mask, x, y) = true;
 
             ImageView cell_view = {
                 .image = &sudoku_cells,
@@ -299,11 +303,10 @@ int main(int argc, char **argv) {
     }
     
     bmp_save_to_path("SUDOKU_Z.bmp", &cells_view);
-    return 0;
 
     neural_network NN = ia_load("ocr40.txt");
     
-    char * sudoku__ = ia_launch(NN, sudoku_imgs);
+    char * sudoku__ = ia_launch(NN, sudoku_mask, sudoku_imgs);
 
     //char * sudoku__ = calloc(81 ,sizeof(char));
 

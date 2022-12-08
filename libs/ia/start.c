@@ -25,12 +25,14 @@ int ia_launch_single(neural_network NN, ImageView im)
     return res;
 }
 
-char* ia_launch(neural_network NN, Matrix(ImageView) images)
+char* ia_launch(neural_network NN, Matrix(bool) images_mask, Matrix(ImageView) images)
 {
     size_t size = m_length(images);
     char *result = malloc(sizeof(int) * size);
     for (size_t i = 0; i < size; i++)
     {
+        if (!images_mask[i])
+            continue;
         result[i] = (char) ia_launch_single(NN, images[i]);
     }
     
