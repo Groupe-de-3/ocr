@@ -124,8 +124,8 @@ void train2(neural_network NN, size_t nb_training, coople ret)
 
 
     Matrix(size_t) labels = m_new(size_t, 1, c);
-    size_t labels_[] = {5,3,7,6,1,9,5,9,8,6,8,6,3,4,8,3,1,7,2,6,6,2,8,4,1,9,5,8,7,9};
-    //size_t labels_[] = {4,5,8,7,2,1,3,4,3,2,1,6,7,4,7,2,6,3,4,9,1,3,6,1,5,8,6,6,9,5};
+    //size_t labels_[] = {5,3,7,6,1,9,5,9,8,6,8,6,3,4,8,3,1,7,2,6,6,2,8,4,1,9,5,8,7,9};
+    size_t labels_[] = {4,5,8,7,2,1,3,4,3,2,1,6,7,4,7,2,6,3,4,9,1,3,6,1,5,8,6,6,9,5};
 
     for (size_t i = 0; i < c; i++)
         labels[i] = labels_[i];
