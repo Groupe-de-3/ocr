@@ -28,7 +28,6 @@
 #include "ia.h"
 #include "matrices.h"
 #include "save.h"
-#include "gene.h"
 #include "mnist.h"
 #include "struct.h"
 #include "time.h"
@@ -328,7 +327,6 @@ char* solving(gchar* filename)
     char * sudoku__ = calloc(81 ,sizeof(char));
     
     ia_launch(NN, sudoku_mask, sudoku_imgs, sudoku__);
-    gene(filename, sudoku__);
 
     sudoku_print(sudoku__);
     
