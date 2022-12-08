@@ -31,4 +31,4 @@ void ia_launch(neural_network NN, Matrix(bool) images_mask, Matrix(ImageView) im
 void launch(neural_network NN, size_t nb_sample, MnistDataSet mnist);
 void train(neural_network NN, size_t nb_training, size_t nb_sample, MnistDataSet mnist);
 
-void train2(neural_network NN, size_t nb_training, coople ret);
+void train2(neural_network NN, size_t nb_training, coople ret, coople ret2);

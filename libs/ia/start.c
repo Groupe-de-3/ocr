@@ -85,7 +85,7 @@ void train(neural_network NN, size_t nb_training, size_t nb_sample, MnistDataSet
         Matrix(double) output = m_new(double, 1, NN.layers_sizes[NN.layers_number]);
         for (size_t j = 0; j < m_length(output); j++) {
             if (e == j)
-                output[j] = 5;
+                output[j] = 8;
             else
                 output[j] = 0;
         }
@@ -112,43 +112,55 @@ void train(neural_network NN, size_t nb_training, size_t nb_sample, MnistDataSet
 }
 
 
-void train2(neural_network NN, size_t nb_training, coople ret)
+void train2(neural_network NN, size_t nb_training, coople ret, coople ret2)
 {
+    
     //data
     size_t c = 0;
     for (int i = 0; i < 81; i++)
         c += ret.sudoku_mask[i];
-    
+    for (int i = 0; i < 81; i++)
+        c += ret2.sudoku_mask[i];
     Data d = data_init(c); // a modif
 
 
     Matrix(size_t) labels = m_new(size_t, 1, 81);
-    size_t labels_[] = {
-        5,3,0,0,7,0,0,0,0,
-        6,0,0,1,9,5,0,0,0,
-        0,9,8,0,0,0,0,6,0,
-        8,0,0,0,6,0,0,0,3,
-        4,0,0,8,0,3,0,0,1,
-        7,0,0,0,2,0,0,0,6,
-        0,6,0,0,0,0,2,8,0,
-        0,0,0,4,1,9,0,0,5,
-        0,0,0,0,8,0,0,7,9
-        };
+    Matrix(size_t) labels2 = m_new(size_t, 1, 81);
+    size_t labels_[] = {5,3,7,6,1,9,5,9,8,6,8,6,3,4,8,3,1,7,2,6,6,2,8,4,1,9,5,8,7,9};
+    size_t labels_2[] = {4,5,8,7,2,1,3,4,3,2,1,6,7,4,7,2,6,3,4,9,1,3,6,1,5,8,6,6,9,5};
 
     for (size_t i = 0; i < 81; i++)
         labels[i] = labels_[i];
-        
+        for (size_t i = 0; i < 81; i++)
+        labels2[i] = labels_2[i];
+
     int n = 0;
     for (int i = 0; i < 81; i++)
     {
         if (ret.sudoku_mask[i])
         {
             Matrix(double) input = arr_to_mat(ret.sudoku_imgs[i]);
-            size_t e = labels[i];
+            size_t e = labels[n];
             Matrix(double) output = m_new(double, 1, NN.layers_sizes[NN.layers_number]);
             for (size_t j = 0; j < m_length(output); j++) {
                 if (e == j)
-                    output[j] = 5;
+                    output[j] = 8;
+                else
+                    output[j] = 0;
+            }
+            DataPoint dp = To_dataPoint(input , output);
+            d.data[n] = dp;
+            n++;
+        }
+
+        if (ret2.sudoku_mask[i])
+        {
+            Matrix(double) input = arr_to_mat(ret2.sudoku_imgs[i]);
+            size_t e = labels2[n];
+            Matrix(double) output = m_new(double, 1, NN.layers_sizes[NN.layers_number]);
+            for (size_t j = 0; j < m_length(output); j++) {
+                if (e == j)
+                    output[j] = 8;
                 else
                     output[j] = 0;
             }

@@ -65,7 +65,7 @@ static void draw_all_lines_on(ImageView *in, HoughLine *lines) {
 }
 
 
-coople sudoku_init() {
+coople sudoku_init(char * filename) {
 
     struct timeval start;
 
@@ -73,7 +73,7 @@ coople sudoku_init() {
 
     Image           image;
     ImageLoadResult rslt =
-        img_load_file("examples/image_01.bmp", &image, false, PixelFormat_Rgbf);
+        img_load_file(filename, &image, false, PixelFormat_Rgbf);
     if (!rslt.success) {
         errx(1, "Could not load");
     }
@@ -324,7 +324,7 @@ coople sudoku_init() {
 }
 
 
-void input_user(neural_network NN, MnistDataSet mnist, MnistDataSet mnist2, coople ret)
+void input_user(neural_network NN, MnistDataSet mnist, MnistDataSet mnist2, coople ret, coople ret2)
 {
     char *filename = malloc(sizeof(char) * 30);
     char *output = malloc(sizeof(char) * 30);
@@ -361,9 +361,7 @@ void input_user(neural_network NN, MnistDataSet mnist, MnistDataSet mnist2, coop
                 size_t nb_training2 = 0;
                 scanf("%zu", &nb_training2);
 
-                train2(NN, nb_training2, ret);
-                
-                printf("\n");
+                train2(NN, nb_training2, ret, ret2);
                 break;
 
             case 's':
@@ -415,8 +413,8 @@ void input_user(neural_network NN, MnistDataSet mnist, MnistDataSet mnist2, coop
 int main() {
 
     printf("%s", "Launch\n\n");
-    size_t layers_number = 2;
-    size_t layers_sizes[] = {784,300,10};
+    size_t layers_number = 3;
+    size_t layers_sizes[] = {784,300,300,10};
 
     size_t *layers_sizes_ = malloc(sizeof(size_t) * (layers_number + 1));
     for (size_t i = 0; i < layers_number + 1; i++)
@@ -427,8 +425,9 @@ int main() {
     MnistDataSet mnist = mnist_dataset_read("train-images-idx3-ubyte", "train-labels-idx1-ubyte");
     MnistDataSet mnist2 = mnist_dataset_read("t10k-images-idx3-ubyte", "t10k-labels-idx1-ubyte");
     //Matrix(ImageView) sudoku = sudoku_init();
-    coople ret = sudoku_init();
-    input_user(NN, mnist, mnist2, ret);
+    coople ret2 = sudoku_init("examples/image_03.bmp");
+    coople ret = sudoku_init("examples/image_01.bmp");
+    input_user(NN, mnist, mnist2, ret, ret2);
 
     // free the memory
     ia_memory_free(&NN);
