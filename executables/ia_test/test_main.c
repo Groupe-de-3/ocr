@@ -18,6 +18,7 @@
 #include <time.h>
 
 #include "bilinear_sampling.h"
+#include "otsu_threshold.h"
 #include "blood_filling.h"
 #include "box_blur.h"
 #include "canny_edge_detector.h"
@@ -45,22 +46,7 @@
 #include "start.h"
 
 
-static void print_m(float *m) {
-    for (size_t y = 0; y < m_height(m); y++) {
-        for (size_t x = 0; x < m_width(m); x++) {
-            printf("%03.4f", m_get2(m, x, y));
-            printf(" - ");
-        }
-        printf("\n");
-    }
-}
 
-static long timediff(struct timeval start) {
-    struct timeval now;
-    gettimeofday(&now, NULL);
-    return (now.tv_sec - start.tv_sec) * 1000 + now.tv_usec / 1000 -
-           start.tv_usec / 1000;
-}
 
 static void draw_all_lines_on(ImageView *in, HoughLine *lines) {
     some_pixel_t line_colors = (some_pixel_t){
@@ -78,8 +64,8 @@ static void draw_all_lines_on(ImageView *in, HoughLine *lines) {
     }
 }
 
-Matrix(ImageView) sudoku_init(void) {
 
+coople sudoku_init() {
 
     struct timeval start;
 
@@ -93,9 +79,6 @@ Matrix(ImageView) sudoku_init(void) {
     }
     ImageView image_view    = imgv_default(&image);
     image_view.wraping_mode = WrappingMode_Clamp;
-
-    // Save input
-    printf("    Done (%ldms)\n", timediff(start));
 
     size_t target_width =
         image.width > image.height ? 800 : (image.width * 800) / image.height;
@@ -170,7 +153,7 @@ Matrix(ImageView) sudoku_init(void) {
     box_blur_run(&edges_view, &edges_mask_view, 11);
     global_threshold_run(&edges_mask_view, 0.09f);
 
-    blood_fill_largest_blob(&edges_mask_view);
+    blood_fill_largest_blob(&edges_mask_view, false);
 
 
     image_mask_run(&edges_view, &edges_mask_view);
@@ -225,7 +208,7 @@ Matrix(ImageView) sudoku_init(void) {
 
     gettimeofday(&start, NULL);
 
-    Image     sudoku      = img_new(28*9, 28*9, resized.format);
+    Image     sudoku      = img_new(900, 900, resized.format);
     ImageView sudoku_view = imgv_default(&sudoku);
 
     bilinear_perspective_transmute(
@@ -256,40 +239,92 @@ Matrix(ImageView) sudoku_init(void) {
     img_destroy(hough);
 
     sudoku_view.wraping_mode = WrappingMode_Clamp;
-    bmp_save_to_path("SUDOKU_B.bmp", &sudoku_view);
-    gaussian_adaptive_threshold_run(&sudoku_view, 3.f);
-    bmp_save_to_path("SUDOKU_A.bmp", &sudoku_view);
+    Image prep_sudoku = img_new(
+        (size_t)sudoku_view.width, (size_t)sudoku_view.height,
+        PixelFormat_GrayScale
+    );
+    ImageView prep_view = imgv_default(&prep_sudoku);
+    prep_view.wraping_mode= WrappingMode_Clamp;
+    imgv_copy(&sudoku_view, &prep_view);
+    
+    bmp_save_to_path("SUDOKU_A.bmp", &prep_view);
+    // bmp_save_to_path("SUDOKU_B.bmp", &prep_view);
+    
+    Image sudoku_cells = img_new(
+        28 * 9, 28 * 9, PixelFormat_GrayScale
+    );
+    ImageView cells_view = imgv_default(&sudoku_cells);
+    cells_view.wraping_mode= WrappingMode_Clamp;
 
     Matrix(ImageView) sudoku_imgs = m_new(ImageView, 9, 9);
+    Matrix(bool) sudoku_mask = m_new(bool, 9, 9);
+
     for (size_t x = 0; x < 9; x += 1) {
+        int original_start_x = (int)(x * prep_sudoku.width) / 9;
         int start_x = (int)(x * 28 * 9) / 9;
         
         for (size_t y = 0; y < 9; y += 1) {
+            int original_start_y = (int)(y * prep_sudoku.height) / 9;
             int start_y = (int)(y * 28 * 9) / 9;
 
-            //printf("%d x %d\n", start_x, start_y);
-            ImageView view = {
-                .image = &sudoku,
+            // printf("start   : %dx%d\n", start_x, start_y);
+            // printf("og start: %dx%d\n", original_start_x, original_start_y);
+
+            ImageView original_view = {
+                .image = &prep_sudoku,
+                .wraping_mode = WrappingMode_Clamp,
+                .x = original_start_x, .y = original_start_y,
+                .width = sudoku_view.width/9, .height = sudoku_view.height/9
+            };
+
+            double thresh = otsus_method(&original_view);
+            size_t white_pixs = global_threshold_run(&original_view, (float)thresh);
+            // Inverse if there is more white than blacks
+            if ((int)white_pixs > (original_view.width * original_view.height) / 2) {
+                for (int sx = 0; sx < original_view.width; sx++)
+                    for (int sy = 0; sy < original_view.height; sy++)
+                        imgv_set_pixel_grayscale(
+                            &original_view, sx, sy,
+                            1.f - imgv_get_pixel_grayscale(&original_view, sx, sy)
+                        );
+            }
+            
+            long v = blood_fill_largest_weighted_blob(&original_view, blood_fill_center_weighter, true);
+            m_get2(sudoku_mask, x, y) = false;
+            if (v < 500000)
+                continue;
+            m_get2(sudoku_mask, x, y) = true;
+
+            ImageView cell_view = {
+                .image = &sudoku_cells,
                 .wraping_mode = WrappingMode_Clamp,
                 .x = start_x, .y = start_y,
                 .width = 28, .height = 28
             };
+            bilinear_resize(&original_view, &cell_view);
 
-            blood_fill_largest_weighted_blob(&view, blood_fill_center_weighter);
-
-            m_get2(sudoku_imgs, x, y) = view;
+            char bjr[100];
+            snprintf(bjr, 100, "%02zux%02zu.bmp", x, y);
+            // printf("Start %s\n", bjr);
+            bmp_save_to_path(bjr, &cell_view);
+            // printf("End %s\n", bjr);
+            m_get2(sudoku_imgs, x, y) = cell_view;
         }
     }
+    
+    bmp_save_to_path("SUDOKU_Z.bmp", &cells_view);
 
-    bmp_save_to_path("SUDOKU_Z.bmp", &sudoku_view);
- 
-    img_destroy(sudoku);
-    return sudoku_imgs;
+    
+    coople *ret = malloc(sizeof(coople));
+    ret->sudoku_imgs = sudoku_imgs;
+    ret->sudoku_mask = sudoku_mask;
+    //free(sudoku__);
+    //img_destroy(sudoku);
+    return *ret;
 }
 
 
-
-void input_user(neural_network NN, MnistDataSet mnist, MnistDataSet mnist2, Matrix(ImageView) sudoku_imgs)
+void input_user(neural_network NN, MnistDataSet mnist, MnistDataSet mnist2, coople ret)
 {
     char *filename = malloc(sizeof(char) * 30);
     char *output = malloc(sizeof(char) * 30);
@@ -319,21 +354,15 @@ void input_user(neural_network NN, MnistDataSet mnist, MnistDataSet mnist2, Matr
                 }
                 printf("\n");
                 break;
+                
             case 'y':
-                printf("number of sample training? ");
-                size_t nb_training_sample2 = 0;
-                scanf("%zu", &nb_training_sample2);
+
                 printf("number of training? ");
                 size_t nb_training2 = 0;
                 scanf("%zu", &nb_training2);
-                printf("size of sample? ");
-                nb_sample = 0;
-                scanf("%zu", &nb_sample);
-                for (size_t i = 0; i < nb_training_sample2; i++)
-                {
-                    printf(" %zu / %zu\n", i+1, nb_training_sample2);
-                    train2(NN, nb_training2, nb_sample, sudoku_imgs);
-                }
+
+                train2(NN, nb_training2, ret);
+                
                 printf("\n");
                 break;
 
@@ -351,9 +380,11 @@ void input_user(neural_network NN, MnistDataSet mnist, MnistDataSet mnist2, Matr
                 break;
             case 'm':
                 printf("Launch\n");
-                char * sudoku__ = ia_launch(NN, sudoku_imgs);
+                char * sudoku__ = calloc(81 ,sizeof(char));
+                ia_launch(NN, ret.sudoku_mask, ret.sudoku_imgs, sudoku__);
+                //solve(0, 0, sudoku__);
+
                 sudoku_print(sudoku__);
-                free(sudoku__);
                 break;
             
             case 'L':
@@ -384,8 +415,8 @@ void input_user(neural_network NN, MnistDataSet mnist, MnistDataSet mnist2, Matr
 int main() {
 
     printf("%s", "Launch\n\n");
-    size_t layers_number = 3;
-    size_t layers_sizes[] = {784,200,200,10};
+    size_t layers_number = 2;
+    size_t layers_sizes[] = {784,300,10};
 
     size_t *layers_sizes_ = malloc(sizeof(size_t) * (layers_number + 1));
     for (size_t i = 0; i < layers_number + 1; i++)
@@ -395,12 +426,14 @@ int main() {
     neural_network NN = ia_init(layers_number, layers_sizes_);
     MnistDataSet mnist = mnist_dataset_read("train-images-idx3-ubyte", "train-labels-idx1-ubyte");
     MnistDataSet mnist2 = mnist_dataset_read("t10k-images-idx3-ubyte", "t10k-labels-idx1-ubyte");
-    Matrix(ImageView) sudoku = sudoku_init();
-    input_user(NN, mnist, mnist2, sudoku);
+    //Matrix(ImageView) sudoku = sudoku_init();
+    coople ret = sudoku_init();
+    input_user(NN, mnist, mnist2, ret);
 
     // free the memory
     ia_memory_free(&NN);
-    m_destroy(sudoku);
+    m_destroy(ret.sudoku_imgs);
+    m_destroy(ret.sudoku_mask);
     mnist_dataset_destroy(mnist);
     mnist_dataset_destroy(mnist2);
     return 0;

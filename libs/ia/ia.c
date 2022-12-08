@@ -13,23 +13,6 @@
 #include <string.h>
 #include <time.h>
 
-Matrix(double) get_blanck()
-{
-    Matrix(double) res = m_new(double, 1, 784);
-    for(int i = 0; i < 28; i++)
-    {
-        for(int j = 0; j < 28; j++)
-        {
-            if ((unsigned long)rand()%784 < 40)
-                res[j * 28 + i] = 1;
-            else
-                res[j * 28 + i] = 0;
-        }
-            
-    }
-
-    return res;
-}
 
 Matrix(double) arr_to_mat(ImageView img)
 {
@@ -38,7 +21,7 @@ Matrix(double) arr_to_mat(ImageView img)
     {
         for(int j = 0; j < 28; j++)
         {
-            if ((unsigned long)rand()%784 < 40)
+            if ((unsigned long)rand()%784 < 0)
                 res[j * 28 + i] = 1;
             else
             {

@@ -1,6 +1,7 @@
 #pragma once
 #include <stdlib.h>
 #include "matrices.h"
+#include "image_view.h"
 
 typedef struct {
     /*! \brief The number of neurons in the layer.
@@ -62,4 +63,11 @@ typedef struct {
     DataPoint *data;
     int size;
 } Data;
+
+
+typedef struct {
+    Matrix(ImageView) sudoku_imgs;
+    Matrix(bool) sudoku_mask;
+} coople;
+
 

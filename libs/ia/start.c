@@ -25,18 +25,16 @@ int ia_launch_single(neural_network NN, ImageView im)
     return res;
 }
 
-char* ia_launch(neural_network NN, Matrix(bool) images_mask, Matrix(ImageView) images)
+void ia_launch(neural_network NN, Matrix(bool) images_mask, Matrix(ImageView) images, char * sudo)
 {
-    size_t size = m_length(images);
-    char *result = malloc(sizeof(int) * size);
-    for (size_t i = 0; i < size; i++)
+
+    for (size_t i = 0; i < 81; i++)
     {
         if (!images_mask[i])
             continue;
-        result[i] = (char) ia_launch_single(NN, images[i]);
+        sudo[i] = (char) ia_launch_single(NN, images[i]);
     }
-    
-    return result;
+
 }
 
 
@@ -78,16 +76,8 @@ void train(neural_network NN, size_t nb_training, size_t nb_sample, MnistDataSet
     
     Data d = data_init(nb_sample); // a modif
 
-    Matrix(double) input1 = get_blanck();
-    Matrix(double) output1 = m_new(double, 1, NN.layers_sizes[NN.layers_number]);
-    output1[0] = 3;
-    for (size_t j = 1; j < m_length(output1); j++) {
-         output1[j] = 0;
-    }
 
-    d.data[0] = To_dataPoint(input1 , output1);
-
-    for (int i = 1; i < d.size; i++)
+    for (int i = 0; i < d.size; i++)
     {
         unsigned long ind_pic = ((unsigned long)rand()%mnist.size);
         Matrix(double) input = arr_to_mat(imgv_default(&mnist.images[ind_pic]));
@@ -122,14 +112,17 @@ void train(neural_network NN, size_t nb_training, size_t nb_sample, MnistDataSet
 }
 
 
-void train2(neural_network NN, size_t nb_training, size_t nb_sample, Matrix(ImageView) sudo)
+void train2(neural_network NN, size_t nb_training, coople ret)
 {
     //data
+    size_t c = 0;
+    for (int i = 0; i < 81; i++)
+        c += ret.sudoku_mask[i];
     
-    Data d = data_init(nb_sample); // a modif
+    Data d = data_init(c); // a modif
 
 
-    Matrix(size_t) labels = m_new(size_t, 1, m_length(sudo));
+    Matrix(size_t) labels = m_new(size_t, 1, 81);
     size_t labels_[] = {
         5,3,0,0,7,0,0,0,0,
         6,0,0,1,9,5,0,0,0,
@@ -144,20 +137,26 @@ void train2(neural_network NN, size_t nb_training, size_t nb_sample, Matrix(Imag
 
     for (size_t i = 0; i < 81; i++)
         labels[i] = labels_[i];
-    
-    for (int i = 0; i < d.size; i++)
+        
+    int n = 0;
+    for (int i = 0; i < 81; i++)
     {
-        Matrix(double) input = arr_to_mat(sudo[i]);
-        size_t e = labels[i];
-        Matrix(double) output = m_new(double, 1, NN.layers_sizes[NN.layers_number]);
-        for (size_t j = 0; j < m_length(output); j++) {
-            if (e == j)
-                output[j] = 5;
-            else
-                output[j] = 0;
+        if (ret.sudoku_mask[i])
+        {
+            Matrix(double) input = arr_to_mat(ret.sudoku_imgs[i]);
+            size_t e = labels[i];
+            Matrix(double) output = m_new(double, 1, NN.layers_sizes[NN.layers_number]);
+            for (size_t j = 0; j < m_length(output); j++) {
+                if (e == j)
+                    output[j] = 5;
+                else
+                    output[j] = 0;
+            }
+            DataPoint dp = To_dataPoint(input , output);
+            d.data[n] = dp;
+            n++;
         }
-        DataPoint dp = To_dataPoint(input , output);
-        d.data[i] = dp;
+        
     }
 
 
